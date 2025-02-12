@@ -1,11 +1,28 @@
 
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/AppSidebar';
 import SqlConnectionForm from '@/components/SqlConnectionForm';
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4">
-      <SqlConnectionForm />
-    </div>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full">
+        <AppSidebar />
+        <main className="flex-1 overflow-hidden">
+          <div className="h-full flex flex-col">
+            <div className="flex items-center p-4 border-b">
+              <SidebarTrigger />
+              <h1 className="ml-4 text-xl font-semibold">Configuración SQL Server</h1>
+            </div>
+            <div className="flex-1 p-6 overflow-auto">
+              <div className="max-w-4xl mx-auto">
+                <SqlConnectionForm />
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </SidebarProvider>
   );
 };
 
