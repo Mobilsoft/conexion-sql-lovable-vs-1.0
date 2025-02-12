@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Card } from '@/components/ui/card';
+import { Database, Server, Lock, User } from 'lucide-react';
 
 const formSchema = z.object({
   server: z.string().min(1, 'El servidor es requerido'),
@@ -48,7 +49,6 @@ const SqlConnectionForm = () => {
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
     try {
-      // Aquí iría la lógica de conexión al servidor
       console.log('Datos de conexión:', data);
       toast({
         title: 'Conexión exitosa',
@@ -68,120 +68,164 @@ const SqlConnectionForm = () => {
   };
 
   return (
-    <Card className="w-full max-w-md p-6 space-y-6 backdrop-blur-sm bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800">
+    <Card className="w-full max-w-2xl p-8 space-y-8 bg-white/90 dark:bg-slate-900/90 border-0 shadow-lg">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
+        className="space-y-8"
       >
-        <div className="space-y-2 text-center">
-          <h2 className="text-3xl font-semibold tracking-tight">Conexión SQL Server</h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Ingrese los datos de conexión al servidor
+        <div className="space-y-2">
+          <h2 className="text-3xl font-bold tracking-tight text-center">Configuración de Conexión</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 text-center">
+            Ingrese los datos de conexión al servidor SQL Server
           </p>
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-6">
-            <FormField
-              control={form.control}
-              name="server"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Servidor</FormLabel>
-                  <FormControl>
-                    <Input placeholder="ejemplo.database.windows.net" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="server"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <Server className="h-4 w-4" />
+                      Servidor
+                    </FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="ejemplo.database.windows.net" 
+                        className="bg-white dark:bg-slate-900"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="port"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <Server className="h-4 w-4" />
+                      Puerto
+                    </FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="1433" 
+                        className="bg-white dark:bg-slate-900"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="database"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <Database className="h-4 w-4" />
+                      Base de datos
+                    </FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="nombreBaseDatos" 
+                        className="bg-white dark:bg-slate-900"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="useWindowsAuth"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
+                    <div className="space-y-0.5">
+                      <FormLabel className="flex items-center gap-2">
+                        <Lock className="h-4 w-4" />
+                        Autenticación Windows
+                      </FormLabel>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              {!form.watch('useWindowsAuth') && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <User className="h-4 w-4" />
+                          Usuario
+                        </FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="usuario" 
+                            className="bg-white dark:bg-slate-900"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <Lock className="h-4 w-4" />
+                          Contraseña
+                        </FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="password" 
+                            placeholder="••••••••" 
+                            className="bg-white dark:bg-slate-900"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
               )}
-            />
+            </div>
 
-            <FormField
-              control={form.control}
-              name="port"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Puerto</FormLabel>
-                  <FormControl>
-                    <Input placeholder="1433" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="database"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Base de datos</FormLabel>
-                  <FormControl>
-                    <Input placeholder="nombreBaseDatos" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="useWindowsAuth"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-                  <div className="space-y-0.5">
-                    <FormLabel>Autenticación Windows</FormLabel>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            {!form.watch('useWindowsAuth') && (
-              <>
-                <FormField
-                  control={form.control}
-                  name="username"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Usuario</FormLabel>
-                      <FormControl>
-                        <Input placeholder="usuario" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Contraseña</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </>
-            )}
-
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Conectando...' : 'Conectar'}
-            </Button>
+            <div className="pt-4">
+              <Button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-lg font-semibold rounded-lg"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Conectando...' : 'Conectar'}
+              </Button>
+            </div>
           </form>
         </Form>
       </motion.div>
