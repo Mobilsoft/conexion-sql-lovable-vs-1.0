@@ -8,8 +8,26 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { Cliente } from "@/types/cliente";
+import { useState } from "react";
+import { toast } from "@/components/ui/use-toast";
 
 interface ClientesTableProps {
   clientes: Cliente[];
@@ -18,55 +36,86 @@ interface ClientesTableProps {
 }
 
 export function ClientesTable({ clientes, onEdit, onDelete }: ClientesTableProps) {
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+
+  const handleDelete = (id: number) => {
+    onDelete(id);
+    toast({
+      title: "Cliente eliminado",
+      description: "El cliente ha sido eliminado exitosamente.",
+    });
+    setDeleteId(null);
+  };
+
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Nombre</TableHead>
-            <TableHead>Apellido</TableHead>
-            <TableHead>Documento</TableHead>
-            <TableHead>Teléfono</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Dirección</TableHead>
-            <TableHead>Ciudad</TableHead>
-            <TableHead>Estado</TableHead>
-            <TableHead className="text-right">Acciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {clientes.map((cliente) => (
-            <TableRow key={cliente.id}>
-              <TableCell>{cliente.nombre}</TableCell>
-              <TableCell>{cliente.apellido}</TableCell>
-              <TableCell>{cliente.documento}</TableCell>
-              <TableCell>{cliente.telefono}</TableCell>
-              <TableCell>{cliente.email}</TableCell>
-              <TableCell>{cliente.direccion}</TableCell>
-              <TableCell>{cliente.ciudad}</TableCell>
-              <TableCell>{cliente.estado}</TableCell>
-              <TableCell className="text-right">
-                <div className="flex justify-end gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onEdit(cliente)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => cliente.id && onDelete(cliente.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
+    <>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Documento</TableHead>
+              <TableHead>Teléfono</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Ciudad</TableHead>
+              <TableHead className="w-[50px]"></TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+          </TableHeader>
+          <TableBody>
+            {clientes.map((cliente) => (
+              <TableRow key={cliente.id}>
+                <TableCell>{`${cliente.nombre} ${cliente.apellido}`}</TableCell>
+                <TableCell>{cliente.documento}</TableCell>
+                <TableCell>{cliente.telefono}</TableCell>
+                <TableCell>{cliente.email}</TableCell>
+                <TableCell>{cliente.ciudad}</TableCell>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => onEdit(cliente)}>
+                        <Pencil className="mr-2 h-4 w-4" />
+                        Editar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => setDeleteId(cliente.id!)}
+                        className="text-red-600"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Eliminar
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Esto eliminará permanentemente el cliente y todos sus datos asociados.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteId && handleDelete(deleteId)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
