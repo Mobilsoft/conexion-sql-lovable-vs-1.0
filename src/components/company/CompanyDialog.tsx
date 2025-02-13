@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -176,12 +177,32 @@ export function CompanyDialog({
       onOpenChange(false);
     } catch (error: any) {
       console.error('Error completo:', error);
-      console.error('Detalles del error:', error.message);
-      if (error.error) console.error('Error interno:', error.error);
+      
+      // Analizamos el mensaje de error para identificar el campo específico
+      let errorDescription = error.message;
+      
+      if (error.message.includes('violates foreign key constraint')) {
+        // Error de llave foránea
+        const fieldMatch = error.message.match(/companies_(\w+)_fkey/);
+        if (fieldMatch) {
+          const fieldName = fieldMatch[1];
+          errorDescription = `Error en el campo ${fieldName}: La referencia seleccionada no es válida.`;
+        }
+      } else if (error.message.includes('value too long')) {
+        // Error de longitud de campo
+        const fieldMatch = error.message.match(/value too long for type character varying\(\d+\)/);
+        if (fieldMatch) {
+          const columnMatch = error.message.match(/column "([^"]+)"/);
+          if (columnMatch) {
+            const fieldName = columnMatch[1];
+            errorDescription = `Error en el campo ${fieldName}: El valor ingresado es demasiado largo.`;
+          }
+        }
+      }
       
       toast({
         title: "Error en el Proceso",
-        description: `${error.message}. Por favor, verifique los datos e intente nuevamente.`,
+        description: errorDescription,
         variant: "destructive",
       });
     }
