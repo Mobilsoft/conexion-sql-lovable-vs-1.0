@@ -3,7 +3,7 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { CompaniesTable } from '@/components/CompaniesTable';
 import { useState } from 'react';
-import { Company } from '@/types/company';
+import { Company, CodigoCIIU, ActividadComercial, Pais, Departamento, Ciudad, TipoRegimenTributario, TipoDocumento } from '@/types/company';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -17,6 +17,91 @@ const Companies = () => {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
 
+  // Consultas para obtener los datos de las tablas de referencia
+  const { data: codigosCIIU = [] } = useQuery({
+    queryKey: ['codigos_ciiu'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('codigos_ciiu')
+        .select('*')
+        .order('codigo');
+      if (error) throw error;
+      return data as CodigoCIIU[];
+    },
+  });
+
+  const { data: actividadesComerciales = [] } = useQuery({
+    queryKey: ['actividades_comerciales'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('actividades_comerciales')
+        .select('*')
+        .order('nombre');
+      if (error) throw error;
+      return data as ActividadComercial[];
+    },
+  });
+
+  const { data: paises = [] } = useQuery({
+    queryKey: ['paises'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('paises')
+        .select('*')
+        .order('nombre');
+      if (error) throw error;
+      return data as Pais[];
+    },
+  });
+
+  const { data: departamentos = [] } = useQuery({
+    queryKey: ['departamentos'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('departamentos')
+        .select('*')
+        .order('nombre');
+      if (error) throw error;
+      return data as Departamento[];
+    },
+  });
+
+  const { data: ciudades = [] } = useQuery({
+    queryKey: ['ciudades'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('ciudades')
+        .select('*')
+        .order('nombre');
+      if (error) throw error;
+      return data as Ciudad[];
+    },
+  });
+
+  const { data: tiposRegimen = [] } = useQuery({
+    queryKey: ['tipos_regimen_tributario'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('tipos_regimen_tributario')
+        .select('*')
+        .order('nombre');
+      if (error) throw error;
+      return data as TipoRegimenTributario[];
+    },
+  });
+
+  const { data: tiposDocumento = [] } = useQuery({
+    queryKey: ['tipos_documento'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('tipos_documento')
+        .select('*')
+        .order('nombre');
+      if (error) throw error;
+      return data as TipoDocumento[];
+    },
+  });
+
   const formFields: DynamicFormField[] = [
     { name: 'nit', type: 'text', required: true },
     { name: 'dv', type: 'text', required: true },
@@ -25,20 +110,51 @@ const Companies = () => {
     { name: 'segundo_apellido', type: 'text', required: false },
     { name: 'primer_nombre', type: 'text', required: false },
     { name: 'segundo_nombre', type: 'text', required: false },
-    { name: 'tipo_documento', type: 'text', required: true },
+    { 
+      name: 'tipo_documento_id', 
+      type: 'select', 
+      required: true,
+      options: tiposDocumento.map(td => ({ value: td.id.toString(), label: td.nombre }))
+    },
     { name: 'numero_documento', type: 'text', required: true },
     { name: 'tipo_empresa', type: 'text', required: true },
     { name: 'naturaleza_empresa', type: 'text', required: true },
-    { name: 'codigo_ciuu', type: 'text', required: true },
+    { 
+      name: 'codigo_ciiu_id', 
+      type: 'select', 
+      required: true,
+      options: codigosCIIU.map(c => ({ value: c.id.toString(), label: `${c.codigo} - ${c.descripcion}` }))
+    },
+    { 
+      name: 'actividad_comercial_id', 
+      type: 'select', 
+      required: true,
+      options: actividadesComerciales.map(ac => ({ value: ac.id.toString(), label: ac.nombre }))
+    },
     { name: 'descripcion_actividad', type: 'textarea', required: true },
     { name: 'fecha_constitucion', type: 'date', required: true },
     { name: 'direccion', type: 'text', required: true },
     { name: 'direccion_principal', type: 'text', required: true },
     { name: 'barrio', type: 'text', required: true },
-    { name: 'ciudad', type: 'text', required: true },
+    { 
+      name: 'pais_id', 
+      type: 'select', 
+      required: true,
+      options: paises.map(p => ({ value: p.id.toString(), label: p.nombre }))
+    },
+    { 
+      name: 'departamento_id', 
+      type: 'select', 
+      required: true,
+      options: departamentos.map(d => ({ value: d.id.toString(), label: d.nombre }))
+    },
+    { 
+      name: 'ciudad_id', 
+      type: 'select', 
+      required: true,
+      options: ciudades.map(c => ({ value: c.id.toString(), label: c.nombre }))
+    },
     { name: 'municipio', type: 'text', required: true },
-    { name: 'departamento', type: 'text', required: true },
-    { name: 'pais', type: 'text', required: true },
     { name: 'telefono', type: 'text', required: true },
     { name: 'telefono_fijo', type: 'text', required: false },
     { name: 'telefono_movil', type: 'text', required: true },
@@ -46,8 +162,19 @@ const Companies = () => {
     { name: 'correo_electronico', type: 'email', required: true },
     { name: 'pagina_web', type: 'url', required: false },
     { name: 'tipo_contribuyente', type: 'text', required: true },
-    { name: 'regimen_tributario', type: 'text', required: true },
+    { 
+      name: 'tipo_regimen_id', 
+      type: 'select', 
+      required: true,
+      options: tiposRegimen.map(tr => ({ value: tr.id.toString(), label: tr.nombre }))
+    },
     { name: 'responsabilidad_fiscal', type: 'text', required: true },
+    { name: 'categoria', type: 'text', required: false },
+    { name: 'tipo_permiso', type: 'text', required: false },
+    { name: 'numero_permiso', type: 'text', required: false },
+    { name: 'numero_matricula', type: 'text', required: false },
+    { name: 'estado_empresa', type: 'text', required: false },
+    { name: 'estado_dian', type: 'text', required: false },
     { name: 'sucursales', type: 'checkbox', required: false },
     { name: 'comentarios', type: 'textarea', required: false },
   ];

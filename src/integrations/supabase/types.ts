@@ -9,6 +9,71 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      actividades_comerciales: {
+        Row: {
+          created_at: string | null
+          descripcion: string | null
+          id: number
+          master_detail: string | null
+          nombre: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          descripcion?: string | null
+          id?: number
+          master_detail?: string | null
+          nombre: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          descripcion?: string | null
+          id?: number
+          master_detail?: string | null
+          nombre?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      ciudades: {
+        Row: {
+          codigo: string | null
+          created_at: string | null
+          departamento_id: number | null
+          id: number
+          master_detail: string | null
+          nombre: string
+          updated_at: string | null
+        }
+        Insert: {
+          codigo?: string | null
+          created_at?: string | null
+          departamento_id?: number | null
+          id?: number
+          master_detail?: string | null
+          nombre: string
+          updated_at?: string | null
+        }
+        Update: {
+          codigo?: string | null
+          created_at?: string | null
+          departamento_id?: number | null
+          id?: number
+          master_detail?: string | null
+          nombre?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ciudades_departamento_id_fkey"
+            columns: ["departamento_id"]
+            isOneToOne: false
+            referencedRelation: "departamentos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clientes: {
         Row: {
           apellido: string
@@ -54,19 +119,55 @@ export type Database = {
         }
         Relationships: []
       }
+      codigos_ciiu: {
+        Row: {
+          codigo: string
+          created_at: string | null
+          descripcion: string
+          id: number
+          master_detail: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          codigo: string
+          created_at?: string | null
+          descripcion: string
+          id?: number
+          master_detail?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          codigo?: string
+          created_at?: string | null
+          descripcion?: string
+          id?: number
+          master_detail?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       companies: {
         Row: {
+          actividad_comercial_id: number | null
           barrio: string | null
+          camara_comercio_file_name: string | null
+          camara_comercio_file_url: string | null
+          categoria: string | null
           ciudad: string | null
+          ciudad_id: number | null
+          codigo_ciiu_id: number | null
           codigo_ciuu: string | null
           comentarios: string | null
           correo_electronico: string | null
           departamento: string
+          departamento_id: number | null
           descripcion_actividad: string | null
           direccion: string
           direccion_principal: string | null
           dv: string
           email: string
+          estado_dian: string | null
+          estado_empresa: string | null
           fecha_actualizacion: string | null
           fecha_constitucion: string | null
           fecha_creacion: string | null
@@ -75,13 +176,18 @@ export type Database = {
           naturaleza_empresa: string | null
           nit: string
           numero_documento: string | null
+          numero_matricula: string | null
+          numero_permiso: string | null
           pagina_web: string | null
           pais: string | null
+          pais_id: number | null
           primer_apellido: string | null
           primer_nombre: string | null
           razon_social: string
           regimen_tributario: string | null
           responsabilidad_fiscal: string | null
+          rut_file_name: string | null
+          rut_file_url: string | null
           segundo_apellido: string | null
           segundo_nombre: string | null
           sucursales: boolean | null
@@ -90,20 +196,32 @@ export type Database = {
           telefono_movil: string | null
           tipo_contribuyente: string
           tipo_documento: string | null
+          tipo_documento_id: number | null
           tipo_empresa: string | null
+          tipo_permiso: string | null
+          tipo_regimen_id: number | null
         }
         Insert: {
+          actividad_comercial_id?: number | null
           barrio?: string | null
+          camara_comercio_file_name?: string | null
+          camara_comercio_file_url?: string | null
+          categoria?: string | null
           ciudad?: string | null
+          ciudad_id?: number | null
+          codigo_ciiu_id?: number | null
           codigo_ciuu?: string | null
           comentarios?: string | null
           correo_electronico?: string | null
           departamento: string
+          departamento_id?: number | null
           descripcion_actividad?: string | null
           direccion: string
           direccion_principal?: string | null
           dv: string
           email: string
+          estado_dian?: string | null
+          estado_empresa?: string | null
           fecha_actualizacion?: string | null
           fecha_constitucion?: string | null
           fecha_creacion?: string | null
@@ -112,13 +230,18 @@ export type Database = {
           naturaleza_empresa?: string | null
           nit: string
           numero_documento?: string | null
+          numero_matricula?: string | null
+          numero_permiso?: string | null
           pagina_web?: string | null
           pais?: string | null
+          pais_id?: number | null
           primer_apellido?: string | null
           primer_nombre?: string | null
           razon_social: string
           regimen_tributario?: string | null
           responsabilidad_fiscal?: string | null
+          rut_file_name?: string | null
+          rut_file_url?: string | null
           segundo_apellido?: string | null
           segundo_nombre?: string | null
           sucursales?: boolean | null
@@ -127,20 +250,32 @@ export type Database = {
           telefono_movil?: string | null
           tipo_contribuyente: string
           tipo_documento?: string | null
+          tipo_documento_id?: number | null
           tipo_empresa?: string | null
+          tipo_permiso?: string | null
+          tipo_regimen_id?: number | null
         }
         Update: {
+          actividad_comercial_id?: number | null
           barrio?: string | null
+          camara_comercio_file_name?: string | null
+          camara_comercio_file_url?: string | null
+          categoria?: string | null
           ciudad?: string | null
+          ciudad_id?: number | null
+          codigo_ciiu_id?: number | null
           codigo_ciuu?: string | null
           comentarios?: string | null
           correo_electronico?: string | null
           departamento?: string
+          departamento_id?: number | null
           descripcion_actividad?: string | null
           direccion?: string
           direccion_principal?: string | null
           dv?: string
           email?: string
+          estado_dian?: string | null
+          estado_empresa?: string | null
           fecha_actualizacion?: string | null
           fecha_constitucion?: string | null
           fecha_creacion?: string | null
@@ -149,13 +284,18 @@ export type Database = {
           naturaleza_empresa?: string | null
           nit?: string
           numero_documento?: string | null
+          numero_matricula?: string | null
+          numero_permiso?: string | null
           pagina_web?: string | null
           pais?: string | null
+          pais_id?: number | null
           primer_apellido?: string | null
           primer_nombre?: string | null
           razon_social?: string
           regimen_tributario?: string | null
           responsabilidad_fiscal?: string | null
+          rut_file_name?: string | null
+          rut_file_url?: string | null
           segundo_apellido?: string | null
           segundo_nombre?: string | null
           sucursales?: boolean | null
@@ -164,7 +304,125 @@ export type Database = {
           telefono_movil?: string | null
           tipo_contribuyente?: string
           tipo_documento?: string | null
+          tipo_documento_id?: number | null
           tipo_empresa?: string | null
+          tipo_permiso?: string | null
+          tipo_regimen_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "companies_actividad_comercial_id_fkey"
+            columns: ["actividad_comercial_id"]
+            isOneToOne: false
+            referencedRelation: "actividades_comerciales"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "companies_ciudad_id_fkey"
+            columns: ["ciudad_id"]
+            isOneToOne: false
+            referencedRelation: "ciudades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "companies_codigo_ciiu_id_fkey"
+            columns: ["codigo_ciiu_id"]
+            isOneToOne: false
+            referencedRelation: "codigos_ciiu"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "companies_departamento_id_fkey"
+            columns: ["departamento_id"]
+            isOneToOne: false
+            referencedRelation: "departamentos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "companies_pais_id_fkey"
+            columns: ["pais_id"]
+            isOneToOne: false
+            referencedRelation: "paises"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "companies_tipo_documento_id_fkey"
+            columns: ["tipo_documento_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_documento"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "companies_tipo_regimen_id_fkey"
+            columns: ["tipo_regimen_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_regimen_tributario"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      departamentos: {
+        Row: {
+          codigo: string | null
+          created_at: string | null
+          id: number
+          master_detail: string | null
+          nombre: string
+          pais_id: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          codigo?: string | null
+          created_at?: string | null
+          id?: number
+          master_detail?: string | null
+          nombre: string
+          pais_id?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          codigo?: string | null
+          created_at?: string | null
+          id?: number
+          master_detail?: string | null
+          nombre?: string
+          pais_id?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "departamentos_pais_id_fkey"
+            columns: ["pais_id"]
+            isOneToOne: false
+            referencedRelation: "paises"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      paises: {
+        Row: {
+          codigo: string | null
+          created_at: string | null
+          id: number
+          master_detail: string | null
+          nombre: string
+          updated_at: string | null
+        }
+        Insert: {
+          codigo?: string | null
+          created_at?: string | null
+          id?: number
+          master_detail?: string | null
+          nombre: string
+          updated_at?: string | null
+        }
+        Update: {
+          codigo?: string | null
+          created_at?: string | null
+          id?: number
+          master_detail?: string | null
+          nombre?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -419,6 +677,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tipos_documento: {
+        Row: {
+          codigo: string | null
+          created_at: string | null
+          id: number
+          master_detail: string | null
+          nombre: string
+          updated_at: string | null
+        }
+        Insert: {
+          codigo?: string | null
+          created_at?: string | null
+          id?: number
+          master_detail?: string | null
+          nombre: string
+          updated_at?: string | null
+        }
+        Update: {
+          codigo?: string | null
+          created_at?: string | null
+          id?: number
+          master_detail?: string | null
+          nombre?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      tipos_regimen_tributario: {
+        Row: {
+          created_at: string | null
+          descripcion: string | null
+          id: number
+          master_detail: string | null
+          nombre: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          descripcion?: string | null
+          id?: number
+          master_detail?: string | null
+          nombre: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          descripcion?: string | null
+          id?: number
+          master_detail?: string | null
+          nombre?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       users: {
         Row: {
