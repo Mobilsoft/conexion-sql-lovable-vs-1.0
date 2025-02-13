@@ -12,6 +12,7 @@ import { CompanyCommercialInfo } from './CompanyCommercialInfo';
 import { UseFormReturn } from "react-hook-form";
 import * as z from "zod";
 import { formSchema } from '@/pages/Companies';
+import { toast } from '@/hooks/use-toast';
 
 interface CompanyFormProps {
   form: UseFormReturn<z.infer<typeof formSchema>>;
@@ -36,11 +37,20 @@ export function CompanyForm({
   actividadesComerciales,
   tiposRegimen
 }: CompanyFormProps) {
-  console.log('Renderizando formulario con valores:', form.getValues());
+  console.log('CompanyForm - Renderizando formulario con valores:', form.getValues());
   
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
-    console.log('Enviando formulario con datos:', data);
-    await onSubmit(data);
+    try {
+      console.log('CompanyForm - Enviando formulario con datos:', data);
+      await onSubmit(data);
+    } catch (error) {
+      console.error('Error en CompanyForm handleSubmit:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Ocurrió un error al enviar el formulario.",
+      });
+    }
   };
 
   return (

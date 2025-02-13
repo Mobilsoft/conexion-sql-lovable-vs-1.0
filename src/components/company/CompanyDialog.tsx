@@ -14,6 +14,7 @@ import { formSchema } from '@/pages/Companies';
 import { CompanyForm } from './CompanyForm';
 import { useCompanyData } from '@/hooks/useCompanyData';
 import { useCompanyForm } from './useCompanyForm';
+import { toast } from '@/hooks/use-toast';
 
 interface CompanyDialogProps {
   open: boolean;
@@ -31,7 +32,7 @@ export function CompanyDialog({
   departamentos
 }: CompanyDialogProps) {
   const { codigosCIIU, actividadesComerciales, tiposRegimen } = useCompanyData();
-  const { handleSubmit } = useCompanyForm({ onOpenChange, editingCompany, departamentos, ciudades });
+  const { handleSubmit: handleFormSubmit } = useCompanyForm({ onOpenChange, editingCompany, departamentos, ciudades });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -75,8 +76,21 @@ export function CompanyDialog({
   console.log('Form values:', form.getValues());
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log('Formulario enviado con valores:', values);
-    await handleSubmit(values);
+    try {
+      console.log('CompanyDialog - Formulario enviado con valores:', values);
+      toast({
+        title: "Procesando...",
+        description: "Guardando los datos de la compañía.",
+      });
+      await handleFormSubmit(values);
+    } catch (error) {
+      console.error('Error en CompanyDialog onSubmit:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Ocurrió un error al procesar el formulario.",
+      });
+    }
   };
 
   return (
