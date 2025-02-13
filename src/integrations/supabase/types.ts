@@ -392,7 +392,6 @@ export type Database = {
           table_name: string
           row_count: number
           size_in_kb: number
-          master_detail: string
         }[]
       }
     }
