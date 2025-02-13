@@ -51,7 +51,6 @@ export function CompanyDialog({
       codigo_ciiu_id: editingCompany.codigo_ciiu_id?.toString() || "",
       actividad_comercial_id: editingCompany.actividad_comercial_id?.toString() || "",
       tipo_regimen_id: editingCompany.tipo_regimen_id?.toString() || "",
-      numero_documento: editingCompany.numero_documento || "",
       municipio: editingCompany.municipio || "",
     } : {
       tipo_documento_id: "",
@@ -68,7 +67,6 @@ export function CompanyDialog({
       codigo_ciiu_id: "",
       actividad_comercial_id: "",
       tipo_regimen_id: "",
-      numero_documento: "",
       municipio: "",
     },
   });

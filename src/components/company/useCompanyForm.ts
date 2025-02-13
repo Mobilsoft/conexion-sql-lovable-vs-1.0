@@ -24,7 +24,6 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
         dv: values.dv.substring(0, 1),
         razon_social: values.razon_social,
         tipo_documento_id: parseInt(values.tipo_documento_id),
-        numero_documento: values.numero_documento,
         tipo_contribuyente: values.tipo_contribuyente,
         direccion: values.direccion,
         direccion_principal: values.direccion,
