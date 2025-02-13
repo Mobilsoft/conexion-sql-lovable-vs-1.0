@@ -183,6 +183,50 @@ export function CompanyBasicInfo({ form }: CompanyBasicInfoProps) {
           </FormItem>
         )}
       />
+
+      <FormField
+        control={form.control}
+        name="ciudad_id"
+        render={({ field }) => (
+          <FormItem className="col-span-4">
+            <FormLabel>Ciudad</FormLabel>
+            <Select onValueChange={field.onChange} value={field.value}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccione ciudad" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {ciudades.map((ciudad) => (
+                  <SelectItem key={ciudad.id} value={ciudad.id.toString()}>
+                    {ciudad.nombre}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="departamento_id"
+        render={({ field }) => (
+          <FormItem className="col-span-3">
+            <FormLabel>Departamento</FormLabel>
+            <FormControl>
+              <Input
+                {...field}
+                readOnly
+                value={departamentos.find(d => d.id === parseInt(field.value))?.nombre || ''}
+                className="bg-gray-100"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
 }
