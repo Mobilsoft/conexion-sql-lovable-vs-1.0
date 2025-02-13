@@ -1,15 +1,16 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
-// Definimos un tipo simple para las tablas
-type TableName = string;
+// Definimos los tipos de tablas permitidos explícitamente
+type ValidTable = 'tipos_documento' | 'departamentos' | 'ciudades' | 'paises' | 
+                 'codigos_ciiu' | 'actividades_comerciales' | 'tipos_regimen_tributario';
 
 interface FieldValidation {
   maxLength?: number;
   required?: boolean;
   type?: string;
   foreignKey?: {
-    table: TableName;
+    table: ValidTable;
     field: string;
   };
 }
@@ -77,7 +78,7 @@ const isValidEmail = (email: string): boolean => {
 };
 
 // Función para verificar si un ID existe en una tabla relacionada
-const verifyForeignKeyExists = async (table: TableName, field: string, value: number): Promise<boolean> => {
+const verifyForeignKeyExists = async (table: ValidTable, field: string, value: number): Promise<boolean> => {
   try {
     const { data, error } = await supabase
       .from(table)
