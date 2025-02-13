@@ -1,22 +1,86 @@
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
-import { CompaniesTable } from '@/components/CompaniesTable';
 import { useState } from 'react';
-import { Company, CodigoCIIU, ActividadComercial, Pais, Departamento, Ciudad, TipoRegimenTributario, TipoDocumento } from '@/types/company';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
-import { DynamicForm } from '@/components/DynamicForm';
-import { DynamicFormField } from '@/types/table-structure';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Plus } from 'lucide-react';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CompaniesTable } from '@/components/CompaniesTable';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Company, CodigoCIIU, ActividadComercial, Pais, Departamento, Ciudad, TipoRegimenTributario, TipoDocumento } from '@/types/company';
+
+const formSchema = z.object({
+  nit: z.string().min(1, "El NIT es requerido"),
+  dv: z.string().min(1, "El DV es requerido"),
+  razon_social: z.string().min(1, "La razón social es requerida"),
+  tipo_documento_id: z.string(),
+  numero_documento: z.string(),
+  tipo_contribuyente: z.string(),
+  direccion: z.string(),
+  telefono: z.string(),
+  email: z.string().email("Email inválido"),
+  // ... add other validations as needed
+});
 
 const Companies = () => {
-  const [editingCompany, setEditingCompany] = useState<Company | null>(null);
   const [open, setOpen] = useState(false);
+  const [editingCompany, setEditingCompany] = useState<Company | null>(null);
   const queryClient = useQueryClient();
 
-  // Consultas para obtener los datos de las tablas de referencia
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      nit: "",
+      dv: "",
+      razon_social: "",
+      tipo_documento_id: "",
+      numero_documento: "",
+      tipo_contribuyente: "",
+      direccion: "",
+      telefono: "",
+      email: "",
+      // ... add other default values
+    },
+  });
+
+  // Query hooks
+  const { data: tiposDocumento = [] } = useQuery({
+    queryKey: ['tipos_documento'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('tipos_documento')
+        .select('*')
+        .order('nombre');
+      if (error) throw error;
+      return data as TipoDocumento[];
+    },
+  });
+
   const { data: codigosCIIU = [] } = useQuery({
     queryKey: ['codigos_ciiu'],
     queryFn: async () => {
@@ -89,95 +153,6 @@ const Companies = () => {
     },
   });
 
-  const { data: tiposDocumento = [] } = useQuery({
-    queryKey: ['tipos_documento'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('tipos_documento')
-        .select('*')
-        .order('nombre');
-      if (error) throw error;
-      return data as TipoDocumento[];
-    },
-  });
-
-  const formFields: DynamicFormField[] = [
-    { name: 'nit', type: 'text', required: true },
-    { name: 'dv', type: 'text', required: true },
-    { name: 'razon_social', type: 'text', required: true },
-    { name: 'primer_apellido', type: 'text', required: false },
-    { name: 'segundo_apellido', type: 'text', required: false },
-    { name: 'primer_nombre', type: 'text', required: false },
-    { name: 'segundo_nombre', type: 'text', required: false },
-    { 
-      name: 'tipo_documento_id', 
-      type: 'select', 
-      required: true,
-      options: tiposDocumento.map(td => ({ value: td.id.toString(), label: td.nombre }))
-    },
-    { name: 'numero_documento', type: 'text', required: true },
-    { name: 'tipo_empresa', type: 'text', required: true },
-    { name: 'naturaleza_empresa', type: 'text', required: true },
-    { 
-      name: 'codigo_ciiu_id', 
-      type: 'select', 
-      required: true,
-      options: codigosCIIU.map(c => ({ value: c.id.toString(), label: `${c.codigo} - ${c.descripcion}` }))
-    },
-    { 
-      name: 'actividad_comercial_id', 
-      type: 'select', 
-      required: true,
-      options: actividadesComerciales.map(ac => ({ value: ac.id.toString(), label: ac.nombre }))
-    },
-    { name: 'descripcion_actividad', type: 'textarea', required: true },
-    { name: 'fecha_constitucion', type: 'date', required: true },
-    { name: 'direccion', type: 'text', required: true },
-    { name: 'direccion_principal', type: 'text', required: true },
-    { name: 'barrio', type: 'text', required: true },
-    { 
-      name: 'pais_id', 
-      type: 'select', 
-      required: true,
-      options: paises.map(p => ({ value: p.id.toString(), label: p.nombre }))
-    },
-    { 
-      name: 'departamento_id', 
-      type: 'select', 
-      required: true,
-      options: departamentos.map(d => ({ value: d.id.toString(), label: d.nombre }))
-    },
-    { 
-      name: 'ciudad_id', 
-      type: 'select', 
-      required: true,
-      options: ciudades.map(c => ({ value: c.id.toString(), label: c.nombre }))
-    },
-    { name: 'municipio', type: 'text', required: true },
-    { name: 'telefono', type: 'text', required: true },
-    { name: 'telefono_fijo', type: 'text', required: false },
-    { name: 'telefono_movil', type: 'text', required: true },
-    { name: 'email', type: 'email', required: true },
-    { name: 'correo_electronico', type: 'email', required: true },
-    { name: 'pagina_web', type: 'url', required: false },
-    { name: 'tipo_contribuyente', type: 'text', required: true },
-    { 
-      name: 'tipo_regimen_id', 
-      type: 'select', 
-      required: true,
-      options: tiposRegimen.map(tr => ({ value: tr.id.toString(), label: tr.nombre }))
-    },
-    { name: 'responsabilidad_fiscal', type: 'text', required: true },
-    { name: 'categoria', type: 'text', required: false },
-    { name: 'tipo_permiso', type: 'text', required: false },
-    { name: 'numero_permiso', type: 'text', required: false },
-    { name: 'numero_matricula', type: 'text', required: false },
-    { name: 'estado_empresa', type: 'text', required: false },
-    { name: 'estado_dian', type: 'text', required: false },
-    { name: 'sucursales', type: 'checkbox', required: false },
-    { name: 'comentarios', type: 'textarea', required: false },
-  ];
-
   const { data: companies = [], isLoading } = useQuery({
     queryKey: ['companies'],
     queryFn: async () => {
@@ -200,31 +175,30 @@ const Companies = () => {
     },
   });
 
-  const handleSave = async (company: Company) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const { 
-        fecha_creacion,
-        fecha_actualizacion,
-        master_detail,
-        ...rest
-      } = company;
-
-      const departamento = departamentos.find(d => d.id === company.departamento_id)?.nombre || '';
+      const departamento = departamentos.find(d => d.id === parseInt(values.departamento_id))?.nombre || '';
 
       const companyData = {
-        ...rest,
+        ...values,
         departamento,
-        master_detail: 'M'
+        master_detail: 'M',
+        tipo_documento_id: parseInt(values.tipo_documento_id),
+        departamento_id: parseInt(values.departamento_id),
+        ciudad_id: parseInt(values.ciudad_id),
+        pais_id: parseInt(values.pais_id),
+        codigo_ciiu_id: parseInt(values.codigo_ciiu_id),
+        actividad_comercial_id: parseInt(values.actividad_comercial_id),
+        tipo_regimen_id: parseInt(values.tipo_regimen_id),
       };
 
       if (editingCompany) {
         const { error } = await supabase
           .from('companies')
           .update(companyData)
-          .eq('nit', company.nit);
+          .eq('nit', values.nit);
 
         if (error) throw error;
-
         toast({
           title: "Compañía actualizada",
           description: "Los datos de la compañía han sido actualizados exitosamente.",
@@ -235,7 +209,6 @@ const Companies = () => {
           .insert(companyData);
 
         if (error) throw error;
-
         toast({
           title: "Compañía registrada",
           description: "La compañía ha sido registrada exitosamente.",
@@ -251,41 +224,6 @@ const Companies = () => {
         description: error.message,
         variant: "destructive",
       });
-    }
-  };
-
-  const handleEdit = (company: Company) => {
-    setEditingCompany(company);
-    setOpen(true);
-  };
-
-  const handleDelete = async (nit: string) => {
-    try {
-      const { error } = await supabase
-        .from('companies')
-        .delete()
-        .eq('nit', nit);
-
-      if (error) throw error;
-
-      queryClient.invalidateQueries({ queryKey: ['companies'] });
-      toast({
-        title: "Compañía eliminada",
-        description: "La compañía ha sido eliminada exitosamente.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error al eliminar",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleOpenChange = (open: boolean) => {
-    setOpen(open);
-    if (!open) {
-      setEditingCompany(null);
     }
   };
 
@@ -308,19 +246,157 @@ const Companies = () => {
             <div className="flex-1 p-6 overflow-auto">
               <div className="max-w-6xl mx-auto space-y-6">
                 <CompaniesTable 
-                  companies={companies} 
-                  onEdit={handleEdit} 
-                  onDelete={handleDelete}
+                  companies={companies}
+                  onEdit={setEditingCompany}
                   isLoading={isLoading}
                 />
-                <DynamicForm 
-                  open={open}
-                  onOpenChange={handleOpenChange}
-                  onSave={handleSave}
-                  fields={formFields}
-                  tableName="Compañía"
-                  initialData={editingCompany}
-                />
+
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <DialogContent className="max-w-4xl">
+                    <DialogHeader>
+                      <DialogTitle>
+                        {editingCompany ? "Editar Compañía" : "Nueva Compañía"}
+                      </DialogTitle>
+                    </DialogHeader>
+                    <Form {...form}>
+                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-4">
+                            <h2 className="text-lg font-semibold">Información Básica</h2>
+                            
+                            <FormField
+                              control={form.control}
+                              name="tipo_contribuyente"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Tipo de Contribuyente</FormLabel>
+                                  <Select 
+                                    onValueChange={field.onChange} 
+                                    defaultValue={field.value}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Seleccione el tipo de contribuyente" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="Responsable de IVA">Responsable de IVA</SelectItem>
+                                      <SelectItem value="No Responsable de IVA">No Responsable de IVA</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <FormField
+                                control={form.control}
+                                name="nit"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>NIT</FormLabel>
+                                    <FormControl>
+                                      <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              <FormField
+                                control={form.control}
+                                name="dv"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>DV</FormLabel>
+                                    <FormControl>
+                                      <Input {...field} maxLength={1} />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+
+                            <FormField
+                              control={form.control}
+                              name="razon_social"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Razón Social</FormLabel>
+                                  <FormControl>
+                                    <Input {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name="direccion"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Dirección</FormLabel>
+                                  <FormControl>
+                                    <Input {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+
+                          <div className="space-y-4">
+                            <h2 className="text-lg font-semibold">Información de Contacto</h2>
+                            
+                            <FormField
+                              control={form.control}
+                              name="email"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Email</FormLabel>
+                                  <FormControl>
+                                    <Input {...field} type="email" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name="telefono"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Teléfono</FormLabel>
+                                  <FormControl>
+                                    <Input {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setOpen(false)}
+                          >
+                            Cancelar
+                          </Button>
+                          <Button type="submit">
+                            {editingCompany ? "Actualizar" : "Guardar"}
+                          </Button>
+                        </div>
+                      </form>
+                    </Form>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </div>
