@@ -1,4 +1,3 @@
-
 /**
  * Companies.tsx
  * Main component for managing company data
@@ -368,7 +367,11 @@ const Companies = () => {
                           <AccordionItem value="item-1" className="border rounded-lg bg-gray-50/30">
                             <AccordionTrigger className="px-4">Información Básica</AccordionTrigger>
                             <AccordionContent className="p-4">
-                              <CompanyBasicInfo form={form} />
+                              <CompanyBasicInfo 
+                                form={form} 
+                                ciudades={ciudades} 
+                                departamentos={departamentos}
+                              />
                             </AccordionContent>
                           </AccordionItem>
 

@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Building2, Mail, Phone } from "lucide-react";
@@ -11,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Ciudad, Departamento } from "@/types/company";
 
 // Import the form schema from Companies.tsx
 import { formSchema } from "../../pages/Companies";
@@ -19,9 +19,11 @@ type FormData = z.infer<typeof formSchema>;
 
 interface CompanyBasicInfoProps {
   form: UseFormReturn<FormData>;
+  ciudades: Ciudad[];
+  departamentos: Departamento[];
 }
 
-export function CompanyBasicInfo({ form }: CompanyBasicInfoProps) {
+export function CompanyBasicInfo({ form, ciudades, departamentos }: CompanyBasicInfoProps) {
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="grid grid-cols-12 gap-4 col-span-12">
