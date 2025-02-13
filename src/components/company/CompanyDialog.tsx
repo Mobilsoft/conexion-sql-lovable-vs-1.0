@@ -141,9 +141,11 @@ export function CompanyDialog({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <Accordion type="single" collapsible defaultValue="item-1" className="w-full space-y-4">
-              <AccordionItem value="item-1" className="border rounded-lg bg-gray-50/30">
-                <AccordionTrigger className="px-4">Información Básica</AccordionTrigger>
-                <AccordionContent className="p-4">
+              <AccordionItem value="item-1" className="border rounded-lg">
+                <AccordionTrigger className="px-4 bg-[#F2FCE2] hover:bg-[#E5F7D3] rounded-t-lg">
+                  <span className="font-medium text-[#2E7D32]">Información Básica</span>
+                </AccordionTrigger>
+                <AccordionContent className="p-4 bg-white">
                   <CompanyBasicInfo 
                     form={form} 
                     ciudades={ciudades} 

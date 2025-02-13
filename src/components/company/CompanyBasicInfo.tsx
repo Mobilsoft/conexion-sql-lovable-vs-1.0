@@ -1,7 +1,8 @@
+
 import { Input } from "@/components/ui/input";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Building2, Mail, Phone } from "lucide-react";
-import { UseFormReturn } from "react-hook-form";
+import { UseFormReturn, useWatch } from "react-hook-form";
 import { z } from "zod";
 import {
   Select,
@@ -11,8 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Ciudad, Departamento } from "@/types/company";
-
-// Import the form schema from Companies.tsx
+import { useEffect } from "react";
+import { calculateDV } from "@/utils/dvCalculator";
 import { formSchema } from "../../pages/Companies";
 
 type FormData = z.infer<typeof formSchema>;
@@ -24,6 +25,28 @@ interface CompanyBasicInfoProps {
 }
 
 export function CompanyBasicInfo({ form, ciudades, departamentos }: CompanyBasicInfoProps) {
+  const nit = useWatch({ control: form.control, name: "nit" });
+  const selectedCiudadId = useWatch({ control: form.control, name: "ciudad_id" });
+
+  useEffect(() => {
+    if (nit) {
+      const dv = calculateDV(nit);
+      form.setValue("dv", dv);
+    }
+  }, [nit, form]);
+
+  useEffect(() => {
+    if (selectedCiudadId) {
+      const ciudad = ciudades.find(c => c.id.toString() === selectedCiudadId);
+      if (ciudad) {
+        const departamento = departamentos.find(d => d.id === ciudad.departamento_id);
+        if (departamento) {
+          form.setValue("departamento_id", departamento.id.toString());
+        }
+      }
+    }
+  }, [selectedCiudadId, ciudades, departamentos, form]);
+
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="grid grid-cols-12 gap-4 col-span-12">
@@ -78,7 +101,8 @@ export function CompanyBasicInfo({ form, ciudades, departamentos }: CompanyBasic
               <FormControl>
                 <Input
                   {...field}
-                  maxLength={1}
+                  readOnly
+                  className="bg-gray-100"
                 />
               </FormControl>
               <FormMessage />
@@ -221,7 +245,7 @@ export function CompanyBasicInfo({ form, ciudades, departamentos }: CompanyBasic
               <Input
                 {...field}
                 readOnly
-                value={departamentos.find(d => d.id === parseInt(field.value))?.nombre || ''}
+                value={departamentos.find(d => d.id.toString() === field.value)?.nombre || ''}
                 className="bg-gray-100"
               />
             </FormControl>
