@@ -37,62 +37,61 @@ serve(async (req) => {
       },
       options: {
         encrypt: true,
-        trustServerCertificate: true
+        trustServerCertificate: true,
+        enableArithAbort: true
       }
     }
 
     console.log('Intentando conectar a:', data.server)
     
-    // Conectar a SQL Server
-    await sql.connect(config)
-    console.log('Conexión establecida exitosamente')
+    let pool = null
+    try {
+      // Crear un nuevo pool de conexiones
+      pool = await sql.connect(config)
+      console.log('Conexión establecida exitosamente')
 
-    let result
+      let result
 
-    switch (action) {
-      case 'getTableStats':
-        console.log('Ejecutando consulta getTableStats')
-        result = await sql.query`
-          SELECT 
-            t.name AS table_name,
-            p.rows AS row_count,
-            (SUM(a.used_pages) * 8.0 / 1024) AS size_in_kb
-          FROM sys.tables t
-          INNER JOIN sys.indexes i ON t.object_id = i.object_id
-          INNER JOIN sys.partitions p ON i.object_id = p.object_id AND i.index_id = p.index_id
-          INNER JOIN sys.allocation_units a ON p.partition_id = a.container_id
-          GROUP BY t.name, p.rows
-          ORDER BY t.name;
-        `
-        break
+      switch (action) {
+        case 'getTableStats':
+          console.log('Ejecutando consulta getTableStats')
+          result = await pool.request().query(`
+            SELECT 
+              t.name AS table_name,
+              p.rows AS row_count,
+              (SUM(a.used_pages) * 8.0 / 1024) AS size_in_kb
+            FROM sys.tables t
+            INNER JOIN sys.indexes i ON t.object_id = i.object_id
+            INNER JOIN sys.partitions p ON i.object_id = p.object_id AND i.index_id = p.index_id
+            INNER JOIN sys.allocation_units a ON p.partition_id = a.container_id
+            GROUP BY t.name, p.rows
+            ORDER BY t.name;
+          `)
+          break
 
-      default:
-        throw new Error('Acción no válida: ' + action)
-    }
-
-    await sql.close()
-    console.log('Conexión cerrada exitosamente')
-
-    return new Response(
-      JSON.stringify({ success: true, data: result.recordset || result }),
-      { 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
+        default:
+          throw new Error('Acción no válida: ' + action)
       }
-    )
+
+      return new Response(
+        JSON.stringify({ success: true, data: result.recordset || result }),
+        { 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json' 
+          } 
+        }
+      )
+    } finally {
+      if (pool) {
+        await pool.close()
+        console.log('Conexión cerrada exitosamente')
+      }
+    }
 
   } catch (error) {
     console.error('Error en la función edge:', error)
     
-    // Asegurarse de cerrar la conexión en caso de error
-    try {
-      await sql.close()
-    } catch (closeError) {
-      console.error('Error al cerrar la conexión:', closeError)
-    }
-
     return new Response(
       JSON.stringify({ 
         success: false, 
@@ -100,7 +99,7 @@ serve(async (req) => {
         details: error.toString()
       }),
       { 
-        status: 400,
+        status: 500,
         headers: { 
           ...corsHeaders, 
           'Content-Type': 'application/json' 

@@ -11,9 +11,8 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     proxy: {
       '/api/sql-server-connection': {
-        target: 'http://145.223.75.189:1433',
+        target: 'http://localhost:54321/functions/v1/sql-server-connection',
         changeOrigin: true,
-        secure: false,
         rewrite: (path) => path.replace(/^\/api\/sql-server-connection/, ''),
       },
     },
