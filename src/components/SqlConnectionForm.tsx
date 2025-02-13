@@ -11,6 +11,7 @@ import FormHeader from './sql/FormHeader';
 import ConnectionFields from './sql/ConnectionFields';
 import DatabaseStats from './DatabaseStats';
 import { sqlConnectionSchema, type SqlConnectionFormValues, type TableStats } from '@/types/sql-connection';
+import { supabase } from '@/integrations/supabase/client';
 
 const SqlConnectionForm = () => {
   const { toast } = useToast();
@@ -37,12 +38,8 @@ const SqlConnectionForm = () => {
         password: '***********'
       });
 
-      const response = await fetch('http://localhost:54321/functions/v1/sql-server-connection', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data: result, error } = await supabase.functions.invoke('sql-server-connection', {
+        body: {
           action: 'getTableStats',
           data: {
             server: data.server,
@@ -52,18 +49,14 @@ const SqlConnectionForm = () => {
             password: data.password,
             useWindowsAuth: data.useWindowsAuth,
           }
-        }),
+        },
       });
 
-      const responseText = await response.text();
-      console.log('Respuesta cruda:', responseText);
+      console.log('Respuesta recibida:', result);
 
-      if (!response.ok) {
-        throw new Error(`Error del servidor: ${response.status} ${responseText}`);
+      if (error) {
+        throw error;
       }
-
-      const result = JSON.parse(responseText);
-      console.log('Respuesta parseada:', result);
 
       if (!result.success) {
         throw new Error(result.error || 'Error desconocido en la conexión');
