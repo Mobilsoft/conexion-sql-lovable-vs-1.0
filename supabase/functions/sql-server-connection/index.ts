@@ -41,7 +41,7 @@ serve(async (req) => {
       server: data.server,
       port: parseInt(data.port),
       options: {
-        encrypt: false,  // Cambiado a false para conexiones locales/directas
+        encrypt: false,
         trustServerCertificate: true,
         enableArithAbort: true
       },
@@ -50,14 +50,12 @@ serve(async (req) => {
         min: 0,
         idleTimeoutMillis: 30000
       },
-      connectionTimeout: 15000,  // Reducido a 15 segundos para fallar más rápido si hay problemas
-      requestTimeout: 15000      // Reducido a 15 segundos
+      connectionTimeout: 15000,
+      requestTimeout: 15000
     }
 
     try {
       console.log('Iniciando conexión a SQL Server...')
-      
-      // Crear un pool de conexiones
       const pool = await mssql.connect(config)
       console.log('Conexión establecida exitosamente')
 
@@ -79,6 +77,27 @@ serve(async (req) => {
             ORDER BY t.name;
           `)
           console.log('Consulta ejecutada exitosamente')
+          break
+
+        case 'getTableStructure':
+          console.log('Obteniendo estructura de tabla:', data.tableName)
+          result = await pool.request()
+            .input('tableName', mssql.VarChar, data.tableName)
+            .query(`
+              SELECT 
+                c.name AS column_name,
+                t.name AS data_type,
+                c.is_nullable,
+                OBJECT_DEFINITION(c.default_object_id) as column_default,
+                c.max_length,
+                c.precision,
+                c.scale
+              FROM sys.columns c
+              INNER JOIN sys.types t ON c.user_type_id = t.user_type_id
+              WHERE object_id = OBJECT_ID(@tableName)
+              ORDER BY c.column_id;
+            `)
+          console.log('Estructura de tabla obtenida exitosamente')
           break
 
         default:

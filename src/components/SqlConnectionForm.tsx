@@ -17,6 +17,7 @@ const SqlConnectionForm = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [tableStats, setTableStats] = useState<TableStats[]>([]);
+  const [connectionData, setConnectionData] = useState<any>(null);
 
   const form = useForm<SqlConnectionFormValues>({
     resolver: zodResolver(sqlConnectionSchema),
@@ -59,6 +60,7 @@ const SqlConnectionForm = () => {
       }
 
       setTableStats(result.data);
+      setConnectionData(data);
 
       toast({
         title: 'Conexión exitosa',
@@ -74,6 +76,7 @@ const SqlConnectionForm = () => {
         duration: 3000,
       });
       setTableStats([]);
+      setConnectionData(null);
     } finally {
       setIsLoading(false);
     }
@@ -105,7 +108,7 @@ const SqlConnectionForm = () => {
           </Form>
         </motion.div>
       </Card>
-      <DatabaseStats stats={tableStats} />
+      <DatabaseStats stats={tableStats} connectionData={connectionData} />
     </>
   );
 };

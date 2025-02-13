@@ -132,6 +132,50 @@ export type Database = {
         }
         Relationships: []
       }
+      table_structures: {
+        Row: {
+          column_default: string | null
+          column_name: string
+          created_at: string | null
+          data_type: string
+          id: number
+          is_nullable: boolean
+          sql_connection_id: number | null
+          table_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          column_default?: string | null
+          column_name: string
+          created_at?: string | null
+          data_type: string
+          id?: number
+          is_nullable: boolean
+          sql_connection_id?: number | null
+          table_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          column_default?: string | null
+          column_name?: string
+          created_at?: string | null
+          data_type?: string
+          id?: number
+          is_nullable?: boolean
+          sql_connection_id?: number | null
+          table_name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "table_structures_sql_connection_id_fkey"
+            columns: ["sql_connection_id"]
+            isOneToOne: false
+            referencedRelation: "sql_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       task_attachments: {
         Row: {
           created_at: string | null

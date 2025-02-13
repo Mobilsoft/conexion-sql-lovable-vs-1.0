@@ -9,7 +9,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
-import { Database } from "lucide-react";
+import { Database, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { TableStructureDialog } from "./TableStructureDialog";
 
 interface TableStats {
   table_name: string;
@@ -17,7 +19,9 @@ interface TableStats {
   size_in_kb: number;
 }
 
-const DatabaseStats = ({ stats }: { stats: TableStats[] }) => {
+const DatabaseStats = ({ stats, connectionData }: { stats: TableStats[], connectionData: any }) => {
+  const [selectedTable, setSelectedTable] = useState<string | null>(null);
+
   if (!stats?.length) return null;
 
   return (
@@ -34,6 +38,7 @@ const DatabaseStats = ({ stats }: { stats: TableStats[] }) => {
             <TableHead>Tabla</TableHead>
             <TableHead className="text-right">Registros</TableHead>
             <TableHead className="text-right">Tamaño (KB)</TableHead>
+            <TableHead className="text-right">Acciones</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -42,10 +47,26 @@ const DatabaseStats = ({ stats }: { stats: TableStats[] }) => {
               <TableCell className="font-medium">{stat.table_name}</TableCell>
               <TableCell className="text-right">{stat.row_count.toLocaleString()}</TableCell>
               <TableCell className="text-right">{stat.size_in_kb.toFixed(2)}</TableCell>
+              <TableCell className="text-right">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setSelectedTable(stat.table_name)}
+                >
+                  <FileText className="h-4 w-4" />
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
+      <TableStructureDialog
+        open={!!selectedTable}
+        onOpenChange={(open) => !open && setSelectedTable(null)}
+        tableName={selectedTable || ''}
+        connectionData={connectionData}
+      />
     </Card>
   );
 };
