@@ -20,6 +20,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { CompanyBasicInfo } from './CompanyBasicInfo';
+import { CompanyCommercialInfo } from './CompanyCommercialInfo';
 import { toast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
@@ -101,8 +102,8 @@ export function CompanyDialog({
 
         if (error) throw error;
         toast({
-          title: "Compañía actualizada",
-          description: "Los datos de la compañía han sido actualizados exitosamente.",
+          title: "¡Actualización Exitosa!",
+          description: "Los datos de la compañía han sido actualizados correctamente.",
         });
       } else {
         const { error } = await supabase
@@ -111,8 +112,8 @@ export function CompanyDialog({
 
         if (error) throw error;
         toast({
-          title: "Compañía registrada",
-          description: "La compañía ha sido registrada exitosamente.",
+          title: "¡Registro Exitoso!",
+          description: "La compañía ha sido registrada correctamente en el sistema.",
         });
       }
 
@@ -120,8 +121,8 @@ export function CompanyDialog({
       onOpenChange(false);
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message,
+        title: "Error en el Proceso",
+        description: `${error.message}. Por favor, verifique los datos e intente nuevamente.`,
         variant: "destructive",
       });
     }
@@ -151,6 +152,15 @@ export function CompanyDialog({
                     ciudades={ciudades} 
                     departamentos={departamentos}
                   />
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-2" className="border rounded-lg">
+                <AccordionTrigger className="px-4 bg-[#F2FCE2] hover:bg-[#E5F7D3] rounded-t-lg">
+                  <span className="font-medium text-[#2E7D32]">Información Comercial</span>
+                </AccordionTrigger>
+                <AccordionContent className="p-4 bg-white">
+                  <CompanyCommercialInfo form={form} />
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
