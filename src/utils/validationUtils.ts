@@ -2,14 +2,16 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
 
-type TableNames = keyof Database['public']['Tables'];
+// Definimos explícitamente las tablas que usaremos
+type ValidTables = 'tipos_documento' | 'departamentos' | 'ciudades' | 'paises' | 
+                   'codigos_ciiu' | 'actividades_comerciales' | 'tipos_regimen_tributario';
 
 interface FieldValidation {
   maxLength?: number;
   required?: boolean;
   type?: string;
   foreignKey?: {
-    table: TableNames;
+    table: ValidTables;
     field: string;
   };
 }
@@ -28,12 +30,11 @@ const fieldConstraints: Record<string, FieldValidation> = {
   direccion: { maxLength: 255, required: true },
   telefono: { maxLength: 20, required: true },
   email: { maxLength: 100, required: true, type: 'email' },
-  municipio: { maxLength: 100 }, // Removemos required: true ya que se maneja en el esquema Zod
+  municipio: { maxLength: 100 },
   master_detail: { maxLength: 10 },
   estado_empresa: { maxLength: 50 },
   naturaleza_empresa: { maxLength: 50 },
   tipo_empresa: { maxLength: 50 },
-  // Definición de campos con llaves foráneas
   tipo_documento_id: { 
     required: true, 
     type: 'number',
@@ -78,7 +79,7 @@ const isValidEmail = (email: string): boolean => {
 };
 
 // Función para verificar si un ID existe en una tabla relacionada
-const verifyForeignKeyExists = async (table: TableNames, field: string, value: number): Promise<boolean> => {
+const verifyForeignKeyExists = async (table: ValidTables, field: string, value: number): Promise<boolean> => {
   try {
     const { data, error } = await supabase
       .from(table)
