@@ -202,16 +202,12 @@ const Companies = () => {
 
   const handleSave = async (company: Company) => {
     try {
-      const { departamento_id, ciudad_id, pais_id, ...restCompany } = company;
-      
-      const companyData = {
-        ...restCompany,
-        departamento_id,
-        ciudad_id,
-        pais_id,
-        master_detail: 'M',
-        fecha_actualizacion: new Date().toISOString(),
-      };
+      const { 
+        fecha_creacion,
+        fecha_actualizacion,
+        master_detail,
+        ...companyData 
+      } = company;
 
       if (editingCompany) {
         const { error } = await supabase
@@ -228,10 +224,7 @@ const Companies = () => {
       } else {
         const { error } = await supabase
           .from('companies')
-          .insert({
-            ...companyData,
-            fecha_creacion: new Date().toISOString(),
-          });
+          .insert(companyData);
 
         if (error) throw error;
 
