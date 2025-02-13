@@ -8,12 +8,21 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const { action, data } = await req.json()
+    console.log('Recibiendo petición:', req.method)
+    const body = await req.json()
+    console.log('Datos recibidos:', JSON.stringify(body))
+
+    const { action, data } = body
+
+    if (!action || !data) {
+      throw new Error('Se requieren los campos action y data')
+    }
 
     const config = {
       user: data.username,
@@ -32,13 +41,17 @@ serve(async (req) => {
       }
     }
 
+    console.log('Intentando conectar a:', data.server)
+    
     // Conectar a SQL Server
     await sql.connect(config)
+    console.log('Conexión establecida exitosamente')
 
     let result
 
     switch (action) {
       case 'getTableStats':
+        console.log('Ejecutando consulta getTableStats')
         result = await sql.query`
           SELECT 
             t.name AS table_name,
@@ -54,23 +67,44 @@ serve(async (req) => {
         break
 
       default:
-        throw new Error('Acción no válida')
+        throw new Error('Acción no válida: ' + action)
     }
 
     await sql.close()
+    console.log('Conexión cerrada exitosamente')
 
     return new Response(
       JSON.stringify({ success: true, data: result.recordset || result }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        } 
+      }
     )
 
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error en la función edge:', error)
+    
+    // Asegurarse de cerrar la conexión en caso de error
+    try {
+      await sql.close()
+    } catch (closeError) {
+      console.error('Error al cerrar la conexión:', closeError)
+    }
+
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ 
+        success: false, 
+        error: error.message || 'Error interno del servidor',
+        details: error.toString()
+      }),
       { 
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        }
       }
     )
   }

@@ -32,6 +32,11 @@ const SqlConnectionForm = () => {
   const onSubmit = async (data: SqlConnectionFormValues) => {
     setIsLoading(true);
     try {
+      console.log('Enviando datos de conexión:', {
+        ...data,
+        password: '***********'
+      });
+
       const response = await fetch('/api/sql-server-connection', {
         method: 'POST',
         headers: {
@@ -41,7 +46,7 @@ const SqlConnectionForm = () => {
           action: 'getTableStats',
           data: {
             server: data.server,
-            port: parseInt(data.port),
+            port: data.port,
             database: data.database,
             username: data.username,
             password: data.password,
@@ -50,10 +55,17 @@ const SqlConnectionForm = () => {
         }),
       });
 
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error en la respuesta:', response.status, errorText);
+        throw new Error(`Error del servidor: ${response.status} ${errorText}`);
+      }
+
       const result = await response.json();
+      console.log('Respuesta recibida:', result);
 
       if (!result.success) {
-        throw new Error(result.error);
+        throw new Error(result.error || 'Error desconocido en la conexión');
       }
 
       setTableStats(result.data);
