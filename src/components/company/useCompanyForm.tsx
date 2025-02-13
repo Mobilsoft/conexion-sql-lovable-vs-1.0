@@ -38,22 +38,22 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
         nit: values.nit,
         dv: values.dv.substring(0, 1),
         razon_social: values.razon_social,
-        tipo_documento_id: parseInt(values.tipo_documento_id),
-        tipo_contribuyente: parseInt(values.tipo_contribuyente),
+        tipo_documento_id: values.tipo_documento_id,
+        tipo_contribuyente: values.tipo_contribuyente,
         direccion: values.direccion,
         direccion_principal: values.direccion,
         telefono: values.telefono,
         telefono_movil: values.telefono,
         email: values.email,
         correo_electronico: values.email,
-        departamento_id: parseInt(values.departamento_id),
+        departamento_id: values.departamento_id,
         departamento: departamentos.find(d => d.id === parseInt(values.departamento_id))?.nombre || '',
-        ciudad_id: parseInt(values.ciudad_id),
+        ciudad_id: values.ciudad_id,
         ciudad: ciudades.find(c => c.id === parseInt(values.ciudad_id))?.nombre || '',
         pais_id: 1,
-        codigo_ciiu_id: parseInt(values.codigo_ciiu_id),
-        actividad_comercial_id: parseInt(values.actividad_comercial_id),
-        tipo_regimen_id: parseInt(values.tipo_regimen_id),
+        codigo_ciiu_id: values.codigo_ciiu_id,
+        actividad_comercial_id: values.actividad_comercial_id,
+        tipo_regimen_id: values.tipo_regimen_id,
         municipio: values.municipio,
         master_detail: 'M',
         estado_empresa: 'Activo',
@@ -93,17 +93,21 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
         duration: 100000,
       });
 
-      // Enviar al servidor SQL Server
-      const { data, error } = await supabase.functions.invoke('sql-server-connection', {
+      // Enviar al servidor SQL Server a través de la Edge Function
+      const { data: response, error: functionError } = await supabase.functions.invoke('sql-server-connection', {
         body: {
           action: editingCompany ? 'updateCompany' : 'insertCompany',
           data: companyData
         }
       });
 
-      if (error) throw error;
+      if (functionError) throw functionError;
 
-      console.log('Respuesta del servidor:', data);
+      console.log('Respuesta del servidor:', response);
+
+      if (!response.success) {
+        throw new Error(response.error || 'Error al procesar la solicitud');
+      }
 
       // Actualizar progress 75%
       toastInstance.update({
@@ -117,27 +121,23 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
         duration: 100000,
       });
       
-      if (data.success) {
-        // Progress 100% y mensaje de éxito
-        toastInstance.update({
-          title: editingCompany ? "¡Actualización Exitosa!" : "¡Registro Exitoso!",
-          description: (
-            <div className="w-full space-y-2">
-              <p>{`La compañía ${companyData.razon_social} ha sido ${editingCompany ? 'actualizada' : 'registrada'} correctamente.`}</p>
-              <Progress value={100} className="w-full" />
-            </div>
-          ),
-          duration: 3000,
-        });
+      // Progress 100% y mensaje de éxito
+      toastInstance.update({
+        title: editingCompany ? "¡Actualización Exitosa!" : "¡Registro Exitoso!",
+        description: (
+          <div className="w-full space-y-2">
+            <p>{`La compañía ${companyData.razon_social} ha sido ${editingCompany ? 'actualizada' : 'registrada'} correctamente.`}</p>
+            <Progress value={100} className="w-full" />
+          </div>
+        ),
+        duration: 3000,
+      });
 
-        // Invalidar la consulta para refrescar la tabla
-        await queryClient.invalidateQueries({ queryKey: ['companies'] });
-        
-        // Cerrar el diálogo y reiniciar el formulario
-        onOpenChange(false);
-      } else {
-        throw new Error(data.error || 'Error al procesar la solicitud');
-      }
+      // Invalidar la consulta para refrescar la tabla
+      await queryClient.invalidateQueries({ queryKey: ['companies'] });
+      
+      // Cerrar el diálogo
+      onOpenChange(false);
       
     } catch (error: any) {
       console.error('Error completo:', error);

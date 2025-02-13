@@ -2,7 +2,7 @@
 import { serve } from "https://deno.land/std@0.204.0/http/server.ts"
 import { getConnection, clearConnection } from "./db/connection.ts"
 import { corsHeaders, handleCors } from "./utils/cors.ts"
-import { Connection, Request } from "npm:tedious@15.1.0"
+import { Connection, Request, TYPES } from "npm:tedious@15.1.0"
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -76,10 +76,31 @@ serve(async (req) => {
           }
         })
 
-        // Agregar parámetros
-        Object.entries(data).forEach(([key, value]) => {
-          request.addParameter(key, value)
-        })
+        // Agregar parámetros con sus tipos correspondientes
+        request.addParameter('nit', TYPES.VarChar, data.nit)
+        request.addParameter('dv', TYPES.VarChar, data.dv)
+        request.addParameter('razon_social', TYPES.VarChar, data.razon_social)
+        request.addParameter('tipo_documento_id', TYPES.Int, parseInt(data.tipo_documento_id))
+        request.addParameter('tipo_contribuyente', TYPES.VarChar, data.tipo_contribuyente)
+        request.addParameter('direccion', TYPES.VarChar, data.direccion)
+        request.addParameter('direccion_principal', TYPES.VarChar, data.direccion_principal)
+        request.addParameter('telefono', TYPES.VarChar, data.telefono)
+        request.addParameter('telefono_movil', TYPES.VarChar, data.telefono_movil)
+        request.addParameter('email', TYPES.VarChar, data.email)
+        request.addParameter('correo_electronico', TYPES.VarChar, data.correo_electronico)
+        request.addParameter('departamento_id', TYPES.Int, parseInt(data.departamento_id))
+        request.addParameter('departamento', TYPES.VarChar, data.departamento)
+        request.addParameter('ciudad_id', TYPES.Int, parseInt(data.ciudad_id))
+        request.addParameter('ciudad', TYPES.VarChar, data.ciudad)
+        request.addParameter('pais_id', TYPES.Int, data.pais_id)
+        request.addParameter('codigo_ciiu_id', TYPES.Int, parseInt(data.codigo_ciiu_id))
+        request.addParameter('actividad_comercial_id', TYPES.Int, parseInt(data.actividad_comercial_id))
+        request.addParameter('tipo_regimen_id', TYPES.Int, parseInt(data.tipo_regimen_id))
+        request.addParameter('municipio', TYPES.VarChar, data.municipio)
+        request.addParameter('master_detail', TYPES.Char, data.master_detail)
+        request.addParameter('estado_empresa', TYPES.VarChar, data.estado_empresa)
+        request.addParameter('naturaleza_empresa', TYPES.VarChar, data.naturaleza_empresa)
+        request.addParameter('tipo_empresa', TYPES.VarChar, data.tipo_empresa)
 
         connection.execSql(request)
       })
@@ -120,10 +141,30 @@ serve(async (req) => {
           }
         })
 
-        // Agregar parámetros
-        Object.entries(data).forEach(([key, value]) => {
-          request.addParameter(key, value)
-        })
+        // Agregar parámetros con sus tipos correspondientes
+        request.addParameter('nit', TYPES.VarChar, data.nit)
+        request.addParameter('dv', TYPES.VarChar, data.dv)
+        request.addParameter('razon_social', TYPES.VarChar, data.razon_social)
+        request.addParameter('tipo_documento_id', TYPES.Int, parseInt(data.tipo_documento_id))
+        request.addParameter('tipo_contribuyente', TYPES.VarChar, data.tipo_contribuyente)
+        request.addParameter('direccion', TYPES.VarChar, data.direccion)
+        request.addParameter('direccion_principal', TYPES.VarChar, data.direccion_principal)
+        request.addParameter('telefono', TYPES.VarChar, data.telefono)
+        request.addParameter('telefono_movil', TYPES.VarChar, data.telefono_movil)
+        request.addParameter('email', TYPES.VarChar, data.email)
+        request.addParameter('correo_electronico', TYPES.VarChar, data.correo_electronico)
+        request.addParameter('departamento_id', TYPES.Int, parseInt(data.departamento_id))
+        request.addParameter('departamento', TYPES.VarChar, data.departamento)
+        request.addParameter('ciudad_id', TYPES.Int, parseInt(data.ciudad_id))
+        request.addParameter('ciudad', TYPES.VarChar, data.ciudad)
+        request.addParameter('pais_id', TYPES.Int, data.pais_id)
+        request.addParameter('codigo_ciiu_id', TYPES.Int, parseInt(data.codigo_ciiu_id))
+        request.addParameter('actividad_comercial_id', TYPES.Int, parseInt(data.actividad_comercial_id))
+        request.addParameter('tipo_regimen_id', TYPES.Int, parseInt(data.tipo_regimen_id))
+        request.addParameter('municipio', TYPES.VarChar, data.municipio)
+        request.addParameter('estado_empresa', TYPES.VarChar, data.estado_empresa)
+        request.addParameter('naturaleza_empresa', TYPES.VarChar, data.naturaleza_empresa)
+        request.addParameter('tipo_empresa', TYPES.VarChar, data.tipo_empresa)
 
         connection.execSql(request)
       })
