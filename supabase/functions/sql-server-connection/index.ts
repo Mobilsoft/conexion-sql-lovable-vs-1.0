@@ -1,7 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.204.0/http/server.ts"
 import { getConnection, clearConnection } from "./db/connection.ts"
-import { getTableStats, getTableStructure, insertCompany, updateCompany } from "./services/tableService.ts"
+import { getTableStats, getTableStructure, insertCompany, updateCompany, initializeDatabase } from "./services/tableService.ts"
 import { corsHeaders, handleCors } from "./utils/cors.ts"
 
 serve(async (req) => {
@@ -24,6 +24,12 @@ serve(async (req) => {
 
     const pool = await getConnection(data)
     let result
+
+    // Inicializar base de datos si es necesario
+    if (action === 'getTableStats') {
+      console.log('Verificando y creando estructura de base de datos...')
+      await initializeDatabase(pool)
+    }
 
     switch (action) {
       case 'getTableStats':
