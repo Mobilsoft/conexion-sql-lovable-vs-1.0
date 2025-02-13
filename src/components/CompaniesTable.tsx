@@ -51,11 +51,11 @@ export function CompaniesTable({ companies, onEdit, onDelete, isLoading }: Compa
           <TableHeader>
             <TableRow>
               <TableHead>NIT</TableHead>
-              <TableHead>DV</TableHead>
               <TableHead>Razón Social</TableHead>
-              <TableHead>Tipo Contribuyente</TableHead>
-              <TableHead>Email</TableHead>
+              <TableHead>Tipo Empresa</TableHead>
+              <TableHead>Ciudad</TableHead>
               <TableHead>Teléfono</TableHead>
+              <TableHead>Email</TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -63,11 +63,11 @@ export function CompaniesTable({ companies, onEdit, onDelete, isLoading }: Compa
             {[...Array(5)].map((_, index) => (
               <TableRow key={index}>
                 <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
-                <TableCell><Skeleton className="h-4 w-[30px]" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-[200px]" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-[120px]" /></TableCell>
-                <TableCell><Skeleton className="h-4 w-[180px]" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-[180px]" /></TableCell>
                 <TableCell><Skeleton className="h-8 w-8 rounded-full" /></TableCell>
               </TableRow>
             ))}
@@ -84,11 +84,11 @@ export function CompaniesTable({ companies, onEdit, onDelete, isLoading }: Compa
           <TableHeader>
             <TableRow>
               <TableHead>NIT</TableHead>
-              <TableHead>DV</TableHead>
               <TableHead>Razón Social</TableHead>
-              <TableHead>Tipo Contribuyente</TableHead>
-              <TableHead>Email</TableHead>
+              <TableHead>Tipo Empresa</TableHead>
+              <TableHead>Ciudad</TableHead>
               <TableHead>Teléfono</TableHead>
+              <TableHead>Email</TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -96,11 +96,11 @@ export function CompaniesTable({ companies, onEdit, onDelete, isLoading }: Compa
             {companies.map((company) => (
               <TableRow key={company.nit}>
                 <TableCell>{company.nit}</TableCell>
-                <TableCell>{company.dv}</TableCell>
                 <TableCell>{company.razon_social}</TableCell>
-                <TableCell>{company.tipo_contribuyente}</TableCell>
-                <TableCell>{company.email}</TableCell>
-                <TableCell>{company.telefono}</TableCell>
+                <TableCell>{company.tipo_empresa}</TableCell>
+                <TableCell>{company.ciudad}</TableCell>
+                <TableCell>{company.telefono_movil || company.telefono_fijo}</TableCell>
+                <TableCell>{company.correo_electronico}</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

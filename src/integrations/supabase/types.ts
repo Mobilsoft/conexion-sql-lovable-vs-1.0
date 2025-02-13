@@ -56,46 +56,115 @@ export type Database = {
       }
       companies: {
         Row: {
+          barrio: string | null
+          ciudad: string | null
+          codigo_ciuu: string | null
+          comentarios: string | null
+          correo_electronico: string | null
           departamento: string
+          descripcion_actividad: string | null
           direccion: string
+          direccion_principal: string | null
           dv: string
           email: string
           fecha_actualizacion: string | null
+          fecha_constitucion: string | null
           fecha_creacion: string | null
           master_detail: string | null
           municipio: string
+          naturaleza_empresa: string | null
           nit: string
+          numero_documento: string | null
+          pagina_web: string | null
+          pais: string | null
+          primer_apellido: string | null
+          primer_nombre: string | null
           razon_social: string
+          regimen_tributario: string | null
+          responsabilidad_fiscal: string | null
+          segundo_apellido: string | null
+          segundo_nombre: string | null
+          sucursales: boolean | null
           telefono: string
+          telefono_fijo: string | null
+          telefono_movil: string | null
           tipo_contribuyente: string
+          tipo_documento: string | null
+          tipo_empresa: string | null
         }
         Insert: {
+          barrio?: string | null
+          ciudad?: string | null
+          codigo_ciuu?: string | null
+          comentarios?: string | null
+          correo_electronico?: string | null
           departamento: string
+          descripcion_actividad?: string | null
           direccion: string
+          direccion_principal?: string | null
           dv: string
           email: string
           fecha_actualizacion?: string | null
+          fecha_constitucion?: string | null
           fecha_creacion?: string | null
           master_detail?: string | null
           municipio: string
+          naturaleza_empresa?: string | null
           nit: string
+          numero_documento?: string | null
+          pagina_web?: string | null
+          pais?: string | null
+          primer_apellido?: string | null
+          primer_nombre?: string | null
           razon_social: string
+          regimen_tributario?: string | null
+          responsabilidad_fiscal?: string | null
+          segundo_apellido?: string | null
+          segundo_nombre?: string | null
+          sucursales?: boolean | null
           telefono: string
+          telefono_fijo?: string | null
+          telefono_movil?: string | null
           tipo_contribuyente: string
+          tipo_documento?: string | null
+          tipo_empresa?: string | null
         }
         Update: {
+          barrio?: string | null
+          ciudad?: string | null
+          codigo_ciuu?: string | null
+          comentarios?: string | null
+          correo_electronico?: string | null
           departamento?: string
+          descripcion_actividad?: string | null
           direccion?: string
+          direccion_principal?: string | null
           dv?: string
           email?: string
           fecha_actualizacion?: string | null
+          fecha_constitucion?: string | null
           fecha_creacion?: string | null
           master_detail?: string | null
           municipio?: string
+          naturaleza_empresa?: string | null
           nit?: string
+          numero_documento?: string | null
+          pagina_web?: string | null
+          pais?: string | null
+          primer_apellido?: string | null
+          primer_nombre?: string | null
           razon_social?: string
+          regimen_tributario?: string | null
+          responsabilidad_fiscal?: string | null
+          segundo_apellido?: string | null
+          segundo_nombre?: string | null
+          sucursales?: boolean | null
           telefono?: string
+          telefono_fijo?: string | null
+          telefono_movil?: string | null
           tipo_contribuyente?: string
+          tipo_documento?: string | null
+          tipo_empresa?: string | null
         }
         Relationships: []
       }
