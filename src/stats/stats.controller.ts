@@ -3,23 +3,23 @@ import { Controller, Get } from '@nestjs/common';
 import { StatsService } from './stats.service';
 import { StatsResponse } from '../types/table-stats';
 
-@Controller()
+@Controller('stats')
 export class StatsController {
   constructor(private readonly statsService: StatsService) {}
 
   @Get()
-  async getTableStats(): Promise<StatsResponse> {
+  async getTableStats() {
     try {
       const data = await this.statsService.getTableStats();
       return {
         success: true,
         data
-      };
+      } as StatsResponse;
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Error al obtener estadísticas de tablas'
-      };
+      } as StatsResponse;
     }
   }
 }
