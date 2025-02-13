@@ -5,15 +5,8 @@ import { Building2, Mail, Phone } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 
-// Using the existing form schema from Companies.tsx
-const formSchema = z.object({
-  nit: z.string().min(1, "El NIT es requerido"),
-  dv: z.string().min(1, "El DV es requerido"),
-  razon_social: z.string().min(1, "La razón social es requerida"),
-  direccion: z.string(),
-  email: z.string().email("Email inválido"),
-  telefono: z.string(),
-});
+// Import the form schema from Companies.tsx
+import { formSchema } from "../../pages/Companies";
 
 type FormData = z.infer<typeof formSchema>;
 

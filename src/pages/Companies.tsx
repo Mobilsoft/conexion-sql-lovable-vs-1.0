@@ -1,3 +1,4 @@
+
 /**
  * Companies.tsx
  * Main component for managing company data
@@ -57,7 +58,7 @@ import {
 } from '@/types/company';
 import { CompanyBasicInfo } from '@/components/company/CompanyBasicInfo';
 
-const formSchema = z.object({
+export const formSchema = z.object({
   tipo_documento_id: z.string(),
   nit: z.string().min(1, "El NIT es requerido"),
   dv: z.string().min(1, "El DV es requerido"),
