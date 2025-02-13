@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Building2, Mail, Phone } from "lucide-react";
@@ -55,7 +54,6 @@ export function CompanyBasicInfo({ form }: CompanyBasicInfoProps) {
                 <Input
                   {...field}
                   maxLength={1}
-                  placeholder="0"
                 />
               </FormControl>
               <FormMessage />
