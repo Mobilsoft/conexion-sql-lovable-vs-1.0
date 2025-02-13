@@ -42,11 +42,15 @@ export function DynamicForm({
   const generateValidationSchema = () => {
     const schemaFields: { [key: string]: any } = {};
     fields.forEach((field) => {
-      let fieldSchema = z.string();
       if (field.type === 'number') {
-        fieldSchema = z.string().transform((val) => Number(val));
+        schemaFields[field.name] = field.required 
+          ? z.number()
+          : z.number().nullable();
+      } else {
+        schemaFields[field.name] = field.required 
+          ? z.string()
+          : z.string().nullable();
       }
-      schemaFields[field.name] = field.required ? fieldSchema : z.string().nullable();
     });
     return z.object(schemaFields);
   };
