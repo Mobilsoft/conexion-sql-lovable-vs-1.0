@@ -47,7 +47,8 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
         tipo_empresa: 'Principal',
       };
 
-      const validationErrors = validateCompanyData(companyData);
+      // Realizar validación previa (ahora asíncrona)
+      const validationErrors = await validateCompanyData(companyData);
       if (validationErrors.length > 0) {
         toast({
           title: "Error de Validación",
