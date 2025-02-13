@@ -23,7 +23,7 @@ import { CompanyBasicInfo } from './CompanyBasicInfo';
 import { CompanyCommercialInfo } from './CompanyCommercialInfo';
 import { toast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { formSchema } from '@/pages/Companies';
 
 interface CompanyDialogProps {
@@ -42,6 +42,43 @@ export function CompanyDialog({
   departamentos
 }: CompanyDialogProps) {
   const queryClient = useQueryClient();
+
+  const { data: codigosCIIU = [] } = useQuery({
+    queryKey: ['codigos_ciiu'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('codigos_ciiu')
+        .select('*')
+        .order('codigo');
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: actividadesComerciales = [] } = useQuery({
+    queryKey: ['actividades_comerciales'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('actividades_comerciales')
+        .select('*')
+        .order('nombre');
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: tiposRegimen = [] } = useQuery({
+    queryKey: ['tipos_regimen_tributario'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('tipos_regimen_tributario')
+        .select('*')
+        .order('nombre');
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -160,7 +197,12 @@ export function CompanyDialog({
                   <span className="font-medium text-[#2E7D32]">Información Comercial</span>
                 </AccordionTrigger>
                 <AccordionContent className="p-4 bg-white">
-                  <CompanyCommercialInfo form={form} />
+                  <CompanyCommercialInfo 
+                    form={form}
+                    codigosCIIU={codigosCIIU}
+                    actividadesComerciales={actividadesComerciales}
+                    tiposRegimen={tiposRegimen}
+                  />
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
