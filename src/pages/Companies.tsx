@@ -112,6 +112,8 @@ const Companies = () => {
     if (watchTipoDocumento === "2" && watchNit) { // Assuming 2 is the ID for NIT
       const calculatedDV = calculateDV(watchNit);
       form.setValue("dv", calculatedDV);
+    } else {
+      form.setValue("dv", "");
     }
   }, [watchNit, watchTipoDocumento]);
 
