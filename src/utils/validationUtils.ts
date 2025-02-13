@@ -1,8 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import type { Database } from '@/integrations/supabase/types';
 
-// Definimos explícitamente las tablas que usaremos
+// Definimos los tipos de tablas permitidos explícitamente
 type ValidTables = 'tipos_documento' | 'departamentos' | 'ciudades' | 'paises' | 
                    'codigos_ciiu' | 'actividades_comerciales' | 'tipos_regimen_tributario';
 
