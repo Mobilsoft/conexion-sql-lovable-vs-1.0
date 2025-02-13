@@ -7,6 +7,6 @@ export interface TableStats {
 
 export interface StatsResponse {
   success: boolean;
-  data?: TableStats[];
+  data?: TableStats[] | Promise<TableStats[]>;
   error?: string;
 }

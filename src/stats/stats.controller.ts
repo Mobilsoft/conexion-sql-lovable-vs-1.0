@@ -8,18 +8,17 @@ export class StatsController {
   constructor(private readonly statsService: StatsService) {}
 
   @Get()
-  async getTableStats() {
+  getTableStats(): Promise<StatsResponse> {
     try {
-      const data = await this.statsService.getTableStats();
-      return {
+      return Promise.resolve({
         success: true,
-        data
-      } as StatsResponse;
+        data: this.statsService.getTableStats()
+      });
     } catch (error) {
-      return {
+      return Promise.resolve({
         success: false,
         error: error instanceof Error ? error.message : 'Error al obtener estadísticas de tablas'
-      } as StatsResponse;
+      });
     }
   }
 }
