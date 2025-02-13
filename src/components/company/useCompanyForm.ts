@@ -6,6 +6,7 @@ import { validateCompanyData, formatValidationErrors } from '@/utils/validationU
 import { Company } from '@/types/company';
 import * as z from "zod";
 import { formSchema } from '@/pages/Companies';
+import { Progress } from "@/components/ui/progress";
 
 interface UseCompanyFormProps {
   onOpenChange: (open: boolean) => void;
@@ -18,11 +19,32 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
   const queryClient = useQueryClient();
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    let toastId: string | undefined;
+    
     try {
-      // Mostrar mensaje de guardando
+      // Toast inicial con progress
+      toastId = toast({
+        title: "Iniciando proceso...",
+        description: (
+          <div className="w-full space-y-2">
+            <p>Preparando datos para el envío</p>
+            <Progress value={0} className="w-full" />
+          </div>
+        ),
+        duration: 100000,
+      }).id;
+
+      // Actualizar progress 25%
       toast({
-        title: "Guardando...",
-        description: "Por favor espere mientras se guardan los datos.",
+        id: toastId,
+        title: "Validando datos...",
+        description: (
+          <div className="w-full space-y-2">
+            <p>Validando la información ingresada</p>
+            <Progress value={25} className="w-full" />
+          </div>
+        ),
+        duration: 100000,
       });
 
       const companyData = {
@@ -30,7 +52,7 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
         dv: values.dv.substring(0, 1),
         razon_social: values.razon_social,
         tipo_documento_id: parseInt(values.tipo_documento_id),
-        tipo_contribuyente: parseInt(values.tipo_contribuyente), // Convertir a número
+        tipo_contribuyente: parseInt(values.tipo_contribuyente),
         direccion: values.direccion,
         direccion_principal: values.direccion,
         telefono: values.telefono,
@@ -52,9 +74,22 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
         tipo_empresa: 'Principal',
       };
 
-      console.log('Datos a validar:', companyData);
+      console.log('Iniciando proceso de guardado con datos:', companyData);
 
-      // En lugar de usar Supabase, enviar al servidor SQL Server
+      // Actualizar progress 50%
+      toast({
+        id: toastId,
+        title: "Enviando datos...",
+        description: (
+          <div className="w-full space-y-2">
+            <p>Enviando información al servidor</p>
+            <Progress value={50} className="w-full" />
+          </div>
+        ),
+        duration: 100000,
+      });
+
+      // Enviar al servidor SQL Server
       const { data, error } = await supabase.functions.invoke('sql-server-connection', {
         body: {
           action: editingCompany ? 'updateCompany' : 'insertCompany',
@@ -65,11 +100,32 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
       if (error) throw error;
 
       console.log('Respuesta del servidor:', data);
+
+      // Actualizar progress 75%
+      toast({
+        id: toastId,
+        title: "Procesando respuesta...",
+        description: (
+          <div className="w-full space-y-2">
+            <p>Verificando respuesta del servidor</p>
+            <Progress value={75} className="w-full" />
+          </div>
+        ),
+        duration: 100000,
+      });
       
       if (data.success) {
+        // Progress 100% y mensaje de éxito
         toast({
+          id: toastId,
           title: editingCompany ? "¡Actualización Exitosa!" : "¡Registro Exitoso!",
-          description: `La compañía ${companyData.razon_social} ha sido ${editingCompany ? 'actualizada' : 'registrada'} correctamente.`,
+          description: (
+            <div className="w-full space-y-2">
+              <p>{`La compañía ${companyData.razon_social} ha sido ${editingCompany ? 'actualizada' : 'registrada'} correctamente.`}</p>
+              <Progress value={100} className="w-full" />
+            </div>
+          ),
+          duration: 3000,
         });
 
         // Invalidar la consulta para refrescar la tabla
@@ -102,10 +158,17 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
         errorDescription = "Ya existe una compañía con este NIT en el sistema.";
       }
       
+      // Mostrar error con progress en rojo
       toast({
+        id: toastId,
         variant: "destructive",
         title: "Error en el Proceso",
-        description: errorDescription,
+        description: (
+          <div className="w-full space-y-2">
+            <p>{errorDescription}</p>
+            <Progress value={100} className="w-full bg-red-200" />
+          </div>
+        ),
       });
     }
   };
