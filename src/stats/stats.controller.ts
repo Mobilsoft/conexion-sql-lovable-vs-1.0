@@ -7,7 +7,7 @@ import { StatsResponse } from '../types/table-stats';
 export class StatsController {
   constructor(private readonly statsService: StatsService) {}
 
-  @Get('/api/table-stats')
+  @Get()
   async getTableStats(): Promise<StatsResponse> {
     try {
       const data = await this.statsService.getTableStats();
