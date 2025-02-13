@@ -14,6 +14,8 @@ export default defineConfig(({ mode }) => ({
         target: 'http://localhost:54321/functions/v1/sql-server-connection',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/sql-server-connection/, ''),
+        secure: false,
+        ws: true
       },
     },
   },
