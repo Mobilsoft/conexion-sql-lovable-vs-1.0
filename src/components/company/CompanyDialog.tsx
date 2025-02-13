@@ -121,7 +121,7 @@ export function CompanyDialog({
     try {
       const companyData = {
         nit: values.nit,
-        dv: values.dv.substring(0, 1),
+        dv: values.dv.substring(0, 1), // Aseguramos que DV sea solo 1 dígito
         razon_social: values.razon_social,
         tipo_documento_id: parseInt(values.tipo_documento_id),
         numero_documento: values.numero_documento,
