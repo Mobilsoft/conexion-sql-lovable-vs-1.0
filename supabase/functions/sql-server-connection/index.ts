@@ -8,6 +8,9 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS'
 }
 
+// Creamos un pool global para reutilizar la conexión
+let globalPool: mssql.ConnectionPool | null = null;
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -18,8 +21,6 @@ serve(async (req) => {
       }
     })
   }
-
-  let pool = null;
   
   try {
     const body = await req.json()
@@ -33,39 +34,42 @@ serve(async (req) => {
       throw new Error('Se requieren los campos action y data')
     }
 
-    console.log('Configurando conexión...')
-    console.log('Intentando conectar a:', data.server, 'puerto:', data.port)
+    // Si no hay un pool global o está cerrado, creamos uno nuevo
+    if (!globalPool) {
+      console.log('Configurando nueva conexión...')
+      console.log('Intentando conectar a:', data.server, 'puerto:', data.port)
 
-    const config = {
-      user: data.username,
-      password: data.password,
-      database: data.database,
-      server: data.server,
-      port: parseInt(data.port),
-      options: {
-        encrypt: false,
-        trustServerCertificate: true,
-        enableArithAbort: true
-      },
-      pool: {
-        max: 10,
-        min: 0,
-        idleTimeoutMillis: 30000
-      },
-      connectionTimeout: 15000,
-      requestTimeout: 15000
+      const config = {
+        user: data.username,
+        password: data.password,
+        database: data.database,
+        server: data.server,
+        port: parseInt(data.port),
+        options: {
+          encrypt: false,
+          trustServerCertificate: true,
+          enableArithAbort: true
+        },
+        pool: {
+          max: 10,
+          min: 0,
+          idleTimeoutMillis: 300000 // Aumentamos el tiempo de inactividad a 5 minutos
+        },
+        connectionTimeout: 15000,
+        requestTimeout: 15000
+      }
+
+      console.log('Iniciando conexión a SQL Server...')
+      globalPool = await new mssql.ConnectionPool(config).connect()
+      console.log('Conexión establecida exitosamente')
     }
-
-    console.log('Iniciando conexión a SQL Server...')
-    pool = await new mssql.ConnectionPool(config).connect()
-    console.log('Conexión establecida exitosamente')
 
     let result
 
     switch (action) {
       case 'getTableStats':
         console.log('Ejecutando consulta getTableStats')
-        result = await pool.request().query(`
+        result = await globalPool.request().query(`
           WITH TableSpaceUsage AS (
             SELECT 
               t.object_id,
@@ -94,7 +98,7 @@ serve(async (req) => {
 
       case 'getTableStructure':
         console.log('Obteniendo estructura de tabla:', data.tableName)
-        result = await pool.request()
+        result = await globalPool.request()
           .input('tableName', mssql.VarChar, data.tableName)
           .query(`
             SELECT 
@@ -114,7 +118,11 @@ serve(async (req) => {
                 ELSE 0
               END AS is_foreign_key,
               OBJECT_SCHEMA_NAME(c.object_id) as schema_name,
-              c.collation_name
+              c.collation_name,
+              CASE 
+                WHEN c.name = 'master_detail' THEN 1
+                ELSE 0
+              END AS is_master_detail
             FROM sys.columns c
             INNER JOIN sys.types t 
               ON c.user_type_id = t.user_type_id
@@ -151,6 +159,11 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error:', error)
     
+    // Si hay un error de conexión, limpiamos el pool global
+    if (error instanceof Error && error.message.includes('connection')) {
+      globalPool = null;
+    }
+    
     return new Response(
       JSON.stringify({ 
         success: false, 
@@ -164,15 +177,5 @@ serve(async (req) => {
         }
       }
     )
-  } finally {
-    if (pool) {
-      try {
-        console.log('Cerrando conexión...')
-        await pool.close()
-        console.log('Conexión cerrada')
-      } catch (closeError) {
-        console.error('Error al cerrar la conexión:', closeError)
-      }
-    }
   }
 })
