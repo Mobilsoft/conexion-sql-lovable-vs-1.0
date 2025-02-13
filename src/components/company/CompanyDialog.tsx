@@ -81,7 +81,24 @@ export function CompanyDialog({
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
+    defaultValues: editingCompany ? {
+      tipo_documento_id: editingCompany.tipo_documento_id?.toString() || "",
+      nit: editingCompany.nit || "",
+      dv: editingCompany.dv || "",
+      tipo_contribuyente: editingCompany.tipo_contribuyente || "",
+      razon_social: editingCompany.razon_social || "",
+      direccion: editingCompany.direccion || "",
+      telefono: editingCompany.telefono || "",
+      email: editingCompany.email || "",
+      pais_id: editingCompany.pais_id?.toString() || "",
+      departamento_id: editingCompany.departamento_id?.toString() || "",
+      ciudad_id: editingCompany.ciudad_id?.toString() || "",
+      codigo_ciiu_id: editingCompany.codigo_ciiu_id?.toString() || "",
+      actividad_comercial_id: editingCompany.actividad_comercial_id?.toString() || "",
+      tipo_regimen_id: editingCompany.tipo_regimen_id?.toString() || "",
+      numero_documento: editingCompany.numero_documento || "",
+      municipio: editingCompany.municipio || "",
+    } : {
       tipo_documento_id: "",
       nit: "",
       dv: "",
@@ -103,9 +120,12 @@ export function CompanyDialog({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      // Asegurarse de que el DV tenga solo un carácter
+      const dv = values.dv.charAt(0);
+
       const companyData = {
         nit: values.nit,
-        dv: values.dv,
+        dv: dv,
         razon_social: values.razon_social,
         tipo_documento_id: parseInt(values.tipo_documento_id),
         numero_documento: values.numero_documento,
