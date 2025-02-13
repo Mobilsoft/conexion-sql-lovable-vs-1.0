@@ -7,7 +7,7 @@
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -20,7 +20,7 @@ import * as z from "zod";
 export const formSchema = z.object({
   tipo_documento_id: z.string(),
   nit: z.string().min(1, "El NIT es requerido"),
-  dv: z.string().min(1, "El DV es requerido"),
+  dv: z.string().length(1, "El DV debe ser un solo dígito"),
   tipo_contribuyente: z.string(),
   razon_social: z.string().min(1, "La razón social es requerida"),
   direccion: z.string(),
@@ -39,6 +39,7 @@ export const formSchema = z.object({
 const Companies = () => {
   const [open, setOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
+  const queryClient = useQueryClient();
 
   const handleDelete = async (nit: string) => {
     try {
