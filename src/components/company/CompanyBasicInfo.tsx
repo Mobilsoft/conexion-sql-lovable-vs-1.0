@@ -4,6 +4,13 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/comp
 import { Building2, Mail, Phone } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Import the form schema from Companies.tsx
 import { formSchema } from "../../pages/Companies";
@@ -17,12 +24,33 @@ interface CompanyBasicInfoProps {
 export function CompanyBasicInfo({ form }: CompanyBasicInfoProps) {
   return (
     <div className="grid grid-cols-12 gap-4">
-      <div className="grid grid-cols-2 gap-4 col-span-6">
+      <div className="grid grid-cols-12 gap-4 col-span-12">
+        <FormField
+          control={form.control}
+          name="tipo_documento_id"
+          render={({ field }) => (
+            <FormItem className="col-span-3">
+              <FormLabel>Tipo de Documento</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccione tipo" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="2">NIT</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="nit"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="col-span-3">
               <FormLabel>NIT</FormLabel>
               <div className="relative">
                 <FormControl>
@@ -43,7 +71,7 @@ export function CompanyBasicInfo({ form }: CompanyBasicInfoProps) {
           control={form.control}
           name="dv"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="col-span-1">
               <FormLabel>DV</FormLabel>
               <FormControl>
                 <Input
@@ -51,6 +79,28 @@ export function CompanyBasicInfo({ form }: CompanyBasicInfoProps) {
                   maxLength={1}
                 />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="tipo_contribuyente"
+          render={({ field }) => (
+            <FormItem className="col-span-5">
+              <FormLabel>Tipo de Contribuyente</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccione tipo" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="Responsable de IVA">Responsable de IVA</SelectItem>
+                  <SelectItem value="No Responsable de IVA">No Responsable de IVA</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
