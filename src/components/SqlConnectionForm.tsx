@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -50,28 +51,31 @@ const SqlConnectionForm = () => {
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
     try {
-      const { error: saveError } = await supabase
-        .from('sql_connections')
-        .upsert([{
-          id: 1,
-          server: data.server,
-          port: data.port,
-          database: data.database,
-          username: data.username,
-          password: data.password,
-          use_windows_auth: data.useWindowsAuth,
-          last_connected: new Date().toISOString()
-        }]);
-
-      if (saveError) throw saveError;
-
-      const { data: stats, error } = await supabase.functions.invoke('sql-server-connection', {
-        body: { action: 'getTableStats' }
+      const response = await fetch('/api/sql-server-connection', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'getTableStats',
+          data: {
+            server: data.server,
+            port: parseInt(data.port),
+            database: data.database,
+            username: data.username,
+            password: data.password,
+            useWindowsAuth: data.useWindowsAuth,
+          }
+        }),
       });
 
-      if (error) throw error;
+      const result = await response.json();
 
-      setTableStats(stats);
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      setTableStats(result.data);
 
       toast({
         title: 'Conexión exitosa',
