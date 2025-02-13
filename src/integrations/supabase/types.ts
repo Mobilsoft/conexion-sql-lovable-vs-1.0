@@ -19,6 +19,7 @@ export type Database = {
           email: string
           estado: string
           id: number
+          master_detail: string | null
           nombre: string
           telefono: string
           updated_at: string | null
@@ -32,6 +33,7 @@ export type Database = {
           email: string
           estado: string
           id?: number
+          master_detail?: string | null
           nombre: string
           telefono: string
           updated_at?: string | null
@@ -45,6 +47,7 @@ export type Database = {
           email?: string
           estado?: string
           id?: number
+          master_detail?: string | null
           nombre?: string
           telefono?: string
           updated_at?: string | null
@@ -59,6 +62,7 @@ export type Database = {
           email: string
           fecha_actualizacion: string | null
           fecha_creacion: string | null
+          master_detail: string | null
           municipio: string
           nit: string
           razon_social: string
@@ -72,6 +76,7 @@ export type Database = {
           email: string
           fecha_actualizacion?: string | null
           fecha_creacion?: string | null
+          master_detail?: string | null
           municipio: string
           nit: string
           razon_social: string
@@ -85,6 +90,7 @@ export type Database = {
           email?: string
           fecha_actualizacion?: string | null
           fecha_creacion?: string | null
+          master_detail?: string | null
           municipio?: string
           nit?: string
           razon_social?: string
@@ -99,6 +105,7 @@ export type Database = {
           database: string
           id: number
           last_connected: string | null
+          master_detail: string | null
           password: string
           port: string
           server: string
@@ -111,6 +118,7 @@ export type Database = {
           database: string
           id: number
           last_connected?: string | null
+          master_detail?: string | null
           password: string
           port: string
           server: string
@@ -123,6 +131,7 @@ export type Database = {
           database?: string
           id?: number
           last_connected?: string | null
+          master_detail?: string | null
           password?: string
           port?: string
           server?: string
@@ -140,6 +149,7 @@ export type Database = {
           data_type: string
           id: number
           is_nullable: boolean
+          master_detail: string | null
           sql_connection_id: number | null
           table_name: string
           updated_at: string | null
@@ -151,6 +161,7 @@ export type Database = {
           data_type: string
           id?: number
           is_nullable: boolean
+          master_detail?: string | null
           sql_connection_id?: number | null
           table_name: string
           updated_at?: string | null
@@ -162,6 +173,7 @@ export type Database = {
           data_type?: string
           id?: number
           is_nullable?: boolean
+          master_detail?: string | null
           sql_connection_id?: number | null
           table_name?: string
           updated_at?: string | null
@@ -184,6 +196,7 @@ export type Database = {
           file_type: string
           file_url: string
           id: string
+          master_detail: string | null
           task_id: string
           uploaded_by: string
         }
@@ -194,6 +207,7 @@ export type Database = {
           file_type: string
           file_url: string
           id?: string
+          master_detail?: string | null
           task_id: string
           uploaded_by: string
         }
@@ -204,6 +218,7 @@ export type Database = {
           file_type?: string
           file_url?: string
           id?: string
+          master_detail?: string | null
           task_id?: string
           uploaded_by?: string
         }
@@ -229,6 +244,7 @@ export type Database = {
           comment: string
           created_at: string | null
           id: string
+          master_detail: string | null
           task_id: string
           updated_at: string | null
           user_id: string
@@ -237,6 +253,7 @@ export type Database = {
           comment: string
           created_at?: string | null
           id?: string
+          master_detail?: string | null
           task_id: string
           updated_at?: string | null
           user_id: string
@@ -245,6 +262,7 @@ export type Database = {
           comment?: string
           created_at?: string | null
           id?: string
+          master_detail?: string | null
           task_id?: string
           updated_at?: string | null
           user_id?: string
@@ -275,6 +293,7 @@ export type Database = {
           description: string | null
           due_date: string | null
           id: string
+          master_detail: string | null
           priority: string
           status: string
           title: string
@@ -288,6 +307,7 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           id?: string
+          master_detail?: string | null
           priority?: string
           status?: string
           title: string
@@ -301,6 +321,7 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           id?: string
+          master_detail?: string | null
           priority?: string
           status?: string
           title?: string
@@ -335,6 +356,7 @@ export type Database = {
           created_at: string | null
           email: string
           id: string
+          master_detail: string | null
           password_hash: string
           role: string
           updated_at: string | null
@@ -343,6 +365,7 @@ export type Database = {
           created_at?: string | null
           email: string
           id?: string
+          master_detail?: string | null
           password_hash: string
           role?: string
           updated_at?: string | null
@@ -351,6 +374,7 @@ export type Database = {
           created_at?: string | null
           email?: string
           id?: string
+          master_detail?: string | null
           password_hash?: string
           role?: string
           updated_at?: string | null
