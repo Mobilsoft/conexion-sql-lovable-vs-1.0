@@ -47,6 +47,11 @@ const menuItems = [
     title: "Configurar Conexión",
     icon: Database,
     url: "/",
+  },
+  {
+    title: "Diccionario de Datos",
+    icon: Database,
+    url: "/diccionario-datos"
   }
 ];
 
