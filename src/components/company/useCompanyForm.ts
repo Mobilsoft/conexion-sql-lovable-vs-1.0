@@ -1,7 +1,7 @@
 
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/use-toast'; // Corregido el import del toast
 import { validateCompanyData, formatValidationErrors } from '@/utils/validationUtils';
 import { Company } from '@/types/company';
 import * as z from "zod";
@@ -20,7 +20,7 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       // Mostrar mensaje de guardando
-      const toastId = toast({
+      toast({
         title: "Guardando...",
         description: "Por favor espere mientras se guardan los datos.",
       });
@@ -30,7 +30,7 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
         dv: values.dv.substring(0, 1),
         razon_social: values.razon_social,
         tipo_documento_id: parseInt(values.tipo_documento_id),
-        tipo_contribuyente: values.tipo_contribuyente,
+        tipo_contribuyente: parseInt(values.tipo_contribuyente), // Convertir a número
         direccion: values.direccion,
         direccion_principal: values.direccion,
         telefono: values.telefono,

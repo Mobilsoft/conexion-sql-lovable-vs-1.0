@@ -9,7 +9,6 @@ import { z } from "zod";
 const formSchema = z.object({
   tipo_contribuyente: z.string(),
   tipo_documento_id: z.string(),
-  numero_documento: z.string(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -41,8 +40,8 @@ export function CompanyLegalInfo({
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="Responsable de IVA">Responsable de IVA</SelectItem>
-                <SelectItem value="No Responsable de IVA">No Responsable de IVA</SelectItem>
+                <SelectItem value="1">Responsable de IVA</SelectItem>
+                <SelectItem value="2">No Responsable de IVA</SelectItem>
               </SelectContent>
             </Select>
             <FormMessage />
@@ -73,20 +72,6 @@ export function CompanyLegalInfo({
                 ))}
               </SelectContent>
             </Select>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="numero_documento"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Número de Documento</FormLabel>
-            <FormControl>
-              <Input {...field} />
-            </FormControl>
             <FormMessage />
           </FormItem>
         )}
