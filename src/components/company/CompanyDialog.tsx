@@ -141,7 +141,7 @@ export function CompanyDialog({
         actividad_comercial_id: parseInt(values.actividad_comercial_id),
         tipo_regimen_id: parseInt(values.tipo_regimen_id),
         municipio: values.municipio,
-        master_detail: 'D',
+        master_detail: 'M', // Cambiado a 'M' para empresas principales
         estado_empresa: 'Activo',
         naturaleza_empresa: 'Jurídica',
         tipo_empresa: 'Principal',
