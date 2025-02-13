@@ -1,9 +1,17 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 
-// Definimos los tipos de tablas permitidos explícitamente
-type ValidTable = 'tipos_documento' | 'departamentos' | 'ciudades' | 'paises' | 
-                 'codigos_ciiu' | 'actividades_comerciales' | 'tipos_regimen_tributario';
+type Tables = Database['public']['Tables'];
+type ValidTable = keyof Pick<Tables, 
+  'tipos_documento' | 
+  'departamentos' | 
+  'ciudades' | 
+  'paises' | 
+  'codigos_ciiu' | 
+  'actividades_comerciales' | 
+  'tipos_regimen_tributario'
+>;
 
 interface FieldValidation {
   maxLength?: number;
@@ -11,7 +19,7 @@ interface FieldValidation {
   type?: string;
   foreignKey?: {
     table: ValidTable;
-    field: string;
+    field: 'id';  // Siempre será 'id' para las llaves foráneas
   };
 }
 
@@ -78,12 +86,12 @@ const isValidEmail = (email: string): boolean => {
 };
 
 // Función para verificar si un ID existe en una tabla relacionada
-const verifyForeignKeyExists = async (table: ValidTable, field: string, value: number): Promise<boolean> => {
+const verifyForeignKeyExists = async (table: ValidTable, field: 'id', value: number): Promise<boolean> => {
   try {
     const { data, error } = await supabase
       .from(table)
-      .select(field)
-      .eq(field, value)
+      .select('id')
+      .eq('id', value)
       .maybeSingle();
     
     if (error) {
@@ -143,7 +151,7 @@ export const validateCompanyData = async (data: Record<string, any>): Promise<Va
       if (constraints.foreignKey && !isNaN(Number(value))) {
         const exists = await verifyForeignKeyExists(
           constraints.foreignKey.table,
-          constraints.foreignKey.field,
+          'id',
           Number(value)
         );
         
