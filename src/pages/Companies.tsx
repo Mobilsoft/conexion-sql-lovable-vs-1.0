@@ -213,21 +213,32 @@ const Companies = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const departamento = departamentos.find(d => d.id === parseInt(values.departamento_id))?.nombre || '';
-      const ciudad = ciudades.find(c => c.id === parseInt(values.ciudad_id))?.nombre || '';
-
       const companyData = {
-        ...values,
-        departamento,
-        ciudad,
-        master_detail: 'M',
+        nit: values.nit,
+        dv: values.dv,
+        razon_social: values.razon_social,
         tipo_documento_id: parseInt(values.tipo_documento_id),
+        numero_documento: values.numero_documento,
+        tipo_contribuyente: values.tipo_contribuyente,
+        direccion: values.direccion,
+        direccion_principal: values.direccion,
+        telefono: values.telefono,
+        telefono_movil: values.telefono,
+        email: values.email,
+        correo_electronico: values.email,
         departamento_id: parseInt(values.departamento_id),
+        departamento: departamentos.find(d => d.id === parseInt(values.departamento_id))?.nombre || '',
         ciudad_id: parseInt(values.ciudad_id),
+        ciudad: ciudades.find(c => c.id === parseInt(values.ciudad_id))?.nombre || '',
         pais_id: parseInt(values.pais_id),
         codigo_ciiu_id: parseInt(values.codigo_ciiu_id),
         actividad_comercial_id: parseInt(values.actividad_comercial_id),
         tipo_regimen_id: parseInt(values.tipo_regimen_id),
+        municipio: values.municipio,
+        master_detail: 'M',
+        estado_empresa: 'Activo',
+        naturaleza_empresa: 'Jurídica',
+        tipo_empresa: 'Principal',
       };
 
       if (editingCompany) {
