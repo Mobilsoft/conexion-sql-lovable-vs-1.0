@@ -1,4 +1,4 @@
-import { createClient } from 'npm:@supabase/supabase-js@2.38.4'
+
 import { serve } from "https://deno.fresh.run/std@0.204.0/http/server.ts"
 import { sql } from 'npm:mssql@10.0.1'
 
@@ -15,28 +15,12 @@ serve(async (req) => {
   try {
     const { action, data } = await req.json()
 
-    // Obtener la configuración de conexión almacenada
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
-
-    const { data: connectionConfig, error: configError } = await supabaseClient
-      .from('sql_connections')
-      .select('*')
-      .limit(1)
-      .single()
-
-    if (configError) {
-      throw new Error('No se encontró configuración de conexión')
-    }
-
     const config = {
-      user: connectionConfig.username,
-      password: connectionConfig.password,
-      database: connectionConfig.database,
-      server: connectionConfig.server,
-      port: parseInt(connectionConfig.port),
+      user: data.username,
+      password: data.password,
+      database: data.database,
+      server: data.server,
+      port: parseInt(data.port),
       pool: {
         max: 10,
         min: 0,
