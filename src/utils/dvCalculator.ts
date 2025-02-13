@@ -8,11 +8,11 @@ export const calculateDV = (nit: string): string => {
   // Solo calcular si el NIT tiene hasta 9 dígitos
   if (cleanNit.length > 9) return '';
   
-  // Rellenar con ceros a la izquierda si es necesario
+  // Rellenar con ceros a la izquierda si es necesario para tener 9 dígitos
   const paddedNit = cleanNit.padStart(9, '0');
   
   // Factores de cálculo según la DIAN
-  const factors = [3, 7, 13, 17, 19, 23, 29, 37, 41];
+  const factors = [41, 37, 29, 23, 19, 17, 13, 7, 3];
   
   // Calcular la suma de productos
   let sum = 0;
