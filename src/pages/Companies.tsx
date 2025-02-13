@@ -1,3 +1,4 @@
+
 /**
  * Companies.tsx
  * Main component for managing company data
@@ -91,11 +92,18 @@ const Companies = () => {
   const { data: companies = [], isLoading } = useQuery({
     queryKey: ['companies'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('companies')
-        .select('*')
-        .eq('master_detail', 'M')
-        .order('fecha_creacion', { ascending: false });
+      const { data, error } = await supabase.functions.invoke('sql-server-connection', {
+        body: {
+          action: 'getTableStats',
+          data: {
+            server: '145.223.75.189',
+            port: '1433',
+            database: 'Taskmaster',
+            username: 'sa',
+            password: 'D3v3l0p3r2024$'
+          }
+        }
+      });
 
       if (error) {
         toast({
@@ -106,7 +114,7 @@ const Companies = () => {
         throw error;
       }
 
-      return data;
+      return data?.data || [];
     },
   });
 
