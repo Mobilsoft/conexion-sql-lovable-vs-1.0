@@ -1,7 +1,7 @@
 
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 import { validateCompanyData, formatValidationErrors } from '@/utils/validationUtils';
 import { Company } from '@/types/company';
 import * as z from "zod";
@@ -47,48 +47,55 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
         tipo_empresa: 'Principal',
       };
 
-      // Realizar validación previa (ahora asíncrona)
+      // Realizar validación previa
       const validationErrors = await validateCompanyData(companyData);
       if (validationErrors.length > 0) {
         toast({
+          variant: "destructive",
           title: "Error de Validación",
           description: formatValidationErrors(validationErrors),
-          variant: "destructive",
         });
         return;
       }
 
-      console.log('Datos a enviar:', companyData);
-
+      let result;
       if (editingCompany) {
-        const { error } = await supabase
+        result = await supabase
           .from('companies')
           .update(companyData)
           .eq('nit', values.nit);
 
-        if (error) throw error;
+        if (result.error) throw result.error;
+        
         toast({
           title: "¡Actualización Exitosa!",
-          description: "Los datos de la compañía han sido actualizados correctamente.",
+          description: `La compañía ${companyData.razon_social} ha sido actualizada correctamente.`,
         });
       } else {
-        const { error } = await supabase
+        result = await supabase
           .from('companies')
-          .insert(companyData);
+          .insert(companyData)
+          .select()
+          .single();
 
-        if (error) throw error;
+        if (result.error) throw result.error;
+        
         toast({
           title: "¡Registro Exitoso!",
-          description: "La compañía ha sido registrada correctamente en el sistema.",
+          description: `La compañía ${companyData.razon_social} ha sido registrada correctamente.`,
         });
       }
 
-      queryClient.invalidateQueries({ queryKey: ['companies'] });
+      // Invalidar la consulta para refrescar la tabla
+      await queryClient.invalidateQueries({ queryKey: ['companies'] });
+      
+      // Cerrar el diálogo
       onOpenChange(false);
+      
     } catch (error: any) {
       console.error('Error completo:', error);
       
-      let errorDescription = error.message;
+      let errorDescription = "Ha ocurrido un error al procesar la solicitud.";
       
       if (error.message.includes('violates foreign key constraint')) {
         const fieldMatch = error.message.match(/companies_(\w+)_fkey/);
@@ -97,20 +104,19 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
           errorDescription = `Error en el campo ${fieldName}: La referencia seleccionada no es válida.`;
         }
       } else if (error.message.includes('value too long')) {
-        const fieldMatch = error.message.match(/value too long for type character varying\(\d+\)/);
-        if (fieldMatch) {
-          const columnMatch = error.message.match(/column "([^"]+)"/);
-          if (columnMatch) {
-            const fieldName = columnMatch[1];
-            errorDescription = `Error en el campo ${fieldName}: El valor ingresado es demasiado largo.`;
-          }
+        const columnMatch = error.message.match(/column "([^"]+)"/);
+        if (columnMatch) {
+          const fieldName = columnMatch[1];
+          errorDescription = `Error en el campo ${fieldName}: El valor ingresado es demasiado largo.`;
         }
+      } else if (error.message.includes('duplicate key')) {
+        errorDescription = "Ya existe una compañía con este NIT en el sistema.";
       }
       
       toast({
+        variant: "destructive",
         title: "Error en el Proceso",
         description: errorDescription,
-        variant: "destructive",
       });
     }
   };
