@@ -1,6 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.204.0/http/server.ts"
-import { sql } from 'npm:mssql@10.0.1'
+import { Connection, ConnectionPool, Request } from "npm:mssql@10.0.1"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -56,7 +56,7 @@ serve(async (req) => {
     try {
       // Crear un nuevo pool de conexiones
       console.log('Creando pool de conexiones...')
-      pool = await sql.connect(config)
+      pool = await new ConnectionPool(config).connect()
       console.log('Conexión establecida exitosamente')
 
       let result
