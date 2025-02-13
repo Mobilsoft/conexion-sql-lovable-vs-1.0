@@ -318,7 +318,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_table_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          table_name: string
+          row_count: number
+          size_in_kb: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
