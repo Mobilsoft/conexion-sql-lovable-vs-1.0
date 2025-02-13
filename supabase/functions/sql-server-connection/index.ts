@@ -65,15 +65,27 @@ serve(async (req) => {
         case 'getTableStats':
           console.log('Ejecutando consulta getTableStats')
           result = await pool.request().query(`
+            WITH TableSpaceUsage AS (
+              SELECT 
+                t.object_id,
+                ROUND(
+                  (SUM(a.total_pages) * 8.0) / 1024, 2
+                ) AS size_in_kb
+              FROM sys.tables t
+              INNER JOIN sys.indexes i ON t.object_id = i.object_id
+              INNER JOIN sys.partitions p ON i.object_id = p.object_id AND i.index_id = p.index_id
+              INNER JOIN sys.allocation_units a ON p.partition_id = a.container_id
+              GROUP BY t.object_id
+            )
             SELECT 
               t.name AS table_name,
-              p.rows AS row_count,
-              (SUM(a.used_pages) * 8.0 / 1024) AS size_in_kb
+              SUM(p.rows) AS row_count,
+              tsu.size_in_kb
             FROM sys.tables t
-            INNER JOIN sys.indexes i ON t.object_id = i.object_id
-            INNER JOIN sys.partitions p ON i.object_id = p.object_id AND i.index_id = p.index_id
-            INNER JOIN sys.allocation_units a ON p.partition_id = a.container_id
-            GROUP BY t.name, p.rows
+            INNER JOIN sys.partitions p ON t.object_id = p.object_id
+            INNER JOIN TableSpaceUsage tsu ON t.object_id = tsu.object_id
+            WHERE t.is_ms_shipped = 0
+            GROUP BY t.name, tsu.size_in_kb
             ORDER BY t.name;
           `)
           console.log('Consulta ejecutada exitosamente')
