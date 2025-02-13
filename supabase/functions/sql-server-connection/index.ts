@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.204.0/http/server.ts"
 import { corsHeaders, handleCors } from "./utils/cors.ts"
 import { Connection, Request, TYPES } from "npm:tedious@15.1.0"
@@ -20,7 +21,7 @@ serve(async (req) => {
       throw new Error('Se requieren los campos action y data')
     }
 
-    let config = {
+    const config = {
       server: data.server,
       authentication: {
         type: 'default',
@@ -39,56 +40,7 @@ serve(async (req) => {
       }
     }
 
-    // Solo para acciones que no sean getTableStats, usar la conexión guardada
-    if (action !== 'getTableStats') {
-      console.log('🔑 Obteniendo credenciales de Supabase...')
-      const supabaseUrl = Deno.env.get('SUPABASE_URL')
-      const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-      
-      if (!supabaseUrl || !supabaseKey) {
-        throw new Error('Faltan variables de entorno de Supabase')
-      }
-
-      console.log('🔌 Inicializando cliente Supabase...')
-      const supabase = createClient(supabaseUrl, supabaseKey)
-
-      console.log('🔍 Buscando configuración de conexión SQL...')
-      const { data: connections, error: queryError } = await supabase
-        .from('sql_connections')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(1)
-
-      if (queryError) {
-        console.error('❌ Error al obtener conexión SQL:', queryError)
-        throw queryError
-      }
-      if (!connections || connections.length === 0) {
-        console.error('❌ No se encontraron conexiones SQL configuradas')
-        throw new Error('No hay conexiones SQL configuradas')
-      }
-
-      const connectionConfig = connections[0]
-      config = {
-        server: connectionConfig.server,
-        authentication: {
-          type: 'default',
-          options: {
-            userName: connectionConfig.username,
-            password: connectionConfig.password
-          }
-        },
-        options: {
-          database: connectionConfig.database,
-          encrypt: true,
-          trustServerCertificate: true,
-          port: parseInt(connectionConfig.port),
-          connectTimeout: 30000,
-          requestTimeout: 30000
-        }
-      }
-    }
-
+    // Primero intentamos conectar con la configuración proporcionada
     console.log('🔄 Intentando conectar a SQL Server...')
     const connection = new Connection(config)
 
@@ -109,6 +61,37 @@ serve(async (req) => {
         }
       })
     })
+
+    // Si la conexión fue exitosa y es getTableStats, guardamos la configuración
+    if (action === 'getTableStats') {
+      console.log('🔑 Guardando configuración en Supabase...')
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')
+      const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+      
+      if (!supabaseUrl || !supabaseKey) {
+        throw new Error('Faltan variables de entorno de Supabase')
+      }
+
+      const supabase = createClient(supabaseUrl, supabaseKey)
+
+      // Insertamos o actualizamos la configuración
+      const { error: upsertError } = await supabase
+        .from('sql_connections')
+        .upsert({
+          server: data.server,
+          port: data.port,
+          database: data.database,
+          username: data.username,
+          password: data.password
+        })
+
+      if (upsertError) {
+        console.error('❌ Error al guardar la configuración:', upsertError)
+        throw upsertError
+      }
+
+      console.log('✅ Configuración guardada exitosamente')
+    }
 
     let result;
 
