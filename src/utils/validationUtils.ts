@@ -1,12 +1,15 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
+
+type TableNames = keyof Database['public']['Tables'];
 
 interface FieldValidation {
   maxLength?: number;
   required?: boolean;
   type?: string;
   foreignKey?: {
-    table: string;
+    table: TableNames;
     field: string;
   };
 }
@@ -75,19 +78,24 @@ const isValidEmail = (email: string): boolean => {
 };
 
 // Función para verificar si un ID existe en una tabla relacionada
-const verifyForeignKeyExists = async (table: string, field: string, value: number): Promise<boolean> => {
-  const { data, error } = await supabase
-    .from(table)
-    .select(field)
-    .eq(field, value)
-    .single();
-  
-  if (error) {
-    console.error(`Error verificando llave foránea en tabla ${table}:`, error);
+const verifyForeignKeyExists = async (table: TableNames, field: string, value: number): Promise<boolean> => {
+  try {
+    const { data, error } = await supabase
+      .from(table)
+      .select(field)
+      .eq(field, value)
+      .maybeSingle();
+    
+    if (error) {
+      console.error(`Error verificando llave foránea en tabla ${table}:`, error);
+      return false;
+    }
+    
+    return data !== null;
+  } catch (error) {
+    console.error(`Error inesperado verificando llave foránea:`, error);
     return false;
   }
-  
-  return data !== null;
 };
 
 export const validateCompanyData = async (data: any): Promise<ValidationError[]> => {
