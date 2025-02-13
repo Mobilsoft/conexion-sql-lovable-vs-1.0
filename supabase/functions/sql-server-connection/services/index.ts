@@ -1,5 +1,6 @@
 
-export * from './initService'
-export * from './companyService'
-export * from './locationService'
-export * from './structureService'
+export * from './initService.ts'
+export * from './companyService.ts'
+export * from './locationService.ts'
+export * from './structureService.ts'
+
