@@ -32,14 +32,20 @@ const Companies = () => {
     { name: 'codigo_ciuu', type: 'text', required: true },
     { name: 'descripcion_actividad', type: 'textarea', required: true },
     { name: 'fecha_constitucion', type: 'date', required: true },
+    { name: 'direccion', type: 'text', required: true },
     { name: 'direccion_principal', type: 'text', required: true },
     { name: 'barrio', type: 'text', required: true },
     { name: 'ciudad', type: 'text', required: true },
+    { name: 'municipio', type: 'text', required: true },
+    { name: 'departamento', type: 'text', required: true },
     { name: 'pais', type: 'text', required: true },
+    { name: 'telefono', type: 'text', required: true },
     { name: 'telefono_fijo', type: 'text', required: false },
     { name: 'telefono_movil', type: 'text', required: true },
+    { name: 'email', type: 'email', required: true },
     { name: 'correo_electronico', type: 'email', required: true },
     { name: 'pagina_web', type: 'url', required: false },
+    { name: 'tipo_contribuyente', type: 'text', required: true },
     { name: 'regimen_tributario', type: 'text', required: true },
     { name: 'responsabilidad_fiscal', type: 'text', required: true },
     { name: 'sucursales', type: 'checkbox', required: false },
@@ -70,13 +76,16 @@ const Companies = () => {
 
   const handleSave = async (company: Company) => {
     try {
+      const companyData = {
+        ...company,
+        master_detail: 'M',
+        fecha_actualizacion: new Date().toISOString(),
+      };
+
       if (editingCompany) {
         const { error } = await supabase
           .from('companies')
-          .update({
-            ...company,
-            fecha_actualizacion: new Date().toISOString(),
-          })
+          .update(companyData)
           .eq('nit', company.nit);
 
         if (error) throw error;
@@ -88,12 +97,10 @@ const Companies = () => {
       } else {
         const { error } = await supabase
           .from('companies')
-          .insert([{
-            ...company,
-            master_detail: 'M',
+          .insert({
+            ...companyData,
             fecha_creacion: new Date().toISOString(),
-            fecha_actualizacion: new Date().toISOString(),
-          }]);
+          });
 
         if (error) throw error;
 
