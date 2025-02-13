@@ -30,7 +30,7 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
         dv: values.dv.substring(0, 1),
         razon_social: values.razon_social,
         tipo_documento_id: parseInt(values.tipo_documento_id),
-        tipo_contribuyente: values.tipo_contribuyente, // Mantener como string
+        tipo_contribuyente: parseInt(values.tipo_contribuyente), // Convertir a número
         direccion: values.direccion,
         direccion_principal: values.direccion,
         telefono: values.telefono,
@@ -54,54 +54,32 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
 
       console.log('Datos a validar:', companyData);
 
-      const validationErrors = await validateCompanyData(companyData);
-      if (validationErrors.length > 0) {
-        console.log('Errores de validación:', validationErrors);
-        toast({
-          variant: "destructive",
-          title: "Error de Validación",
-          description: formatValidationErrors(validationErrors),
-        });
-        return;
-      }
+      // En lugar de usar Supabase, enviar al servidor SQL Server
+      const { data, error } = await supabase.functions.invoke('sql-server-connection', {
+        body: {
+          action: editingCompany ? 'updateCompany' : 'insertCompany',
+          data: companyData
+        }
+      });
 
-      console.log('Iniciando operación de guardado...');
-      let result;
+      if (error) throw error;
+
+      console.log('Respuesta del servidor:', data);
       
-      if (editingCompany) {
-        result = await supabase
-          .from('companies')
-          .update(companyData)
-          .eq('nit', values.nit);
-
-        if (result.error) throw result.error;
-        
-        console.log('Compañía actualizada:', result.data);
+      if (data.success) {
         toast({
-          title: "¡Actualización Exitosa!",
-          description: `La compañía ${companyData.razon_social} ha sido actualizada correctamente.`,
+          title: editingCompany ? "¡Actualización Exitosa!" : "¡Registro Exitoso!",
+          description: `La compañía ${companyData.razon_social} ha sido ${editingCompany ? 'actualizada' : 'registrada'} correctamente.`,
         });
+
+        // Invalidar la consulta para refrescar la tabla
+        await queryClient.invalidateQueries({ queryKey: ['companies'] });
+        
+        // Cerrar el diálogo y reiniciar el formulario
+        onOpenChange(false);
       } else {
-        result = await supabase
-          .from('companies')
-          .insert(companyData)
-          .select()
-          .single();
-
-        if (result.error) throw result.error;
-        
-        console.log('Compañía creada:', result.data);
-        toast({
-          title: "¡Registro Exitoso!",
-          description: `La compañía ${companyData.razon_social} ha sido registrada correctamente.`,
-        });
+        throw new Error(data.error || 'Error al procesar la solicitud');
       }
-
-      // Invalidar la consulta para refrescar la tabla
-      await queryClient.invalidateQueries({ queryKey: ['companies'] });
-      
-      // Cerrar el diálogo y reiniciar el formulario
-      onOpenChange(false);
       
     } catch (error: any) {
       console.error('Error completo:', error);
