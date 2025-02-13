@@ -1,7 +1,17 @@
 
 import { serve } from "https://deno.land/std@0.204.0/http/server.ts"
 import { getConnection, clearConnection } from "./db/connection.ts"
-import { getTableStats, getTableStructure, insertCompany, updateCompany, initializeDatabase, getCompanies, getCiudades, getDepartamentos, deleteCompany } from "./services/tableService.ts"
+import { 
+  getTableStats, 
+  getTableStructure, 
+  insertCompany, 
+  updateCompany, 
+  initializeDatabase, 
+  getCompanies, 
+  getCiudades, 
+  getDepartamentos, 
+  deleteCompany 
+} from "./services/index.ts"
 import { corsHeaders, handleCors } from "./utils/cors.ts"
 
 serve(async (req) => {
