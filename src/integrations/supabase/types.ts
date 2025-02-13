@@ -93,6 +93,45 @@ export type Database = {
         }
         Relationships: []
       }
+      sql_connections: {
+        Row: {
+          created_at: string | null
+          database: string
+          id: number
+          last_connected: string | null
+          password: string
+          port: string
+          server: string
+          updated_at: string | null
+          use_windows_auth: boolean | null
+          username: string
+        }
+        Insert: {
+          created_at?: string | null
+          database: string
+          id: number
+          last_connected?: string | null
+          password: string
+          port: string
+          server: string
+          updated_at?: string | null
+          use_windows_auth?: boolean | null
+          username: string
+        }
+        Update: {
+          created_at?: string | null
+          database?: string
+          id?: number
+          last_connected?: string | null
+          password?: string
+          port?: string
+          server?: string
+          updated_at?: string | null
+          use_windows_auth?: boolean | null
+          username?: string
+        }
+        Relationships: []
+      }
       task_attachments: {
         Row: {
           created_at: string | null
