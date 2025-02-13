@@ -1,5 +1,5 @@
 
-import { serve } from "https://deno.fresh.run/std@0.204.0/http/server.ts"
+import { serve } from "https://deno.land/std@0.204.0/http/server.ts"
 import { sql } from 'npm:mssql@10.0.1'
 
 const corsHeaders = {
