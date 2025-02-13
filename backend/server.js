@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Configuración de SQL Server
+// Configuración de SQL Server con mejores prácticas de seguridad
 const config = {
   user: process.env.DB_USER || 'sa',
   password: process.env.DB_PASSWORD || 'D3v3l0p3r2024$',
@@ -18,21 +18,59 @@ const config = {
   options: {
     encrypt: true,
     trustServerCertificate: true,
+    enableArithAbort: true,
+    connectTimeout: 30000, // 30 segundos
+    requestTimeout: 30000, // 30 segundos
   },
+  pool: {
+    max: 10,
+    min: 0,
+    idleTimeoutMillis: 30000
+  }
 };
 
 // Pool de conexiones
-const pool = new sql.ConnectionPool(config);
-const poolConnect = pool.connect();
+let pool;
 
-pool.on('error', err => {
-  console.error('SQL Pool Error:', err);
-});
-
-// Endpoint para obtener estadísticas de tablas
-app.post('/api/table-stats', async (req, res) => {
+const createPool = async () => {
   try {
-    await poolConnect;
+    pool = await new sql.ConnectionPool(config).connect();
+    console.log('Conexión a SQL Server establecida correctamente');
+    
+    pool.on('error', err => {
+      console.error('Error en el pool de SQL:', err);
+      if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+        createPool();
+      }
+    });
+  } catch (err) {
+    console.error('Error al crear el pool de conexiones:', err);
+    setTimeout(createPool, 5000); // Intentar reconectar cada 5 segundos
+  }
+};
+
+createPool();
+
+// Middleware para verificar la conexión
+const ensureConnection = async (req, res, next) => {
+  try {
+    if (!pool || !pool.connected) {
+      await createPool();
+    }
+    next();
+  } catch (err) {
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error de conexión con la base de datos' 
+    });
+  }
+};
+
+// Endpoint para obtener estadísticas de tablas con mejor manejo de errores
+app.post('/api/table-stats', ensureConnection, async (req, res) => {
+  try {
+    console.log('Recibida solicitud para obtener estadísticas de tablas');
+    
     const result = await pool.request().query(`
       SELECT 
         t.name AS table_name,
@@ -46,17 +84,30 @@ app.post('/api/table-stats', async (req, res) => {
       ORDER BY t.name;
     `);
     
-    res.json({ success: true, data: result.recordset });
+    console.log('Consulta ejecutada exitosamente');
+    res.json({ 
+      success: true, 
+      data: result.recordset 
+    });
   } catch (err) {
-    console.error('Error:', err);
+    console.error('Error al ejecutar la consulta:', err);
     res.status(500).json({ 
       success: false, 
-      error: err.message 
+      error: err.message || 'Error al obtener estadísticas de tablas'
     });
   }
 });
 
-const PORT = process.env.PORT || 3001; // Cambiado a 3001 como puerto por defecto
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Servidor ejecutándose en el puerto ${PORT}`);
 });
+
+// Manejo de cierre graceful
+process.on('SIGTERM', () => {
+  if (pool) {
+    pool.close();
+  }
+  process.exit(0);
+});
+
