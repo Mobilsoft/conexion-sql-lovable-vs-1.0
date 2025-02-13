@@ -15,7 +15,6 @@ import {
 import { corsHeaders, handleCors } from "./utils/cors.ts"
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, handleCors())
   }
@@ -32,12 +31,11 @@ serve(async (req) => {
       throw new Error('Se requieren los campos action y data')
     }
 
-    console.log('🔌 Intentando establecer conexión...')
+    console.log('🔌 Verificando conexión...')
     const pool = await getConnection(data)
-    console.log('✅ Conexión establecida exitosamente')
+    console.log('✅ Conexión verificada')
     let result
 
-    // Inicializar base de datos si es necesario
     if (action === 'getTableStats') {
       console.log('🏗️ Verificando y creando estructura de base de datos...')
       try {
@@ -112,9 +110,12 @@ serve(async (req) => {
   } catch (error) {
     console.error('❌ Error:', error)
     
-    // Si hay un error de conexión, limpiamos el pool global
-    if (error instanceof Error && error.message.includes('connection')) {
-      console.log('🔄 Limpiando pool de conexiones debido a error')
+    // Solo limpiar la conexión si es un error fatal de conexión
+    if (error instanceof Error && 
+       (error.message.includes('Failed to connect') || 
+        error.message.includes('Connection closed') || 
+        error.message.includes('Connection reset'))) {
+      console.log('🔄 Error fatal de conexión, limpiando pool...')
       clearConnection()
     }
     
@@ -133,4 +134,3 @@ serve(async (req) => {
     )
   }
 })
-

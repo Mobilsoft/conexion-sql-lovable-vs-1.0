@@ -36,14 +36,48 @@ export const getConnection = async (config: ConnectionConfig): Promise<mssql.Con
       requestTimeout: 15000
     }
 
-    console.log('Iniciando conexión a SQL Server...')
-    globalPool = await new mssql.ConnectionPool(poolConfig).connect()
-    console.log('Conexión establecida exitosamente')
+    try {
+      console.log('Iniciando conexión a SQL Server...')
+      globalPool = await new mssql.ConnectionPool(poolConfig).connect()
+      console.log('Conexión establecida exitosamente')
+
+      // Agregar evento para manejar errores de conexión
+      globalPool.on('error', (err) => {
+        console.error('Error en la conexión:', err)
+        if (err.code === 'ECONNRESET' || err.code === 'PROTOCOL_CONNECTION_LOST') {
+          console.log('Conexión perdida, limpiando pool...')
+          globalPool = null
+        }
+      })
+    } catch (error) {
+      console.error('Error al establecer conexión:', error)
+      globalPool = null
+      throw error
+    }
+  } else {
+    try {
+      // Verificar si la conexión sigue activa
+      await globalPool.request().query('SELECT 1')
+      console.log('Usando conexión existente')
+    } catch (error) {
+      console.error('Error al verificar conexión existente:', error)
+      console.log('Limpiando conexión inválida...')
+      globalPool = null
+      return getConnection(config)
+    }
   }
 
   return globalPool
 }
 
 export const clearConnection = () => {
+  if (globalPool) {
+    console.log('Cerrando conexión global...')
+    try {
+      globalPool.close()
+    } catch (error) {
+      console.error('Error al cerrar conexión:', error)
+    }
+  }
   globalPool = null
 }
