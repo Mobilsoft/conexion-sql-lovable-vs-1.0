@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Building2, Mail, Phone } from "lucide-react";
@@ -32,6 +31,8 @@ export function CompanyBasicInfo({ form, ciudades, departamentos }: CompanyBasic
     if (nit) {
       const dv = calculateDV(nit);
       form.setValue("dv", dv);
+    } else {
+      form.setValue("dv", "");
     }
   }, [nit, form]);
 
