@@ -1,12 +1,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
-
-interface TableStats {
-  table_name: string;
-  row_count: number;
-  size_in_kb: number;
-}
+import { TableStats } from '../types/table-stats';
 
 @Injectable()
 export class StatsService {

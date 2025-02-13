@@ -1,18 +1,7 @@
 
 import { Controller, Get } from '@nestjs/common';
 import { StatsService } from './stats.service';
-
-interface TableStats {
-  table_name: string;
-  row_count: number;
-  size_in_kb: number;
-}
-
-interface StatsResponse {
-  success: boolean;
-  data?: TableStats[];
-  error?: string;
-}
+import { StatsResponse, TableStats } from '../types/table-stats';
 
 @Controller('api')
 export class StatsController {
