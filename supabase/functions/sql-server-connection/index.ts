@@ -114,7 +114,7 @@ serve(async (req) => {
                 ELSE 0
               END AS is_foreign_key,
               OBJECT_SCHEMA_NAME(c.object_id) as schema_name,
-              col.collation_name as collation
+              c.collation_name
             FROM sys.columns c
             INNER JOIN sys.types t 
               ON c.user_type_id = t.user_type_id
