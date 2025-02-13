@@ -2,7 +2,6 @@
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UseFormReturn } from "react-hook-form";
-import { Input } from "@/components/ui/input";
 import { TipoDocumento } from "@/types/company";
 import { z } from "zod";
 
@@ -40,8 +39,8 @@ export function CompanyLegalInfo({
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="1">Responsable de IVA</SelectItem>
-                <SelectItem value="2">No Responsable de IVA</SelectItem>
+                <SelectItem value="Responsable de IVA">Responsable de IVA</SelectItem>
+                <SelectItem value="No Responsable de IVA">No Responsable de IVA</SelectItem>
               </SelectContent>
             </Select>
             <FormMessage />
