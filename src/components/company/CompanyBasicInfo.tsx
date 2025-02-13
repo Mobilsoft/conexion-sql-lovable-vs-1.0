@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Building2, Mail, Phone } from "lucide-react";
@@ -21,8 +22,8 @@ interface CompanyBasicInfoProps {
 
 export function CompanyBasicInfo({ form }: CompanyBasicInfoProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div className="grid grid-cols-2 gap-4 md:col-span-2">
+    <div className="grid grid-cols-12 gap-4">
+      <div className="grid grid-cols-2 gap-4 col-span-6">
         <FormField
           control={form.control}
           name="nit"
@@ -66,7 +67,7 @@ export function CompanyBasicInfo({ form }: CompanyBasicInfoProps) {
         control={form.control}
         name="razon_social"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="col-span-5">
             <FormLabel>Razón Social</FormLabel>
             <FormControl>
               <Input
@@ -81,9 +82,26 @@ export function CompanyBasicInfo({ form }: CompanyBasicInfoProps) {
 
       <FormField
         control={form.control}
+        name="direccion"
+        render={({ field }) => (
+          <FormItem className="col-span-4">
+            <FormLabel>Dirección</FormLabel>
+            <FormControl>
+              <Input
+                {...field}
+                placeholder="Dirección de la empresa"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
         name="telefono"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="col-span-3">
             <FormLabel>Teléfono</FormLabel>
             <div className="relative">
               <FormControl>
@@ -104,7 +122,7 @@ export function CompanyBasicInfo({ form }: CompanyBasicInfoProps) {
         control={form.control}
         name="email"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="col-span-4">
             <FormLabel>Correo Electrónico</FormLabel>
             <div className="relative">
               <FormControl>
