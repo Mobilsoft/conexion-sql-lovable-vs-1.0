@@ -1,6 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.204.0/http/server.ts"
-import { sql } from "npm:mssql@9.1.1"
+import mssql from "npm:mssql@9.1.1"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -53,7 +53,7 @@ serve(async (req) => {
 
     try {
       console.log('Conectando a SQL Server...')
-      await sql.connect(config)
+      await mssql.connect(config)
       console.log('Conexión establecida')
 
       let result
@@ -61,7 +61,7 @@ serve(async (req) => {
       switch (action) {
         case 'getTableStats':
           console.log('Ejecutando consulta getTableStats')
-          result = await sql.query(`
+          result = await mssql.query(`
             SELECT 
               t.name AS table_name,
               p.rows AS row_count,
@@ -80,7 +80,7 @@ serve(async (req) => {
           throw new Error('Acción no válida: ' + action)
       }
 
-      await sql.close()
+      await mssql.close()
 
       return new Response(
         JSON.stringify({ 
@@ -98,7 +98,7 @@ serve(async (req) => {
     } finally {
       try {
         console.log('Cerrando conexión...')
-        await sql.close()
+        await mssql.close()
         console.log('Conexión cerrada')
       } catch (closeError) {
         console.error('Error al cerrar la conexión:', closeError)
