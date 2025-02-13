@@ -206,8 +206,16 @@ const Companies = () => {
         fecha_creacion,
         fecha_actualizacion,
         master_detail,
-        ...companyData 
+        ...rest
       } = company;
+
+      const departamento = departamentos.find(d => d.id === company.departamento_id)?.nombre || '';
+
+      const companyData = {
+        ...rest,
+        departamento,
+        master_detail: 'M'
+      };
 
       if (editingCompany) {
         const { error } = await supabase
