@@ -1,3 +1,4 @@
+
 /**
  * Companies.tsx
  * Main component for managing company data
@@ -5,57 +6,16 @@
 
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
-import { useState, useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/use-toast';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { 
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage 
-} from "@/components/ui/form";
 import { CompaniesTable } from '@/components/CompaniesTable';
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { CompanyDialog } from '@/components/company/CompanyDialog';
+import { toast } from '@/components/ui/use-toast';
+import { Company } from '@/types/company';
 import * as z from "zod";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { calculateDV } from '@/utils/dvCalculator';
-import { 
-  Company, 
-  TipoDocumento, 
-  CodigoCIIU, 
-  ActividadComercial, 
-  Pais, 
-  Departamento, 
-  Ciudad, 
-  TipoRegimenTributario 
-} from '@/types/company';
-import { CompanyBasicInfo } from '@/components/company/CompanyBasicInfo';
 
 export const formSchema = z.object({
   tipo_documento_id: z.string(),
@@ -79,59 +39,6 @@ export const formSchema = z.object({
 const Companies = () => {
   const [open, setOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
-  const queryClient = useQueryClient();
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      tipo_documento_id: "",
-      nit: "",
-      dv: "",
-      tipo_contribuyente: "",
-      razon_social: "",
-      direccion: "",
-      telefono: "",
-      email: "",
-      pais_id: "",
-      departamento_id: "",
-      ciudad_id: "",
-      codigo_ciiu_id: "",
-      actividad_comercial_id: "",
-      tipo_regimen_id: "",
-      numero_documento: "",
-      municipio: "",
-    },
-  });
-
-  // Watch for NIT changes to calculate DV
-  const watchNit = form.watch("nit");
-  const watchTipoDocumento = form.watch("tipo_documento_id");
-  const watchCiudadId = form.watch("ciudad_id");
-
-  useEffect(() => {
-    if (watchTipoDocumento === "2" && watchNit) { // Assuming 2 is the ID for NIT
-      const calculatedDV = calculateDV(watchNit);
-      form.setValue("dv", calculatedDV);
-    } else {
-      form.setValue("dv", "");
-    }
-  }, [watchNit, watchTipoDocumento]);
-
-  // Update departamento and país when ciudad changes
-  useEffect(() => {
-    if (watchCiudadId) {
-      const ciudad = ciudades.find(c => c.id === parseInt(watchCiudadId));
-      if (ciudad) {
-        const departamento = departamentos.find(d => d.id === ciudad.departamento_id);
-        if (departamento) {
-          form.setValue("departamento_id", departamento.id.toString());
-          if (departamento.pais_id) {
-            form.setValue("pais_id", departamento.pais_id.toString());
-          }
-        }
-      }
-    }
-  }, [watchCiudadId]);
 
   const handleDelete = async (nit: string) => {
     try {
@@ -147,7 +54,8 @@ const Companies = () => {
         description: "La compañía ha sido eliminada exitosamente.",
       });
 
-      queryClient.invalidateQueries({ queryKey: ['companies'] });
+      // Refetch companies after deletion
+      await queryClient.invalidateQueries({ queryKey: ['companies'] });
     } catch (error: any) {
       toast({
         title: "Error",
@@ -157,51 +65,15 @@ const Companies = () => {
     }
   };
 
-  const { data: tiposDocumento = [] } = useQuery({
-    queryKey: ['tipos_documento'],
+  const { data: ciudades = [] } = useQuery({
+    queryKey: ['ciudades'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('tipos_documento')
+        .from('ciudades')
         .select('*')
         .order('nombre');
       if (error) throw error;
-      return data as TipoDocumento[];
-    },
-  });
-
-  const { data: codigosCIIU = [] } = useQuery({
-    queryKey: ['codigos_ciiu'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('codigos_ciiu')
-        .select('*')
-        .order('codigo');
-      if (error) throw error;
-      return data as CodigoCIIU[];
-    },
-  });
-
-  const { data: actividadesComerciales = [] } = useQuery({
-    queryKey: ['actividades_comerciales'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('actividades_comerciales')
-        .select('*')
-        .order('nombre');
-      if (error) throw error;
-      return data as ActividadComercial[];
-    },
-  });
-
-  const { data: paises = [] } = useQuery({
-    queryKey: ['paises'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('paises')
-        .select('*')
-        .order('nombre');
-      if (error) throw error;
-      return data as Pais[];
+      return data;
     },
   });
 
@@ -213,31 +85,7 @@ const Companies = () => {
         .select('*')
         .order('nombre');
       if (error) throw error;
-      return data as Departamento[];
-    },
-  });
-
-  const { data: ciudades = [] } = useQuery({
-    queryKey: ['ciudades'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('ciudades')
-        .select('*')
-        .order('nombre');
-      if (error) throw error;
-      return data as Ciudad[];
-    },
-  });
-
-  const { data: tiposRegimen = [] } = useQuery({
-    queryKey: ['tipos_regimen_tributario'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('tipos_regimen_tributario')
-        .select('*')
-        .order('nombre');
-      if (error) throw error;
-      return data as TipoRegimenTributario[];
+      return data;
     },
   });
 
@@ -262,71 +110,6 @@ const Companies = () => {
       return data;
     },
   });
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      const companyData = {
-        nit: values.nit,
-        dv: values.dv,
-        razon_social: values.razon_social,
-        tipo_documento_id: parseInt(values.tipo_documento_id),
-        numero_documento: values.numero_documento,
-        tipo_contribuyente: values.tipo_contribuyente,
-        direccion: values.direccion,
-        direccion_principal: values.direccion,
-        telefono: values.telefono,
-        telefono_movil: values.telefono,
-        email: values.email,
-        correo_electronico: values.email,
-        departamento_id: parseInt(values.departamento_id),
-        departamento: departamentos.find(d => d.id === parseInt(values.departamento_id))?.nombre || '',
-        ciudad_id: parseInt(values.ciudad_id),
-        ciudad: ciudades.find(c => c.id === parseInt(values.ciudad_id))?.nombre || '',
-        pais_id: parseInt(values.pais_id),
-        codigo_ciiu_id: parseInt(values.codigo_ciiu_id),
-        actividad_comercial_id: parseInt(values.actividad_comercial_id),
-        tipo_regimen_id: parseInt(values.tipo_regimen_id),
-        municipio: values.municipio,
-        master_detail: 'M',
-        estado_empresa: 'Activo',
-        naturaleza_empresa: 'Jurídica',
-        tipo_empresa: 'Principal',
-      };
-
-      if (editingCompany) {
-        const { error } = await supabase
-          .from('companies')
-          .update(companyData)
-          .eq('nit', values.nit);
-
-        if (error) throw error;
-        toast({
-          title: "Compañía actualizada",
-          description: "Los datos de la compañía han sido actualizados exitosamente.",
-        });
-      } else {
-        const { error } = await supabase
-          .from('companies')
-          .insert(companyData);
-
-        if (error) throw error;
-        toast({
-          title: "Compañía registrada",
-          description: "La compañía ha sido registrada exitosamente.",
-        });
-      }
-
-      queryClient.invalidateQueries({ queryKey: ['companies'] });
-      setEditingCompany(null);
-      setOpen(false);
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
 
   return (
     <SidebarProvider>
@@ -353,126 +136,13 @@ const Companies = () => {
                   isLoading={isLoading}
                 />
 
-                <Dialog open={open} onOpenChange={setOpen}>
-                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>
-                        {editingCompany ? "Editar Compañía" : "Nueva Compañía"}
-                      </DialogTitle>
-                      <DialogDescription>
-                        Completa los datos de la compañía para registrarla.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <Form {...form}>
-                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        <Accordion type="single" collapsible defaultValue="item-1" className="w-full space-y-4">
-                          <AccordionItem value="item-1" className="border rounded-lg bg-gray-50/30">
-                            <AccordionTrigger className="px-4">Información Básica</AccordionTrigger>
-                            <AccordionContent className="p-4">
-                              <CompanyBasicInfo 
-                                form={form} 
-                                ciudades={ciudades} 
-                                departamentos={departamentos}
-                              />
-                            </AccordionContent>
-                          </AccordionItem>
-
-                          <AccordionItem value="item-2" className="border rounded-lg bg-gray-50/30">
-                            <AccordionTrigger className="px-4">Información Tributaria</AccordionTrigger>
-                            <AccordionContent className="p-4 space-y-4">
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <FormField
-                                  control={form.control}
-                                  name="codigo_ciiu_id"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>Código CIIU</FormLabel>
-                                      <Select onValueChange={field.onChange} value={field.value}>
-                                        <FormControl>
-                                          <SelectTrigger>
-                                            <SelectValue placeholder="Seleccione código CIIU" />
-                                          </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                          {codigosCIIU.map((ciiu) => (
-                                            <SelectItem key={ciiu.id} value={ciiu.id.toString()}>
-                                              {ciiu.codigo} - {ciiu.descripcion}
-                                            </SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
-                                    </FormItem>
-                                  )}
-                                />
-
-                                <FormField
-                                  control={form.control}
-                                  name="actividad_comercial_id"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>Actividad Comercial</FormLabel>
-                                      <Select onValueChange={field.onChange} value={field.value}>
-                                        <FormControl>
-                                          <SelectTrigger>
-                                            <SelectValue placeholder="Seleccione actividad" />
-                                          </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                          {actividadesComerciales.map((actividad) => (
-                                            <SelectItem key={actividad.id} value={actividad.id.toString()}>
-                                              {actividad.nombre}
-                                            </SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
-                                    </FormItem>
-                                  )}
-                                />
-
-                                <FormField
-                                  control={form.control}
-                                  name="tipo_regimen_id"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>Tipo de Régimen Tributario</FormLabel>
-                                      <Select onValueChange={field.onChange} value={field.value}>
-                                        <FormControl>
-                                          <SelectTrigger>
-                                            <SelectValue placeholder="Seleccione régimen" />
-                                          </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                          {tiposRegimen.map((tipo) => (
-                                            <SelectItem key={tipo.id} value={tipo.id.toString()}>
-                                              {tipo.nombre}
-                                            </SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
-                                    </FormItem>
-                                  )}
-                                />
-                              </div>
-                            </AccordionContent>
-                          </AccordionItem>
-                        </Accordion>
-
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => setOpen(false)}
-                          >
-                            Cancelar
-                          </Button>
-                          <Button type="submit">
-                            {editingCompany ? "Actualizar" : "Guardar"}
-                          </Button>
-                        </div>
-                      </form>
-                    </Form>
-                  </DialogContent>
-                </Dialog>
+                <CompanyDialog
+                  open={open}
+                  onOpenChange={setOpen}
+                  editingCompany={editingCompany}
+                  ciudades={ciudades}
+                  departamentos={departamentos}
+                />
               </div>
             </div>
           </div>
