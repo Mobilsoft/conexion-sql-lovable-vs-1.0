@@ -3,11 +3,11 @@ import { Controller, Get } from '@nestjs/common';
 import { StatsService } from './stats.service';
 import { StatsResponse, TableStats } from '../types/table-stats';
 
-@Controller('api')
+@Controller()
 export class StatsController {
   constructor(private readonly statsService: StatsService) {}
 
-  @Get('table-stats')
+  @Get('api/table-stats')
   async getTableStats(): Promise<StatsResponse> {
     try {
       const data = await this.statsService.getTableStats();
