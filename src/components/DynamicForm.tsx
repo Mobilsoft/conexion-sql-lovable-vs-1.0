@@ -46,7 +46,7 @@ export function DynamicForm({
       if (field.type === 'number') {
         fieldSchema = z.string().transform((val) => Number(val));
       }
-      schemaFields[field.name] = field.required ? fieldSchema : fieldSchema.nullish();
+      schemaFields[field.name] = field.required ? fieldSchema : z.string().nullable();
     });
     return z.object(schemaFields);
   };
