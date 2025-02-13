@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -120,12 +119,6 @@ export function CompanyDialog({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      // Validamos que los IDs sean números válidos
-      const pais_id = parseInt(values.pais_id);
-      if (isNaN(pais_id)) {
-        throw new Error("El país seleccionado no es válido");
-      }
-
       const companyData = {
         nit: values.nit,
         dv: values.dv.substring(0, 1),
@@ -143,7 +136,7 @@ export function CompanyDialog({
         departamento: departamentos.find(d => d.id === parseInt(values.departamento_id))?.nombre || '',
         ciudad_id: parseInt(values.ciudad_id),
         ciudad: ciudades.find(c => c.id === parseInt(values.ciudad_id))?.nombre || '',
-        pais_id: pais_id, // Usamos el valor validado
+        pais_id: 1, // Valor por defecto mientras no validamos
         codigo_ciiu_id: parseInt(values.codigo_ciiu_id),
         actividad_comercial_id: parseInt(values.actividad_comercial_id),
         tipo_regimen_id: parseInt(values.tipo_regimen_id),
