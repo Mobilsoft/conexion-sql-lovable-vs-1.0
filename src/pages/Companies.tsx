@@ -366,7 +366,7 @@ const Companies = () => {
                           <AccordionItem value="item-1" className="border rounded-lg bg-gray-50/30">
                             <AccordionTrigger className="px-4">Información Básica</AccordionTrigger>
                             <AccordionContent className="p-4 space-y-4">
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                 <FormField
                                   control={form.control}
                                   name="tipo_documento_id"
@@ -398,7 +398,7 @@ const Companies = () => {
                                     <FormItem>
                                       <FormLabel>NIT</FormLabel>
                                       <FormControl>
-                                        <Input {...field} />
+                                        <Input {...field} maxLength={15} placeholder="Máximo 15 dígitos" />
                                       </FormControl>
                                     </FormItem>
                                   )}
@@ -414,7 +414,8 @@ const Companies = () => {
                                         <Input 
                                           {...field} 
                                           disabled={watchTipoDocumento !== "2"}
-                                          maxLength={1}
+                                          maxLength={2}
+                                          placeholder="2 dígitos"
                                         />
                                       </FormControl>
                                     </FormItem>
@@ -446,7 +447,7 @@ const Companies = () => {
                                   control={form.control}
                                   name="razon_social"
                                   render={({ field }) => (
-                                    <FormItem className="col-span-2">
+                                    <FormItem className="md:col-span-2">
                                       <FormLabel>Razón Social</FormLabel>
                                       <FormControl>
                                         <Input {...field} />
@@ -459,7 +460,7 @@ const Companies = () => {
                                   control={form.control}
                                   name="direccion"
                                   render={({ field }) => (
-                                    <FormItem className="col-span-3">
+                                    <FormItem className="md:col-span-2">
                                       <FormLabel>Dirección Comercial</FormLabel>
                                       <FormControl>
                                         <Input {...field} />
@@ -485,7 +486,7 @@ const Companies = () => {
                                   control={form.control}
                                   name="email"
                                   render={({ field }) => (
-                                    <FormItem className="col-span-2">
+                                    <FormItem className="md:col-span-2">
                                       <FormLabel>Correo Electrónico</FormLabel>
                                       <FormControl>
                                         <Input {...field} type="email" />
