@@ -11,7 +11,7 @@ import FormHeader from './sql/FormHeader';
 import ConnectionFields from './sql/ConnectionFields';
 import DatabaseStats from './DatabaseStats';
 import { sqlConnectionSchema, type SqlConnectionFormValues, type TableStats } from '@/types/sql-connection';
-import axios from 'axios';
+import { supabase } from '@/integrations/supabase/client';
 
 const SqlConnectionForm = () => {
   const { toast } = useToast();
@@ -38,15 +38,27 @@ const SqlConnectionForm = () => {
         password: '***********'
       });
 
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-      const response = await axios.post(`${apiUrl}/api/table-stats`, data);
-      console.log('Respuesta recibida:', response.data);
+      const { data: result, error } = await supabase.functions.invoke('sql-server-connection', {
+        body: { 
+          action: 'getTableStats',
+          data: {
+            server: data.server,
+            port: data.port,
+            database: data.database,
+            username: data.username,
+            password: data.password,
+            useWindowsAuth: data.useWindowsAuth
+          }
+        }
+      });
 
-      if (!response.data.success) {
-        throw new Error(response.data.error || 'Error desconocido en la conexión');
+      if (error) throw error;
+
+      if (!result.success) {
+        throw new Error(result.error || 'Error desconocido en la conexión');
       }
 
-      setTableStats(response.data.data);
+      setTableStats(result.data);
 
       toast({
         title: 'Conexión exitosa',
