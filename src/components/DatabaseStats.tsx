@@ -11,8 +11,12 @@ import { Card } from "@/components/ui/card";
 import { Database, FileText, FilePlus, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableStructureDialog } from "./TableStructureDialog";
+import { DynamicForm } from "./DynamicForm";
 import { useState } from 'react';
 import { useToast } from "@/components/ui/use-toast";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { DynamicFormField, TableStructure } from "@/types/table-structure";
 
 interface TableStats {
   table_name: string;
@@ -23,24 +27,70 @@ interface TableStats {
 
 const DatabaseStats = ({ stats, connectionData }: { stats: TableStats[], connectionData: any }) => {
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
+  const [formTable, setFormTable] = useState<string | null>(null);
   const [generatedForms, setGeneratedForms] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
+  const { data: tableStructure } = useQuery({
+    queryKey: ['tableStructure', formTable],
+    queryFn: async () => {
+      if (!formTable) return null;
+      const { data, error } = await supabase
+        .from('table_structures')
+        .select('*')
+        .eq('table_name', formTable);
+
+      if (error) throw error;
+      return data as TableStructure[];
+    },
+    enabled: !!formTable,
+  });
+
+  const mapStructureToFields = (structure: TableStructure[]): DynamicFormField[] => {
+    return structure.map(field => ({
+      name: field.column_name,
+      type: field.data_type.includes('int') ? 'number' : 'text',
+      required: !field.is_nullable,
+      defaultValue: field.column_default,
+    }));
+  };
+
   if (!stats?.length) return null;
 
-  const handleFormAction = (tableName: string) => {
+  const handleFormAction = async (tableName: string) => {
+    setFormTable(tableName);
     if (generatedForms.has(tableName)) {
-      // Lógica para editar formulario
       toast({
         title: "Editar Formulario",
         description: `Editando formulario para la tabla ${tableName}`,
       });
     } else {
-      // Lógica para generar formulario
       setGeneratedForms(prev => new Set([...prev, tableName]));
       toast({
         title: "Generar Formulario",
         description: `Formulario generado para la tabla ${tableName}`,
+      });
+    }
+  };
+
+  const handleSaveForm = async (data: any) => {
+    if (!formTable) return;
+    try {
+      const { error } = await supabase
+        .from(formTable.toLowerCase())
+        .insert([data]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Éxito",
+        description: "Datos guardados correctamente",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
       });
     }
   };
@@ -105,6 +155,16 @@ const DatabaseStats = ({ stats, connectionData }: { stats: TableStats[], connect
         tableName={selectedTable || ''}
         connectionData={connectionData}
       />
+
+      {tableStructure && (
+        <DynamicForm
+          open={!!formTable}
+          onOpenChange={(open) => !open && setFormTable(null)}
+          fields={mapStructureToFields(tableStructure)}
+          tableName={formTable || ''}
+          onSave={handleSaveForm}
+        />
+      )}
     </Card>
   );
 };
