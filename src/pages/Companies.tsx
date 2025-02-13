@@ -1,3 +1,4 @@
+
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { useState } from 'react';
@@ -416,7 +417,225 @@ const Companies = () => {
                                 </FormItem>
                               )}
                             />
+
+                            <FormField
+                              control={form.control}
+                              name="tipo_documento_id"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Tipo de Documento</FormLabel>
+                                  <Select 
+                                    onValueChange={field.onChange} 
+                                    defaultValue={field.value}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Seleccione el tipo de documento" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {tiposDocumento.map((tipo) => (
+                                        <SelectItem key={tipo.id} value={tipo.id.toString()}>
+                                          {tipo.nombre}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name="numero_documento"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Número de Documento</FormLabel>
+                                  <FormControl>
+                                    <Input {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="pais_id"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>País</FormLabel>
+                                <Select 
+                                  onValueChange={field.onChange} 
+                                  defaultValue={field.value}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Seleccione el país" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {paises.map((pais) => (
+                                      <SelectItem key={pais.id} value={pais.id.toString()}>
+                                        {pais.nombre}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="departamento_id"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Departamento</FormLabel>
+                                <Select 
+                                  onValueChange={field.onChange} 
+                                  defaultValue={field.value}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Seleccione el departamento" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {departamentos.map((depto) => (
+                                      <SelectItem key={depto.id} value={depto.id.toString()}>
+                                        {depto.nombre}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="ciudad_id"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Ciudad</FormLabel>
+                                <Select 
+                                  onValueChange={field.onChange} 
+                                  defaultValue={field.value}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Seleccione la ciudad" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {ciudades.map((ciudad) => (
+                                      <SelectItem key={ciudad.id} value={ciudad.id.toString()}>
+                                        {ciudad.nombre}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="space-y-4">
+                          <h2 className="text-lg font-semibold">Información Comercial</h2>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField
+                              control={form.control}
+                              name="codigo_ciiu_id"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Código CIIU</FormLabel>
+                                  <Select 
+                                    onValueChange={field.onChange} 
+                                    defaultValue={field.value}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Seleccione el código CIIU" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {codigosCIIU.map((ciiu) => (
+                                        <SelectItem key={ciiu.id} value={ciiu.id.toString()}>
+                                          {ciiu.codigo} - {ciiu.descripcion}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name="actividad_comercial_id"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Actividad Comercial</FormLabel>
+                                  <Select 
+                                    onValueChange={field.onChange} 
+                                    defaultValue={field.value}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Seleccione la actividad comercial" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {actividadesComerciales.map((actividad) => (
+                                        <SelectItem key={actividad.id} value={actividad.id.toString()}>
+                                          {actividad.nombre}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+
+                          <FormField
+                            control={form.control}
+                            name="tipo_regimen_id"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Tipo de Régimen Tributario</FormLabel>
+                                <Select 
+                                  onValueChange={field.onChange} 
+                                  defaultValue={field.value}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Seleccione el tipo de régimen" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {tiposRegimen.map((tipo) => (
+                                      <SelectItem key={tipo.id} value={tipo.id.toString()}>
+                                        {tipo.nombre}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
                         </div>
 
                         <div className="flex justify-end gap-2">

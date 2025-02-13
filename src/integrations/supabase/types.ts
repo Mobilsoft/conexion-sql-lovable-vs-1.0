@@ -359,6 +359,55 @@ export type Database = {
             referencedRelation: "tipos_regimen_tributario"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_companies_actividad_comercial"
+            columns: ["actividad_comercial_id"]
+            isOneToOne: false
+            referencedRelation: "actividades_comerciales"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_companies_ciudad"
+            columns: ["ciudad_id"]
+            isOneToOne: false
+            referencedRelation: "ciudades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_companies_codigo_ciiu"
+            columns: ["codigo_ciiu_id"]
+            isOneToOne: false
+            referencedRelation: "codigos_ciiu"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_companies_departamento"
+            columns: ["departamento_id"]
+            isOneToOne: false
+            referencedRelation: "departamentos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_companies_pais"
+            columns: ["pais_id"]
+            isOneToOne: false
+            referencedRelation: "paises"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_companies_tipo_documento"
+            columns: ["tipo_documento_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_documento"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_companies_tipo_regimen"
+            columns: ["tipo_regimen_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_regimen_tributario"
+            referencedColumns: ["id"]
+          },
         ]
       }
       departamentos: {
