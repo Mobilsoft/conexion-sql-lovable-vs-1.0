@@ -1,8 +1,8 @@
 
 import { serve } from "https://deno.land/std@0.204.0/http/server.ts"
-import { getConnection, clearConnection } from "./db/connection.ts"
 import { corsHeaders, handleCors } from "./utils/cors.ts"
 import { Connection, Request, TYPES } from "npm:tedious@15.1.0"
+import { createClient } from 'npm:@supabase/supabase-js@2.1.0'
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -17,20 +17,51 @@ serve(async (req) => {
       throw new Error('Se requieren los campos action y data')
     }
 
+    // Crear cliente de Supabase para obtener la conexión
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Faltan variables de entorno de Supabase')
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    // Obtener la última conexión configurada
+    const { data: connections, error: queryError } = await supabase
+      .from('sql_connections')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(1)
+
+    if (queryError) throw queryError
+    if (!connections || connections.length === 0) {
+      throw new Error('No hay conexiones SQL configuradas')
+    }
+
+    const connectionConfig = connections[0]
+    console.log('Usando configuración de conexión:', {
+      server: connectionConfig.server,
+      port: connectionConfig.port,
+      database: connectionConfig.database
+    })
+
     const config = {
-      server: '145.223.75.189',
+      server: connectionConfig.server,
       authentication: {
         type: 'default',
         options: {
-          userName: 'sa',
-          password: 'D3v3l0p3r2024$'
+          userName: connectionConfig.username,
+          password: connectionConfig.password
         }
       },
       options: {
-        database: 'Taskmaster',
+        database: connectionConfig.database,
         encrypt: true,
         trustServerCertificate: true,
-        port: 1433
+        port: parseInt(connectionConfig.port),
+        connectTimeout: 30000,
+        requestTimeout: 30000
       }
     }
 
@@ -39,8 +70,10 @@ serve(async (req) => {
     await new Promise((resolve, reject) => {
       connection.connect((err) => {
         if (err) {
+          console.error('Error de conexión:', err)
           reject(err)
         } else {
+          console.log('Conexión establecida exitosamente')
           resolve(true)
         }
       })
