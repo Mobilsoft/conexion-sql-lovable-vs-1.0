@@ -72,6 +72,7 @@ const formSchema = z.object({
   actividad_comercial_id: z.string(),
   tipo_regimen_id: z.string(),
   numero_documento: z.string(),
+  municipio: z.string(),
 });
 
 const Companies = () => {
@@ -97,6 +98,7 @@ const Companies = () => {
       actividad_comercial_id: "",
       tipo_regimen_id: "",
       numero_documento: "",
+      municipio: "",
     },
   });
 
