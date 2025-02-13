@@ -17,8 +17,15 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
-import { Plus, ChevronDown } from 'lucide-react';
-import { Form } from "@/components/ui/form";
+import { Plus } from 'lucide-react';
+import { 
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage 
+} from "@/components/ui/form";
 import { CompaniesTable } from '@/components/CompaniesTable';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
