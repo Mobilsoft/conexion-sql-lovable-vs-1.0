@@ -6,6 +6,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2.1.0'
 
 serve(async (req) => {
   console.log('👉 Iniciando procesamiento de solicitud:', new Date().toISOString())
+  let connection: Connection | null = null;
   
   if (req.method === 'OPTIONS') {
     console.log('🔄 Solicitud OPTIONS - Respondiendo con headers CORS')
@@ -35,22 +36,27 @@ serve(async (req) => {
         encrypt: true,
         trustServerCertificate: true,
         port: parseInt(data.port),
-        connectTimeout: 30000,
-        requestTimeout: 30000
+        connectTimeout: 60000, // Aumentado a 60 segundos
+        requestTimeout: 60000, // Aumentado a 60 segundos
+        rowCollectionOnRequestCompletion: true,
+        useUTC: true
       }
     }
 
     // Primero intentamos conectar con la configuración proporcionada
     console.log('🔄 Intentando conectar a SQL Server...')
-    const connection = new Connection(config)
+    connection = new Connection(config)
 
     await new Promise((resolve, reject) => {
-      let timeoutId = setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         console.error('⏰ Timeout de conexión alcanzado')
-        reject(new Error('Timeout de conexión'))
-      }, 30000)
+        if (connection) {
+          connection.close();
+        }
+        reject(new Error('No se pudo establecer la conexión con el servidor SQL. Por favor, verifique las credenciales y que el servidor esté accesible.'))
+      }, 60000) // Aumentado a 60 segundos
 
-      connection.connect((err) => {
+      connection.on('connect', (err) => {
         clearTimeout(timeoutId)
         if (err) {
           console.error('❌ Error de conexión:', err)
@@ -60,6 +66,13 @@ serve(async (req) => {
           resolve(true)
         }
       })
+
+      connection.on('error', (err) => {
+        console.error('❌ Error en la conexión:', err)
+        reject(err)
+      })
+
+      connection.connect()
     })
 
     // Si la conexión fue exitosa y es getTableStats, guardamos la configuración
@@ -127,29 +140,13 @@ serve(async (req) => {
           tables.push(table);
         });
 
-        request.on('requestCompleted', () => {
-          resolve(tables);
+        request.on('error', (err) => {
+          console.error('❌ Error en la consulta:', err)
+          reject(err)
         });
 
-        connection.execSql(request);
-      });
-    } else if (action === 'insertCompany' || action === 'updateCompany') {
-      const query = action === 'insertCompany'
-        ? `INSERT INTO Companies (name, description) VALUES ('${data.name}', '${data.description}');`
-        : `UPDATE Companies SET name = '${data.name}', description = '${data.description}' WHERE id = ${data.id};`
-
-      result = await new Promise((resolve, reject) => {
-        const request = new Request(
-          query,
-          (err) => {
-            if (err) {
-              reject(err);
-            }
-          }
-        );
-
         request.on('requestCompleted', () => {
-          resolve({ message: 'Compañía insertada/actualizada exitosamente' });
+          resolve(tables);
         });
 
         connection.execSql(request);
@@ -182,5 +179,11 @@ serve(async (req) => {
         }
       }
     )
+  } finally {
+    // Asegurarnos de cerrar la conexión
+    if (connection) {
+      console.log('🔌 Cerrando conexión...')
+      connection.close()
+    }
   }
 })
