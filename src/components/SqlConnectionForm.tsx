@@ -2,42 +2,23 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { motion } from 'framer-motion';
 import { useToast } from '@/components/ui/use-toast';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import { Form } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 import { Card } from '@/components/ui/card';
-import { Database, Server, Lock, User } from 'lucide-react';
+import FormHeader from './sql/FormHeader';
+import ConnectionFields from './sql/ConnectionFields';
 import DatabaseStats from './DatabaseStats';
-
-const formSchema = z.object({
-  server: z.string().min(1, 'El servidor es requerido'),
-  port: z.string().regex(/^\d+$/, 'El puerto debe ser numérico'),
-  database: z.string().min(1, 'La base de datos es requerida'),
-  username: z.string().min(1, 'El usuario es requerido'),
-  password: z.string().min(1, 'La contraseña es requerida'),
-  useWindowsAuth: z.boolean().default(false),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { sqlConnectionSchema, type SqlConnectionFormValues, type TableStats } from '@/types/sql-connection';
 
 const SqlConnectionForm = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [tableStats, setTableStats] = useState<any[]>([]);
+  const [tableStats, setTableStats] = useState<TableStats[]>([]);
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<SqlConnectionFormValues>({
+    resolver: zodResolver(sqlConnectionSchema),
     defaultValues: {
       server: '145.223.75.189',
       port: '1433',
@@ -48,7 +29,7 @@ const SqlConnectionForm = () => {
     },
   });
 
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = async (data: SqlConnectionFormValues) => {
     setIsLoading(true);
     try {
       const response = await fetch('/api/sql-server-connection', {
@@ -105,148 +86,10 @@ const SqlConnectionForm = () => {
           transition={{ duration: 0.5 }}
           className="space-y-8"
         >
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight text-center">Configuración de Conexión</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 text-center">
-              Ingrese los datos de conexión al servidor SQL Server
-            </p>
-          </div>
-
+          <FormHeader />
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="server"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <Server className="h-4 w-4" />
-                        Servidor
-                      </FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="ejemplo.database.windows.net" 
-                          className="bg-white dark:bg-slate-900"
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="port"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <Server className="h-4 w-4" />
-                        Puerto
-                      </FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="1433" 
-                          className="bg-white dark:bg-slate-900"
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="database"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <Database className="h-4 w-4" />
-                        Base de datos
-                      </FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="nombreBaseDatos" 
-                          className="bg-white dark:bg-slate-900"
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="useWindowsAuth"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
-                      <div className="space-y-0.5">
-                        <FormLabel className="flex items-center gap-2">
-                          <Lock className="h-4 w-4" />
-                          Autenticación Windows
-                        </FormLabel>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                {!form.watch('useWindowsAuth') && (
-                  <>
-                    <FormField
-                      control={form.control}
-                      name="username"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="flex items-center gap-2">
-                            <User className="h-4 w-4" />
-                            Usuario
-                          </FormLabel>
-                          <FormControl>
-                            <Input 
-                              placeholder="usuario" 
-                              className="bg-white dark:bg-slate-900"
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="flex items-center gap-2">
-                            <Lock className="h-4 w-4" />
-                            Contraseña
-                          </FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="password" 
-                              placeholder="••••••••" 
-                              className="bg-white dark:bg-slate-900"
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </>
-                )}
-              </div>
-
+              <ConnectionFields form={form} />
               <div className="pt-4">
                 <Button
                   type="submit"
