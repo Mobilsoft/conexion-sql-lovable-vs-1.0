@@ -10,6 +10,7 @@ const formSchema = z.object({
   nit: z.string().min(1, "El NIT es requerido"),
   dv: z.string().min(1, "El DV es requerido"),
   razon_social: z.string().min(1, "La razón social es requerida"),
+  direccion: z.string(),
   email: z.string().email("Email inválido"),
   telefono: z.string(),
 });
