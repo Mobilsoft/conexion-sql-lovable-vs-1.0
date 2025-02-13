@@ -20,11 +20,9 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
   const queryClient = useQueryClient();
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    let toastInstance;
-    
     try {
       // Toast inicial con progress
-      toastInstance = toast({
+      toast({
         title: "Iniciando proceso...",
         description: (
           <div className="w-full space-y-2">
@@ -32,19 +30,7 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
             <Progress value={0} className="w-full" />
           </div>
         ),
-        duration: 100000,
-      });
-
-      // Actualizar progress 25%
-      toastInstance.update({
-        title: "Validando datos...",
-        description: (
-          <div className="w-full space-y-2">
-            <p>Validando la información ingresada</p>
-            <Progress value={25} className="w-full" />
-          </div>
-        ),
-        duration: 100000,
+        duration: 5000,
       });
 
       const companyData = {
@@ -76,8 +62,20 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
 
       console.log('Iniciando proceso de guardado con datos:', companyData);
 
-      // Actualizar progress 50%
-      toastInstance.update({
+      // Toast de validación
+      toast({
+        title: "Validando datos...",
+        description: (
+          <div className="w-full space-y-2">
+            <p>Validando la información ingresada</p>
+            <Progress value={25} className="w-full" />
+          </div>
+        ),
+        duration: 5000,
+      });
+
+      // Toast de envío
+      toast({
         title: "Enviando datos...",
         description: (
           <div className="w-full space-y-2">
@@ -85,7 +83,7 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
             <Progress value={50} className="w-full" />
           </div>
         ),
-        duration: 100000,
+        duration: 5000,
       });
 
       // Enviar al servidor SQL Server
@@ -100,8 +98,7 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
 
       console.log('Respuesta del servidor:', data);
 
-      // Actualizar progress 75%
-      toastInstance.update({
+      toast({
         title: "Procesando respuesta...",
         description: (
           <div className="w-full space-y-2">
@@ -109,12 +106,11 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
             <Progress value={75} className="w-full" />
           </div>
         ),
-        duration: 100000,
+        duration: 5000,
       });
       
       if (data.success) {
-        // Progress 100% y mensaje de éxito
-        toastInstance.update({
+        toast({
           title: editingCompany ? "¡Actualización Exitosa!" : "¡Registro Exitoso!",
           description: (
             <div className="w-full space-y-2">
@@ -156,18 +152,16 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
       }
       
       // Mostrar error con progress en rojo
-      if (toastInstance) {
-        toastInstance.update({
-          variant: "destructive",
-          title: "Error en el Proceso",
-          description: (
-            <div className="w-full space-y-2">
-              <p>{errorDescription}</p>
-              <Progress value={100} className="w-full bg-red-200" />
-            </div>
-          ),
-        });
-      }
+      toast({
+        variant: "destructive",
+        title: "Error en el Proceso",
+        description: (
+          <div className="w-full space-y-2">
+            <p>{errorDescription}</p>
+            <Progress value={100} className="w-full bg-red-200" />
+          </div>
+        ),
+      });
     }
   };
 
