@@ -1,7 +1,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Connection, Request, TediousType } from 'tedious';
+import { Connection, Request, TYPES } from 'tedious';
 
 @Injectable()
 export class DatabaseService {
@@ -38,7 +38,7 @@ export class DatabaseService {
     this.connection.connect();
   }
 
-  async executeQuery<T>(sql: string, parameters?: { name: string; type: TediousType; value: any }[]): Promise<T[]> {
+  async executeQuery<T>(sql: string, parameters?: { name: string; type: typeof TYPES[keyof typeof TYPES]; value: any }[]): Promise<T[]> {
     return new Promise((resolve, reject) => {
       const request = new Request(sql, (err, rowCount, rows) => {
         if (err) {

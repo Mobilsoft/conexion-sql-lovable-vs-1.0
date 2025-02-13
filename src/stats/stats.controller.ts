@@ -1,12 +1,12 @@
 
-import { Controller, Post } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { StatsService } from './stats.service';
 
 @Controller('api')
 export class StatsController {
   constructor(private readonly statsService: StatsService) {}
 
-  @Post('table-stats')
+  @Get('table-stats')
   async getTableStats() {
     try {
       const data = await this.statsService.getTableStats();
