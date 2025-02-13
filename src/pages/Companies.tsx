@@ -1,3 +1,4 @@
+
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { useState } from 'react';
@@ -18,7 +19,16 @@ import { CompaniesTable } from '@/components/CompaniesTable';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Company } from '@/types/company';
+import { 
+  Company, 
+  TipoDocumento, 
+  CodigoCIIU, 
+  ActividadComercial, 
+  Pais, 
+  Departamento, 
+  Ciudad, 
+  TipoRegimenTributario 
+} from '@/types/company';
 import { CompanyBasicInfo } from '@/components/company/CompanyBasicInfo';
 import { CompanyLegalInfo } from '@/components/company/CompanyLegalInfo';
 import { CompanyContactInfo } from '@/components/company/CompanyContactInfo';
