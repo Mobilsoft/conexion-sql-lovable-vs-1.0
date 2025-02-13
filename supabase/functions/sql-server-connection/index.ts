@@ -89,7 +89,7 @@ serve(async (req) => {
           GROUP BY t.name, tsu.size_in_kb
           ORDER BY t.name;
         `)
-        console.log('Consulta ejecutada exitosamente')
+        console.log('Consulta ejecutada exitosamente:', JSON.stringify(result?.recordset))
         break
 
       case 'getTableStructure':
@@ -104,13 +104,31 @@ serve(async (req) => {
               OBJECT_DEFINITION(c.default_object_id) as column_default,
               c.max_length,
               c.precision,
-              c.scale
+              c.scale,
+              CASE 
+                WHEN pk.column_id IS NOT NULL THEN 1
+                ELSE 0
+              END AS is_primary_key,
+              CASE 
+                WHEN fk.parent_column_id IS NOT NULL THEN 1
+                ELSE 0
+              END AS is_foreign_key,
+              OBJECT_SCHEMA_NAME(c.object_id) as schema_name,
+              col.collation_name as collation
             FROM sys.columns c
-            INNER JOIN sys.types t ON c.user_type_id = t.user_type_id
-            WHERE object_id = OBJECT_ID(@tableName)
+            INNER JOIN sys.types t 
+              ON c.user_type_id = t.user_type_id
+            LEFT JOIN sys.index_columns pk 
+              ON pk.object_id = c.object_id 
+              AND pk.column_id = c.column_id 
+              AND pk.index_id = 1
+            LEFT JOIN sys.foreign_key_columns fk 
+              ON fk.parent_object_id = c.object_id 
+              AND fk.parent_column_id = c.column_id
+            WHERE c.object_id = OBJECT_ID(@tableName)
             ORDER BY c.column_id;
           `)
-        console.log('Estructura de tabla obtenida exitosamente')
+        console.log('Estructura de tabla obtenida exitosamente:', JSON.stringify(result?.recordset))
         break
 
       default:
