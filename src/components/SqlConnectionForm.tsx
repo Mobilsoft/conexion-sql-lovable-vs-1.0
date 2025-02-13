@@ -37,7 +37,7 @@ const SqlConnectionForm = () => {
         password: '***********'
       });
 
-      const response = await fetch('/api/sql-server-connection', {
+      const response = await fetch('http://localhost:54321/functions/v1/sql-server-connection', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -55,14 +55,15 @@ const SqlConnectionForm = () => {
         }),
       });
 
+      const responseText = await response.text();
+      console.log('Respuesta cruda:', responseText);
+
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error en la respuesta:', response.status, errorText);
-        throw new Error(`Error del servidor: ${response.status} ${errorText}`);
+        throw new Error(`Error del servidor: ${response.status} ${responseText}`);
       }
 
-      const result = await response.json();
-      console.log('Respuesta recibida:', result);
+      const result = JSON.parse(responseText);
+      console.log('Respuesta parseada:', result);
 
       if (!result.success) {
         throw new Error(result.error || 'Error desconocido en la conexión');
