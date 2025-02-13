@@ -371,7 +371,7 @@ const Companies = () => {
                                   control={form.control}
                                   name="tipo_documento_id"
                                   render={({ field }) => (
-                                    <FormItem className="md:col-span-3">
+                                    <FormItem className="md:col-span-4">
                                       <FormLabel>Tipo de Documento</FormLabel>
                                       <Select onValueChange={field.onChange} value={field.value}>
                                         <FormControl>
@@ -408,7 +408,7 @@ const Companies = () => {
                                   control={form.control}
                                   name="dv"
                                   render={({ field }) => (
-                                    <FormItem className="md:col-span-2">
+                                    <FormItem className="md:col-span-1">
                                       <FormLabel>DV</FormLabel>
                                       <FormControl>
                                         <Input 
