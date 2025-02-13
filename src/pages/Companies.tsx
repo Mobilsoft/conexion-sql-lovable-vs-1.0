@@ -42,10 +42,20 @@ const Companies = () => {
 
   const handleDelete = async (nit: string) => {
     try {
-      const { error } = await supabase
-        .from('companies')
-        .delete()
-        .eq('nit', nit);
+      // Modificar para usar SQL Server
+      const { data, error } = await supabase.functions.invoke('sql-server-connection', {
+        body: {
+          action: 'deleteCompany',
+          data: {
+            server: '145.223.75.189',
+            port: '1433',
+            database: 'Taskmaster',
+            username: 'sa',
+            password: 'D3v3l0p3r2024$',
+            nit: nit
+          }
+        }
+      });
 
       if (error) throw error;
 
@@ -68,24 +78,42 @@ const Companies = () => {
   const { data: ciudades = [] } = useQuery({
     queryKey: ['ciudades'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('ciudades')
-        .select('*')
-        .order('nombre');
+      const { data, error } = await supabase.functions.invoke('sql-server-connection', {
+        body: {
+          action: 'getCiudades',
+          data: {
+            server: '145.223.75.189',
+            port: '1433',
+            database: 'Taskmaster',
+            username: 'sa',
+            password: 'D3v3l0p3r2024$'
+          }
+        }
+      });
+
       if (error) throw error;
-      return data;
+      return data?.data || [];
     },
   });
 
   const { data: departamentos = [] } = useQuery({
     queryKey: ['departamentos'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('departamentos')
-        .select('*')
-        .order('nombre');
+      const { data, error } = await supabase.functions.invoke('sql-server-connection', {
+        body: {
+          action: 'getDepartamentos',
+          data: {
+            server: '145.223.75.189',
+            port: '1433',
+            database: 'Taskmaster',
+            username: 'sa',
+            password: 'D3v3l0p3r2024$'
+          }
+        }
+      });
+
       if (error) throw error;
-      return data;
+      return data?.data || [];
     },
   });
 
@@ -94,7 +122,7 @@ const Companies = () => {
     queryFn: async () => {
       const { data, error } = await supabase.functions.invoke('sql-server-connection', {
         body: {
-          action: 'getTableStats',
+          action: 'getCompanies',
           data: {
             server: '145.223.75.189',
             port: '1433',

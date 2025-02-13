@@ -1,7 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.204.0/http/server.ts"
 import { getConnection, clearConnection } from "./db/connection.ts"
-import { getTableStats, getTableStructure, insertCompany, updateCompany, initializeDatabase } from "./services/tableService.ts"
+import { getTableStats, getTableStructure, insertCompany, updateCompany, initializeDatabase, getCompanies, getCiudades, getDepartamentos, deleteCompany } from "./services/tableService.ts"
 import { corsHeaders, handleCors } from "./utils/cors.ts"
 
 serve(async (req) => {
@@ -44,25 +44,41 @@ serve(async (req) => {
       case 'getTableStats':
         console.log('📊 Ejecutando consulta getTableStats')
         result = await getTableStats(pool)
-        console.log('✅ Consulta ejecutada exitosamente:', JSON.stringify(result?.recordset))
         break
 
       case 'getTableStructure':
         console.log('🔍 Obteniendo estructura de tabla:', data.tableName)
         result = await getTableStructure(pool, data.tableName)
-        console.log('✅ Estructura de tabla obtenida exitosamente:', JSON.stringify(result?.recordset))
         break
 
       case 'insertCompany':
         console.log('➕ Insertando nueva compañía')
         result = await insertCompany(pool, data)
-        console.log('✅ Compañía insertada exitosamente')
         break
 
       case 'updateCompany':
         console.log('📝 Actualizando compañía')
         result = await updateCompany(pool, data)
-        console.log('✅ Compañía actualizada exitosamente')
+        break
+        
+      case 'getCompanies':
+        console.log('📋 Obteniendo lista de compañías')
+        result = await getCompanies(pool)
+        break
+
+      case 'getCiudades':
+        console.log('🏙️ Obteniendo lista de ciudades')
+        result = await getCiudades(pool)
+        break
+
+      case 'getDepartamentos':
+        console.log('🗺️ Obteniendo lista de departamentos')
+        result = await getDepartamentos(pool)
+        break
+
+      case 'deleteCompany':
+        console.log('❌ Eliminando compañía')
+        result = await deleteCompany(pool, data.nit)
         break
 
       default:

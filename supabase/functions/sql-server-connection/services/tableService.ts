@@ -392,6 +392,43 @@ export const updateCompany = async (pool: mssql.ConnectionPool, companyData: any
   return result
 }
 
+export const getCompanies = async (pool: mssql.ConnectionPool) => {
+  console.log('Obteniendo lista de compañías...');
+  return await pool.request().query(`
+    SELECT * FROM companies 
+    WHERE master_detail = 'M' 
+    ORDER BY fecha_creacion DESC
+  `);
+}
+
+export const getCiudades = async (pool: mssql.ConnectionPool) => {
+  console.log('Obteniendo lista de ciudades...');
+  return await pool.request().query(`
+    SELECT * FROM ciudades 
+    WHERE master_detail = 'M' 
+    ORDER BY nombre ASC
+  `);
+}
+
+export const getDepartamentos = async (pool: mssql.ConnectionPool) => {
+  console.log('Obteniendo lista de departamentos...');
+  return await pool.request().query(`
+    SELECT * FROM departamentos 
+    WHERE master_detail = 'M' 
+    ORDER BY nombre ASC
+  `);
+}
+
+export const deleteCompany = async (pool: mssql.ConnectionPool, nit: string) => {
+  console.log('Eliminando compañía con NIT:', nit);
+  return await pool.request()
+    .input('nit', mssql.VarChar, nit)
+    .query(`
+      DELETE FROM companies 
+      WHERE nit = @nit
+    `);
+}
+
 const ensureMasterDetailColumn = async (pool: mssql.ConnectionPool, tableName: string) => {
   console.log('Verificando tabla:', tableName)
   
