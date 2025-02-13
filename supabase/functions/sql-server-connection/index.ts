@@ -1,6 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.204.0/http/server.ts"
-import { ConnectionPool } from "npm:mssql@7.3.5"
+import { ConnectionPool } from "npm:mssql@7.2.1"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,13 +8,14 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  console.log('Recibiendo petición:', req.method)
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    console.log('Recibiendo petición:', req.method)
     const body = await req.json()
     console.log('Datos recibidos:', JSON.stringify(body, (key, value) => 
       key === 'password' ? '***' : value
@@ -84,6 +85,9 @@ serve(async (req) => {
 
       console.log('Resultado obtenido:', result)
 
+      await pool.close()
+      console.log('Conexión cerrada exitosamente')
+
       return new Response(
         JSON.stringify({ 
           success: true, 
@@ -98,14 +102,8 @@ serve(async (req) => {
       )
     } catch (sqlError) {
       console.error('Error específico de SQL:', sqlError)
+      await pool.close()
       throw sqlError
-    } finally {
-      try {
-        await pool.close()
-        console.log('Conexión cerrada exitosamente')
-      } catch (closeError) {
-        console.error('Error al cerrar la conexión:', closeError)
-      }
     }
 
   } catch (error) {
