@@ -1,5 +1,4 @@
 
-import { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -12,6 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Database, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableStructureDialog } from "./TableStructureDialog";
+import { useState } from 'react';
 
 interface TableStats {
   table_name: string;
