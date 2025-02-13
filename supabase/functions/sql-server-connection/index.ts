@@ -32,6 +32,7 @@ serve(async (req) => {
     }
 
     console.log('Configurando conexión...')
+    console.log('Intentando conectar a:', data.server, 'puerto:', data.port)
 
     const config = {
       user: data.username,
@@ -48,13 +49,34 @@ serve(async (req) => {
         max: 10,
         min: 0,
         idleTimeoutMillis: 30000
-      }
+      },
+      connectionTimeout: 30000,  // Aumentado a 30 segundos
+      requestTimeout: 30000      // Aumentado a 30 segundos
     }
 
     try {
-      console.log('Conectando a SQL Server...')
+      console.log('Iniciando conexión a SQL Server...')
+      
+      // Intentar hacer ping al servidor antes de conectar
+      const tcpPingStart = Date.now()
+      try {
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 5000)
+        
+        const response = await fetch(`http://${data.server}:${data.port}`, {
+          signal: controller.signal
+        }).catch(() => null)
+        
+        clearTimeout(timeoutId)
+        
+        const tcpPingTime = Date.now() - tcpPingStart
+        console.log(`TCP Ping time: ${tcpPingTime}ms`)
+      } catch (pingError) {
+        console.log('TCP Ping falló:', pingError instanceof Error ? pingError.message : 'Error desconocido')
+      }
+
       await mssql.connect(config)
-      console.log('Conexión establecida')
+      console.log('Conexión establecida exitosamente')
 
       let result
 
@@ -95,6 +117,18 @@ serve(async (req) => {
         }
       )
 
+    } catch (dbError) {
+      console.error('Error de conexión detallado:', {
+        message: dbError instanceof Error ? dbError.message : 'Error desconocido',
+        name: dbError instanceof Error ? dbError.name : 'Unknown',
+        stack: dbError instanceof Error ? dbError.stack : undefined
+      })
+      
+      throw new Error(
+        dbError instanceof Error 
+          ? `Error de conexión a SQL Server: ${dbError.message}`
+          : 'Error desconocido al conectar a SQL Server'
+      )
     } finally {
       try {
         console.log('Cerrando conexión...')
