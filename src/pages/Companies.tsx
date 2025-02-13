@@ -44,7 +44,13 @@ const formSchema = z.object({
   direccion: z.string(),
   telefono: z.string(),
   email: z.string().email("Email inválido"),
-  // ... add other validations as needed
+  departamento_id: z.string(),
+  ciudad_id: z.string(),
+  pais_id: z.string(),
+  codigo_ciiu_id: z.string(),
+  actividad_comercial_id: z.string(),
+  tipo_regimen_id: z.string(),
+  municipio: z.string(),
 });
 
 const Companies = () => {
@@ -64,11 +70,40 @@ const Companies = () => {
       direccion: "",
       telefono: "",
       email: "",
-      // ... add other default values
+      departamento_id: "",
+      ciudad_id: "",
+      pais_id: "",
+      codigo_ciiu_id: "",
+      actividad_comercial_id: "",
+      tipo_regimen_id: "",
+      municipio: "",
     },
   });
 
-  // Query hooks
+  const handleDelete = async (nit: string) => {
+    try {
+      const { error } = await supabase
+        .from('companies')
+        .delete()
+        .eq('nit', nit);
+
+      if (error) throw error;
+
+      toast({
+        title: "Compañía eliminada",
+        description: "La compañía ha sido eliminada exitosamente.",
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['companies'] });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   const { data: tiposDocumento = [] } = useQuery({
     queryKey: ['tipos_documento'],
     queryFn: async () => {
@@ -178,10 +213,12 @@ const Companies = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const departamento = departamentos.find(d => d.id === parseInt(values.departamento_id))?.nombre || '';
+      const ciudad = ciudades.find(c => c.id === parseInt(values.ciudad_id))?.nombre || '';
 
       const companyData = {
         ...values,
         departamento,
+        ciudad,
         master_detail: 'M',
         tipo_documento_id: parseInt(values.tipo_documento_id),
         departamento_id: parseInt(values.departamento_id),
@@ -248,6 +285,7 @@ const Companies = () => {
                 <CompaniesTable 
                   companies={companies}
                   onEdit={setEditingCompany}
+                  onDelete={handleDelete}
                   isLoading={isLoading}
                 />
 
