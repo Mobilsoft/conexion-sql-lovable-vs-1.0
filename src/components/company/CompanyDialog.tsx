@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,6 +24,7 @@ import { toast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { formSchema } from '@/pages/Companies';
+import { validateCompanyData, formatValidationErrors } from '@/utils/validationUtils';
 
 interface CompanyDialogProps {
   open: boolean;
@@ -122,7 +122,7 @@ export function CompanyDialog({
     try {
       const companyData = {
         nit: values.nit,
-        dv: values.dv.substring(0, 1), // Aseguramos que DV sea solo 1 dígito
+        dv: values.dv.substring(0, 1),
         razon_social: values.razon_social,
         tipo_documento_id: parseInt(values.tipo_documento_id),
         numero_documento: values.numero_documento,
@@ -137,16 +137,26 @@ export function CompanyDialog({
         departamento: departamentos.find(d => d.id === parseInt(values.departamento_id))?.nombre || '',
         ciudad_id: parseInt(values.ciudad_id),
         ciudad: ciudades.find(c => c.id === parseInt(values.ciudad_id))?.nombre || '',
-        pais_id: 1, // Valor por defecto mientras no validamos
+        pais_id: 1,
         codigo_ciiu_id: parseInt(values.codigo_ciiu_id),
         actividad_comercial_id: parseInt(values.actividad_comercial_id),
         tipo_regimen_id: parseInt(values.tipo_regimen_id),
         municipio: values.municipio,
-        master_detail: 'M', // Cambiado a 'M' para empresas principales
+        master_detail: 'M',
         estado_empresa: 'Activo',
         naturaleza_empresa: 'Jurídica',
         tipo_empresa: 'Principal',
       };
+
+      const validationErrors = validateCompanyData(companyData);
+      if (validationErrors.length > 0) {
+        toast({
+          title: "Error de Validación",
+          description: formatValidationErrors(validationErrors),
+          variant: "destructive",
+        });
+        return;
+      }
 
       console.log('Datos a enviar:', companyData);
 
@@ -178,18 +188,15 @@ export function CompanyDialog({
     } catch (error: any) {
       console.error('Error completo:', error);
       
-      // Analizamos el mensaje de error para identificar el campo específico
       let errorDescription = error.message;
       
       if (error.message.includes('violates foreign key constraint')) {
-        // Error de llave foránea
         const fieldMatch = error.message.match(/companies_(\w+)_fkey/);
         if (fieldMatch) {
           const fieldName = fieldMatch[1];
           errorDescription = `Error en el campo ${fieldName}: La referencia seleccionada no es válida.`;
         }
       } else if (error.message.includes('value too long')) {
-        // Error de longitud de campo
         const fieldMatch = error.message.match(/value too long for type character varying\(\d+\)/);
         if (fieldMatch) {
           const columnMatch = error.message.match(/column "([^"]+)"/);
