@@ -47,9 +47,12 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
         tipo_empresa: 'Principal',
       };
 
+      console.log('Datos a validar:', companyData);
+
       // Realizar validación previa
       const validationErrors = await validateCompanyData(companyData);
       if (validationErrors.length > 0) {
+        console.log('Errores de validación:', validationErrors);
         toast({
           variant: "destructive",
           title: "Error de Validación",
@@ -58,7 +61,9 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
         return;
       }
 
+      console.log('Iniciando operación de guardado...');
       let result;
+      
       if (editingCompany) {
         result = await supabase
           .from('companies')
@@ -67,6 +72,7 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
 
         if (result.error) throw result.error;
         
+        console.log('Compañía actualizada:', result.data);
         toast({
           title: "¡Actualización Exitosa!",
           description: `La compañía ${companyData.razon_social} ha sido actualizada correctamente.`,
@@ -80,6 +86,7 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
 
         if (result.error) throw result.error;
         
+        console.log('Compañía creada:', result.data);
         toast({
           title: "¡Registro Exitoso!",
           description: `La compañía ${companyData.razon_social} ha sido registrada correctamente.`,
