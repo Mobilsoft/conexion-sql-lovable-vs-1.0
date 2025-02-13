@@ -36,9 +36,16 @@ export function CompanyForm({
   actividadesComerciales,
   tiposRegimen
 }: CompanyFormProps) {
+  console.log('Renderizando formulario con valores:', form.getValues());
+  
+  const handleSubmit = async (data: z.infer<typeof formSchema>) => {
+    console.log('Enviando formulario con datos:', data);
+    await onSubmit(data);
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <Accordion type="single" collapsible defaultValue="item-1" className="w-full space-y-4">
           <AccordionItem value="item-1" className="border rounded-lg">
             <AccordionTrigger className="px-4 bg-[#F2FCE2] hover:bg-[#E5F7D3] rounded-t-lg">

@@ -72,6 +72,13 @@ export function CompanyDialog({
     },
   });
 
+  console.log('Form values:', form.getValues());
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    console.log('Formulario enviado con valores:', values);
+    await handleSubmit(values);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -85,7 +92,7 @@ export function CompanyDialog({
         </DialogHeader>
         <CompanyForm
           form={form}
-          onSubmit={handleSubmit}
+          onSubmit={onSubmit}
           onCancel={() => onOpenChange(false)}
           editingCompany={!!editingCompany}
           ciudades={ciudades}
