@@ -16,13 +16,21 @@ serve(async (req) => {
   try {
     console.log('Recibiendo petición:', req.method)
     const body = await req.json()
-    console.log('Datos recibidos:', JSON.stringify(body))
+    console.log('Datos recibidos:', JSON.stringify(body, (key, value) => 
+      key === 'password' ? '***' : value
+    ))
 
     const { action, data } = body
 
     if (!action || !data) {
       throw new Error('Se requieren los campos action y data')
     }
+
+    console.log('Configurando conexión con los siguientes parámetros:')
+    console.log('Server:', data.server)
+    console.log('Database:', data.database)
+    console.log('Port:', data.port)
+    console.log('Username:', data.username)
 
     const config = {
       user: data.username,
@@ -42,11 +50,12 @@ serve(async (req) => {
       }
     }
 
-    console.log('Intentando conectar a:', data.server)
+    console.log('Intentando conectar a SQL Server...')
     
     let pool = null
     try {
       // Crear un nuevo pool de conexiones
+      console.log('Creando pool de conexiones...')
       pool = await sql.connect(config)
       console.log('Conexión establecida exitosamente')
 
@@ -67,6 +76,7 @@ serve(async (req) => {
             GROUP BY t.name, p.rows
             ORDER BY t.name;
           `)
+          console.log('Consulta ejecutada exitosamente')
           break
 
         default:
@@ -82,21 +92,32 @@ serve(async (req) => {
           } 
         }
       )
+    } catch (poolError) {
+      console.error('Error específico del pool:', poolError)
+      throw poolError
     } finally {
       if (pool) {
+        console.log('Cerrando conexión...')
         await pool.close()
         console.log('Conexión cerrada exitosamente')
       }
     }
 
   } catch (error) {
-    console.error('Error en la función edge:', error)
+    console.error('Error detallado:', {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+      details: error.toString()
+    })
     
     return new Response(
       JSON.stringify({ 
         success: false, 
         error: error.message || 'Error interno del servidor',
-        details: error.toString()
+        details: error.toString(),
+        name: error.name,
+        stack: error.stack
       }),
       { 
         status: 500,
