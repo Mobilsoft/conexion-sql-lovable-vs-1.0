@@ -9,9 +9,15 @@ export interface TableStructure {
   sql_connection_id: number | null;
 }
 
+export interface SelectOption {
+  value: string;
+  label: string;
+}
+
 export interface DynamicFormField {
   name: string;
   type: string;
   required: boolean;
   defaultValue?: any;
+  options?: SelectOption[];
 }

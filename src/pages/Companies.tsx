@@ -1,4 +1,3 @@
-
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { CompaniesTable } from '@/components/CompaniesTable';
@@ -203,8 +202,13 @@ const Companies = () => {
 
   const handleSave = async (company: Company) => {
     try {
+      const { departamento_id, ciudad_id, pais_id, ...restCompany } = company;
+      
       const companyData = {
-        ...company,
+        ...restCompany,
+        departamento_id,
+        ciudad_id,
+        pais_id,
         master_detail: 'M',
         fecha_actualizacion: new Date().toISOString(),
       };
