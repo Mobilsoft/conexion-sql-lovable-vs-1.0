@@ -56,7 +56,7 @@ app.post('/api/table-stats', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3001; // Cambiado a 3001 como puerto por defecto
 app.listen(PORT, () => {
   console.log(`Servidor ejecutándose en el puerto ${PORT}`);
 });

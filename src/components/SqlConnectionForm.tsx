@@ -38,7 +38,8 @@ const SqlConnectionForm = () => {
         password: '***********'
       });
 
-      const response = await axios.post('http://localhost:5000/api/table-stats', data);
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+      const response = await axios.post(`${apiUrl}/api/table-stats`, data);
       console.log('Respuesta recibida:', response.data);
 
       if (!response.data.success) {
