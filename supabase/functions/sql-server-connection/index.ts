@@ -98,6 +98,29 @@ serve(async (req) => {
 
       case 'getTableStructure':
         console.log('Obteniendo estructura de tabla:', data.tableName)
+        // Primero verificamos si la columna master_detail existe
+        const columnExists = await globalPool.request()
+          .input('tableName', mssql.VarChar, data.tableName)
+          .query(`
+            SELECT COUNT(*) as exists_count
+            FROM sys.columns c
+            WHERE c.object_id = OBJECT_ID(@tableName)
+            AND c.name = 'master_detail'
+          `)
+
+        // Si la columna no existe, la agregamos
+        if (columnExists.recordset[0].exists_count === 0) {
+          console.log('Agregando columna master_detail...')
+          await globalPool.request()
+            .input('tableName', mssql.VarChar, data.tableName)
+            .query(`
+              ALTER TABLE ${data.tableName}
+              ADD master_detail char(1) DEFAULT 'M'
+            `)
+          console.log('Columna master_detail agregada exitosamente')
+        }
+
+        // Ahora obtenemos la estructura actualizada
         result = await globalPool.request()
           .input('tableName', mssql.VarChar, data.tableName)
           .query(`
