@@ -27,25 +27,53 @@ import {
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { Cliente } from "@/types/cliente";
 import { useState } from "react";
-import { toast } from "@/components/ui/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ClientesTableProps {
   clientes: Cliente[];
   onEdit: (cliente: Cliente) => void;
   onDelete: (id: number) => void;
+  isLoading: boolean;
 }
 
-export function ClientesTable({ clientes, onEdit, onDelete }: ClientesTableProps) {
+export function ClientesTable({ clientes, onEdit, onDelete, isLoading }: ClientesTableProps) {
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const handleDelete = (id: number) => {
     onDelete(id);
-    toast({
-      title: "Cliente eliminado",
-      description: "El cliente ha sido eliminado exitosamente.",
-    });
     setDeleteId(null);
   };
+
+  if (isLoading) {
+    return (
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Documento</TableHead>
+              <TableHead>Teléfono</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Ciudad</TableHead>
+              <TableHead className="w-[50px]"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {[...Array(5)].map((_, index) => (
+              <TableRow key={index}>
+                <TableCell><Skeleton className="h-4 w-[200px]" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-[120px]" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-[180px]" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
+                <TableCell><Skeleton className="h-8 w-8 rounded-full" /></TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -93,6 +121,13 @@ export function ClientesTable({ clientes, onEdit, onDelete }: ClientesTableProps
                 </TableCell>
               </TableRow>
             ))}
+            {clientes.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  No hay clientes registrados
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>

@@ -7,19 +7,73 @@ import { useState } from 'react';
 import { Cliente } from '@/types/cliente';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/use-toast';
 
 const Clientes = () => {
   const [editingCliente, setEditingCliente] = useState<Cliente | null>(null);
-  const [clientes, setClientes] = useState<Cliente[]>([]);
   const [open, setOpen] = useState(false);
+  const queryClient = useQueryClient();
 
-  const handleSave = (cliente: Cliente) => {
-    if (editingCliente) {
-      setClientes(clientes.map(c => c.id === cliente.id ? cliente : c));
-    } else {
-      setClientes([...clientes, { ...cliente, id: Date.now() }]);
+  const { data: clientes = [], isLoading } = useQuery({
+    queryKey: ['clientes'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('clientes')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        toast({
+          title: "Error al cargar clientes",
+          description: error.message,
+          variant: "destructive",
+        });
+        throw error;
+      }
+
+      return data;
+    },
+  });
+
+  const handleSave = async (cliente: Cliente) => {
+    try {
+      if (editingCliente) {
+        const { error } = await supabase
+          .from('clientes')
+          .update(cliente)
+          .eq('id', cliente.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Cliente actualizado",
+          description: "Los datos del cliente han sido actualizados exitosamente.",
+        });
+      } else {
+        const { error } = await supabase
+          .from('clientes')
+          .insert([cliente]);
+
+        if (error) throw error;
+
+        toast({
+          title: "Cliente registrado",
+          description: "El cliente ha sido registrado exitosamente.",
+        });
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['clientes'] });
+      setEditingCliente(null);
+      setOpen(false);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     }
-    setEditingCliente(null);
   };
 
   const handleEdit = (cliente: Cliente) => {
@@ -27,8 +81,27 @@ const Clientes = () => {
     setOpen(true);
   };
 
-  const handleDelete = (id: number) => {
-    setClientes(clientes.filter(c => c.id !== id));
+  const handleDelete = async (id: number) => {
+    try {
+      const { error } = await supabase
+        .from('clientes')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ['clientes'] });
+      toast({
+        title: "Cliente eliminado",
+        description: "El cliente ha sido eliminado exitosamente.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error al eliminar",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   const handleOpenChange = (open: boolean) => {
@@ -59,7 +132,8 @@ const Clientes = () => {
                 <ClientesTable 
                   clientes={clientes} 
                   onEdit={handleEdit} 
-                  onDelete={handleDelete} 
+                  onDelete={handleDelete}
+                  isLoading={isLoading}
                 />
                 <ClientesForm 
                   open={open}
