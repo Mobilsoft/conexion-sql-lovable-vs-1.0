@@ -75,9 +75,23 @@ const DatabaseStats = ({ stats, connectionData }: { stats: TableStats[], connect
 
   const handleSaveForm = async (data: any) => {
     if (!formTable) return;
+    
+    // Validar que la tabla existe en el esquema
+    const validTables = ['clientes', 'companies', 'sql_connections', 'table_structures', 
+                        'task_attachments', 'tasks', 'users', 'task_comments'];
+    
+    if (!validTables.includes(formTable.toLowerCase())) {
+      toast({
+        title: "Error",
+        description: "Tabla no válida",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
-        .from(formTable.toLowerCase())
+        .from(formTable.toLowerCase() as any)
         .insert([data]);
 
       if (error) throw error;
