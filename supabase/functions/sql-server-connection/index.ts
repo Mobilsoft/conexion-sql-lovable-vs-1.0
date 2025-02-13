@@ -1,6 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.204.0/http/server.ts"
-import * as mssql from "npm:mssql@10.0.1"
+import { ConnectionPool } from "npm:mssql@10.0.1"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -53,8 +53,9 @@ serve(async (req) => {
     console.log('Intentando conectar a SQL Server...')
     
     try {
-      // Crear una nueva conexión
-      const pool = await mssql.connect(config)
+      // Crear una nueva conexión usando ConnectionPool
+      const pool = new ConnectionPool(config)
+      await pool.connect()
       console.log('Conexión establecida exitosamente')
 
       let result
@@ -96,13 +97,6 @@ serve(async (req) => {
     } catch (sqlError) {
       console.error('Error específico de SQL:', sqlError)
       throw sqlError
-    } finally {
-      try {
-        await mssql.close()
-        console.log('Conexión cerrada en finally')
-      } catch (closeError) {
-        console.error('Error al cerrar la conexión:', closeError)
-      }
     }
 
   } catch (error) {
