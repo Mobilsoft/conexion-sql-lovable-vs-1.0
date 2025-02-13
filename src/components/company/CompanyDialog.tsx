@@ -120,12 +120,9 @@ export function CompanyDialog({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      // Asegurarse de que el DV tenga solo un carácter
-      const dv = values.dv.charAt(0);
-
       const companyData = {
         nit: values.nit,
-        dv: dv,
+        dv: values.dv.substring(0, 1), // Aseguramos que solo tome el primer carácter
         razon_social: values.razon_social,
         tipo_documento_id: parseInt(values.tipo_documento_id),
         numero_documento: values.numero_documento,
@@ -145,11 +142,13 @@ export function CompanyDialog({
         actividad_comercial_id: parseInt(values.actividad_comercial_id),
         tipo_regimen_id: parseInt(values.tipo_regimen_id),
         municipio: values.municipio,
-        master_detail: 'D', // Cambiado de 'M' a 'D' para cumplir con la restricción de la base de datos
+        master_detail: 'D',
         estado_empresa: 'Activo',
         naturaleza_empresa: 'Jurídica',
         tipo_empresa: 'Principal',
       };
+
+      console.log('Datos a enviar:', companyData); // Agregamos log para debugging
 
       if (editingCompany) {
         const { error } = await supabase
@@ -177,7 +176,10 @@ export function CompanyDialog({
       queryClient.invalidateQueries({ queryKey: ['companies'] });
       onOpenChange(false);
     } catch (error: any) {
-      console.error('Error details:', error);
+      console.error('Error completo:', error);
+      console.error('Detalles del error:', error.message);
+      if (error.error) console.error('Error interno:', error.error);
+      
       toast({
         title: "Error en el Proceso",
         description: `${error.message}. Por favor, verifique los datos e intente nuevamente.`,
