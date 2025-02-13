@@ -2,11 +2,17 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 
+interface TableStats {
+  table_name: string;
+  row_count: number;
+  size_in_kb: number;
+}
+
 @Injectable()
 export class StatsService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async getTableStats() {
+  async getTableStats(): Promise<TableStats[]> {
     const sql = `
       SELECT 
         t.name AS table_name,
@@ -20,6 +26,6 @@ export class StatsService {
       ORDER BY t.name;
     `;
     
-    return this.databaseService.executeQuery(sql);
+    return this.databaseService.executeQuery<TableStats>(sql);
   }
 }
