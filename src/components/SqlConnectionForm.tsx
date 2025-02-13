@@ -38,7 +38,7 @@ const SqlConnectionForm = () => {
         password: '***********'
       });
 
-      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
       const response = await axios.post(`${apiUrl}/api/table-stats`, data);
       console.log('Respuesta recibida:', response.data);
 
