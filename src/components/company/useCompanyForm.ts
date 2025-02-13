@@ -19,6 +19,12 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      // Mostrar mensaje de guardando
+      const toastId = toast({
+        title: "Guardando...",
+        description: "Por favor espere mientras se guardan los datos.",
+      });
+
       const companyData = {
         nit: values.nit,
         dv: values.dv.substring(0, 1),
@@ -48,7 +54,6 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
 
       console.log('Datos a validar:', companyData);
 
-      // Realizar validación previa
       const validationErrors = await validateCompanyData(companyData);
       if (validationErrors.length > 0) {
         console.log('Errores de validación:', validationErrors);
@@ -95,7 +100,7 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
       // Invalidar la consulta para refrescar la tabla
       await queryClient.invalidateQueries({ queryKey: ['companies'] });
       
-      // Cerrar el diálogo
+      // Cerrar el diálogo y reiniciar el formulario
       onOpenChange(false);
       
     } catch (error: any) {

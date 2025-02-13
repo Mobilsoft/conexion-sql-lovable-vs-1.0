@@ -76,11 +76,9 @@ export function CompanyDialog({
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       console.log('CompanyDialog - Formulario enviado con valores:', values);
-      toast({
-        title: "Procesando...",
-        description: "Guardando los datos de la compañía.",
-      });
       await handleFormSubmit(values);
+      // Limpiar el formulario después de un guardado exitoso
+      form.reset();
     } catch (error) {
       console.error('Error en CompanyDialog onSubmit:', error);
       toast({
@@ -92,7 +90,12 @@ export function CompanyDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(isOpen) => {
+      if (!isOpen) {
+        form.reset(); // Limpiar el formulario al cerrar el diálogo
+      }
+      onOpenChange(isOpen);
+    }}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
@@ -105,7 +108,10 @@ export function CompanyDialog({
         <CompanyForm
           form={form}
           onSubmit={onSubmit}
-          onCancel={() => onOpenChange(false)}
+          onCancel={() => {
+            form.reset(); // Limpiar el formulario al cancelar
+            onOpenChange(false);
+          }}
           editingCompany={!!editingCompany}
           ciudades={ciudades}
           departamentos={departamentos}
