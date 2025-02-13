@@ -20,11 +20,11 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
   const queryClient = useQueryClient();
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    let toastId: string | undefined;
+    let toastInstance;
     
     try {
       // Toast inicial con progress
-      toastId = toast({
+      toastInstance = toast({
         title: "Iniciando proceso...",
         description: (
           <div className="w-full space-y-2">
@@ -33,11 +33,10 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
           </div>
         ),
         duration: 100000,
-      }).id;
+      });
 
       // Actualizar progress 25%
-      toast({
-        id: toastId,
+      toastInstance.update({
         title: "Validando datos...",
         description: (
           <div className="w-full space-y-2">
@@ -78,8 +77,7 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
       console.log('Iniciando proceso de guardado con datos:', companyData);
 
       // Actualizar progress 50%
-      toast({
-        id: toastId,
+      toastInstance.update({
         title: "Enviando datos...",
         description: (
           <div className="w-full space-y-2">
@@ -103,8 +101,7 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
       console.log('Respuesta del servidor:', data);
 
       // Actualizar progress 75%
-      toast({
-        id: toastId,
+      toastInstance.update({
         title: "Procesando respuesta...",
         description: (
           <div className="w-full space-y-2">
@@ -117,8 +114,7 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
       
       if (data.success) {
         // Progress 100% y mensaje de éxito
-        toast({
-          id: toastId,
+        toastInstance.update({
           title: editingCompany ? "¡Actualización Exitosa!" : "¡Registro Exitoso!",
           description: (
             <div className="w-full space-y-2">
@@ -160,17 +156,18 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
       }
       
       // Mostrar error con progress en rojo
-      toast({
-        id: toastId,
-        variant: "destructive",
-        title: "Error en el Proceso",
-        description: (
-          <div className="w-full space-y-2">
-            <p>{errorDescription}</p>
-            <Progress value={100} className="w-full bg-red-200" />
-          </div>
-        ),
-      });
+      if (toastInstance) {
+        toastInstance.update({
+          variant: "destructive",
+          title: "Error en el Proceso",
+          description: (
+            <div className="w-full space-y-2">
+              <p>{errorDescription}</p>
+              <Progress value={100} className="w-full bg-red-200" />
+            </div>
+          ),
+        });
+      }
     }
   };
 
