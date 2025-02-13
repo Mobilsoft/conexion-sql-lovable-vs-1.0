@@ -34,6 +34,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Company, CodigoCIIU, ActividadComercial, Pais, Departamento, Ciudad, TipoRegimenTributario, TipoDocumento } from '@/types/company';
+import { CompanyBasicInfo } from '@/components/company/CompanyBasicInfo';
 
 const formSchema = z.object({
   nit: z.string().min(1, "El NIT es requerido"),
@@ -318,6 +319,7 @@ const Companies = () => {
                           </TabsList>
 
                           <TabsContent value="basic" className="space-y-4 mt-4">
+                            <CompanyBasicInfo form={form} />
                             <FormField
                               control={form.control}
                               name="tipo_contribuyente"
@@ -338,50 +340,6 @@ const Companies = () => {
                                       <SelectItem value="No Responsable de IVA">No Responsable de IVA</SelectItem>
                                     </SelectContent>
                                   </Select>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-
-                            <div className="grid grid-cols-2 gap-4">
-                              <FormField
-                                control={form.control}
-                                name="nit"
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>NIT</FormLabel>
-                                    <FormControl>
-                                      <Input {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-
-                              <FormField
-                                control={form.control}
-                                name="dv"
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>DV</FormLabel>
-                                    <FormControl>
-                                      <Input {...field} maxLength={1} />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-                            </div>
-
-                            <FormField
-                              control={form.control}
-                              name="razon_social"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Razón Social</FormLabel>
-                                  <FormControl>
-                                    <Input {...field} />
-                                  </FormControl>
                                   <FormMessage />
                                 </FormItem>
                               )}
