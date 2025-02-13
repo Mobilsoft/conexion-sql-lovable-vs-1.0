@@ -4,7 +4,8 @@ import {
   Users,
   Shield,
   Database,
-  BookOpen
+  BookOpen,
+  Building2
 } from 'lucide-react';
 import {
   Sidebar,
@@ -36,6 +37,11 @@ const menuItems = [
     title: "Registro de Clientes",
     icon: Users,
     url: "/clientes"
+  },
+  {
+    title: "Registro de Compañías",
+    icon: Building2,
+    url: "/companies"
   },
   {
     title: "SEGURIDAD",
