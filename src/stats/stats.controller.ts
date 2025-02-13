@@ -1,24 +1,25 @@
 
 import { Controller, Get } from '@nestjs/common';
 import { StatsService } from './stats.service';
-import { StatsResponse } from '../types/table-stats';
+import { StatsResponse, TableStats } from '../types/table-stats';
 
 @Controller('stats')
 export class StatsController {
   constructor(private readonly statsService: StatsService) {}
 
   @Get()
-  getTableStats(): Promise<StatsResponse> {
+  async getTableStats(): Promise<StatsResponse> {
     try {
-      return Promise.resolve({
+      const stats: TableStats[] = await this.statsService.getTableStats();
+      return {
         success: true,
-        data: this.statsService.getTableStats()
-      });
+        data: stats
+      };
     } catch (error) {
-      return Promise.resolve({
+      return {
         success: false,
         error: error instanceof Error ? error.message : 'Error al obtener estadísticas de tablas'
-      });
+      };
     }
   }
 }
