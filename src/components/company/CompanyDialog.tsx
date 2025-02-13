@@ -145,7 +145,7 @@ export function CompanyDialog({
         actividad_comercial_id: parseInt(values.actividad_comercial_id),
         tipo_regimen_id: parseInt(values.tipo_regimen_id),
         municipio: values.municipio,
-        master_detail: 'M',
+        master_detail: 'D', // Cambiado de 'M' a 'D' para cumplir con la restricción de la base de datos
         estado_empresa: 'Activo',
         naturaleza_empresa: 'Jurídica',
         tipo_empresa: 'Principal',
@@ -177,6 +177,7 @@ export function CompanyDialog({
       queryClient.invalidateQueries({ queryKey: ['companies'] });
       onOpenChange(false);
     } catch (error: any) {
+      console.error('Error details:', error);
       toast({
         title: "Error en el Proceso",
         description: `${error.message}. Por favor, verifique los datos e intente nuevamente.`,
