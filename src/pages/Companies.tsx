@@ -1,3 +1,7 @@
+/**
+ * Companies.tsx
+ * Main component for managing company data
+ */
 
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
@@ -10,6 +14,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -306,6 +311,9 @@ const Companies = () => {
                       <DialogTitle>
                         {editingCompany ? "Editar Compañía" : "Nueva Compañía"}
                       </DialogTitle>
+                      <DialogDescription>
+                        Completa los datos de la compañía para registrarla.
+                      </DialogDescription>
                     </DialogHeader>
                     <Form {...form}>
                       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
