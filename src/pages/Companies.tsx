@@ -366,12 +366,12 @@ const Companies = () => {
                           <AccordionItem value="item-1" className="border rounded-lg bg-gray-50/30">
                             <AccordionTrigger className="px-4">Información Básica</AccordionTrigger>
                             <AccordionContent className="p-4 space-y-4">
-                              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
                                 <FormField
                                   control={form.control}
                                   name="tipo_documento_id"
                                   render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className="md:col-span-3">
                                       <FormLabel>Tipo de Documento</FormLabel>
                                       <Select onValueChange={field.onChange} value={field.value}>
                                         <FormControl>
@@ -395,7 +395,7 @@ const Companies = () => {
                                   control={form.control}
                                   name="nit"
                                   render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className="md:col-span-3">
                                       <FormLabel>NIT</FormLabel>
                                       <FormControl>
                                         <Input {...field} maxLength={15} placeholder="Máximo 15 dígitos" />
@@ -408,14 +408,15 @@ const Companies = () => {
                                   control={form.control}
                                   name="dv"
                                   render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className="md:col-span-2">
                                       <FormLabel>DV</FormLabel>
                                       <FormControl>
                                         <Input 
                                           {...field} 
                                           disabled={watchTipoDocumento !== "2"}
-                                          maxLength={2}
-                                          placeholder="2 dígitos"
+                                          maxLength={1}
+                                          placeholder="1 dígito"
+                                          className="w-full"
                                         />
                                       </FormControl>
                                     </FormItem>
@@ -426,7 +427,7 @@ const Companies = () => {
                                   control={form.control}
                                   name="tipo_contribuyente"
                                   render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className="md:col-span-4">
                                       <FormLabel>Tipo de Contribuyente</FormLabel>
                                       <Select onValueChange={field.onChange} value={field.value}>
                                         <FormControl>
@@ -447,7 +448,7 @@ const Companies = () => {
                                   control={form.control}
                                   name="razon_social"
                                   render={({ field }) => (
-                                    <FormItem className="md:col-span-2">
+                                    <FormItem className="md:col-span-6">
                                       <FormLabel>Razón Social</FormLabel>
                                       <FormControl>
                                         <Input {...field} />
@@ -460,7 +461,7 @@ const Companies = () => {
                                   control={form.control}
                                   name="direccion"
                                   render={({ field }) => (
-                                    <FormItem className="md:col-span-2">
+                                    <FormItem className="md:col-span-6">
                                       <FormLabel>Dirección Comercial</FormLabel>
                                       <FormControl>
                                         <Input {...field} />
@@ -486,7 +487,7 @@ const Companies = () => {
                                   control={form.control}
                                   name="email"
                                   render={({ field }) => (
-                                    <FormItem className="md:col-span-2">
+                                    <FormItem className="md:col-span-6">
                                       <FormLabel>Correo Electrónico</FormLabel>
                                       <FormControl>
                                         <Input {...field} type="email" />
