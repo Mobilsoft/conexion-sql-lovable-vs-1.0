@@ -33,7 +33,7 @@ export const formSchema = z.object({
   actividad_comercial_id: z.string(),
   tipo_regimen_id: z.string(),
   numero_documento: z.string(),
-  municipio: z.string(),
+  municipio: z.string().min(1, "El municipio es requerido")
 });
 
 const Companies = () => {

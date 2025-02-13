@@ -28,7 +28,7 @@ const fieldConstraints: Record<string, FieldValidation> = {
   direccion: { maxLength: 255, required: true },
   telefono: { maxLength: 20, required: true },
   email: { maxLength: 100, required: true, type: 'email' },
-  municipio: { maxLength: 100, required: true },
+  municipio: { maxLength: 100 }, // Removemos required: true ya que se maneja en el esquema Zod
   master_detail: { maxLength: 10 },
   estado_empresa: { maxLength: 50 },
   naturaleza_empresa: { maxLength: 50 },
