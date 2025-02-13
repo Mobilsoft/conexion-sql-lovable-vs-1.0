@@ -69,6 +69,41 @@ serve(async (req) => {
     switch (action) {
       case 'getTableStats':
         console.log('Ejecutando consulta getTableStats')
+        // Primero obtenemos todas las tablas del usuario
+        const tables = await globalPool.request().query(`
+          SELECT name 
+          FROM sys.tables 
+          WHERE is_ms_shipped = 0
+          ORDER BY name;
+        `)
+
+        // Para cada tabla, verificamos y agregamos la columna master_detail si no existe
+        for (const table of tables.recordset) {
+          const tableName = table.name
+          console.log('Verificando tabla:', tableName)
+          
+          const columnExists = await globalPool.request()
+            .input('tableName', mssql.VarChar, tableName)
+            .query(`
+              SELECT COUNT(*) as exists_count
+              FROM sys.columns c
+              WHERE c.object_id = OBJECT_ID(@tableName)
+              AND c.name = 'master_detail'
+            `)
+
+          if (columnExists.recordset[0].exists_count === 0) {
+            console.log('Agregando columna master_detail a la tabla:', tableName)
+            await globalPool.request()
+              .input('tableName', mssql.VarChar, tableName)
+              .query(`
+                ALTER TABLE ${tableName}
+                ADD master_detail char(1) DEFAULT 'M'
+              `)
+            console.log('Columna master_detail agregada exitosamente a:', tableName)
+          }
+        }
+
+        // Ahora procedemos con la consulta original de estadísticas
         result = await globalPool.request().query(`
           WITH TableSpaceUsage AS (
             SELECT 
