@@ -1,7 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.204.0/http/server.ts"
 import { getConnection, clearConnection } from "./db/connection.ts"
-import { getTableStats, getTableStructure } from "./services/tableService.ts"
+import { getTableStats, getTableStructure, insertCompany, updateCompany } from "./services/tableService.ts"
 import { corsHeaders, handleCors } from "./utils/cors.ts"
 
 serve(async (req) => {
@@ -36,6 +36,18 @@ serve(async (req) => {
         console.log('Obteniendo estructura de tabla:', data.tableName)
         result = await getTableStructure(pool, data.tableName)
         console.log('Estructura de tabla obtenida exitosamente:', JSON.stringify(result?.recordset))
+        break
+
+      case 'insertCompany':
+        console.log('Insertando nueva compañía')
+        result = await insertCompany(pool, data)
+        console.log('Compañía insertada exitosamente')
+        break
+
+      case 'updateCompany':
+        console.log('Actualizando compañía')
+        result = await updateCompany(pool, data)
+        console.log('Compañía actualizada exitosamente')
         break
 
       default:

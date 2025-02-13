@@ -86,6 +86,103 @@ export const getTableStructure = async (pool: mssql.ConnectionPool, tableName: s
     `)
 }
 
+export const insertCompany = async (pool: mssql.ConnectionPool, companyData: any) => {
+  console.log('Insertando nueva compañía:', companyData)
+  
+  const result = await pool.request()
+    .input('nit', mssql.VarChar, companyData.nit)
+    .input('dv', mssql.VarChar, companyData.dv)
+    .input('razon_social', mssql.VarChar, companyData.razon_social)
+    .input('tipo_documento_id', mssql.Int, companyData.tipo_documento_id)
+    .input('tipo_contribuyente', mssql.VarChar, companyData.tipo_contribuyente)
+    .input('direccion', mssql.VarChar, companyData.direccion)
+    .input('direccion_principal', mssql.VarChar, companyData.direccion_principal)
+    .input('telefono', mssql.VarChar, companyData.telefono)
+    .input('telefono_movil', mssql.VarChar, companyData.telefono_movil)
+    .input('email', mssql.VarChar, companyData.email)
+    .input('correo_electronico', mssql.VarChar, companyData.correo_electronico)
+    .input('departamento_id', mssql.Int, companyData.departamento_id)
+    .input('departamento', mssql.VarChar, companyData.departamento)
+    .input('ciudad_id', mssql.Int, companyData.ciudad_id)
+    .input('ciudad', mssql.VarChar, companyData.ciudad)
+    .input('pais_id', mssql.Int, companyData.pais_id)
+    .input('codigo_ciiu_id', mssql.Int, companyData.codigo_ciiu_id)
+    .input('actividad_comercial_id', mssql.Int, companyData.actividad_comercial_id)
+    .input('tipo_regimen_id', mssql.Int, companyData.tipo_regimen_id)
+    .input('municipio', mssql.VarChar, companyData.municipio)
+    .input('master_detail', mssql.VarChar, 'M')
+    .query(`
+      INSERT INTO companies (
+        nit, dv, razon_social, tipo_documento_id, tipo_contribuyente,
+        direccion, direccion_principal, telefono, telefono_movil,
+        email, correo_electronico, departamento_id, departamento,
+        ciudad_id, ciudad, pais_id, codigo_ciiu_id,
+        actividad_comercial_id, tipo_regimen_id, municipio, master_detail
+      )
+      VALUES (
+        @nit, @dv, @razon_social, @tipo_documento_id, @tipo_contribuyente,
+        @direccion, @direccion_principal, @telefono, @telefono_movil,
+        @email, @correo_electronico, @departamento_id, @departamento,
+        @ciudad_id, @ciudad, @pais_id, @codigo_ciiu_id,
+        @actividad_comercial_id, @tipo_regimen_id, @municipio, @master_detail
+      )
+    `)
+
+  return result
+}
+
+export const updateCompany = async (pool: mssql.ConnectionPool, companyData: any) => {
+  console.log('Actualizando compañía:', companyData)
+  
+  const result = await pool.request()
+    .input('nit', mssql.VarChar, companyData.nit)
+    .input('dv', mssql.VarChar, companyData.dv)
+    .input('razon_social', mssql.VarChar, companyData.razon_social)
+    .input('tipo_documento_id', mssql.Int, companyData.tipo_documento_id)
+    .input('tipo_contribuyente', mssql.VarChar, companyData.tipo_contribuyente)
+    .input('direccion', mssql.VarChar, companyData.direccion)
+    .input('direccion_principal', mssql.VarChar, companyData.direccion_principal)
+    .input('telefono', mssql.VarChar, companyData.telefono)
+    .input('telefono_movil', mssql.VarChar, companyData.telefono_movil)
+    .input('email', mssql.VarChar, companyData.email)
+    .input('correo_electronico', mssql.VarChar, companyData.correo_electronico)
+    .input('departamento_id', mssql.Int, companyData.departamento_id)
+    .input('departamento', mssql.VarChar, companyData.departamento)
+    .input('ciudad_id', mssql.Int, companyData.ciudad_id)
+    .input('ciudad', mssql.VarChar, companyData.ciudad)
+    .input('pais_id', mssql.Int, companyData.pais_id)
+    .input('codigo_ciiu_id', mssql.Int, companyData.codigo_ciiu_id)
+    .input('actividad_comercial_id', mssql.Int, companyData.actividad_comercial_id)
+    .input('tipo_regimen_id', mssql.Int, companyData.tipo_regimen_id)
+    .input('municipio', mssql.VarChar, companyData.municipio)
+    .query(`
+      UPDATE companies
+      SET 
+        dv = @dv,
+        razon_social = @razon_social,
+        tipo_documento_id = @tipo_documento_id,
+        tipo_contribuyente = @tipo_contribuyente,
+        direccion = @direccion,
+        direccion_principal = @direccion_principal,
+        telefono = @telefono,
+        telefono_movil = @telefono_movil,
+        email = @email,
+        correo_electronico = @correo_electronico,
+        departamento_id = @departamento_id,
+        departamento = @departamento,
+        ciudad_id = @ciudad_id,
+        ciudad = @ciudad,
+        pais_id = @pais_id,
+        codigo_ciiu_id = @codigo_ciiu_id,
+        actividad_comercial_id = @actividad_comercial_id,
+        tipo_regimen_id = @tipo_regimen_id,
+        municipio = @municipio
+      WHERE nit = @nit
+    `)
+
+  return result
+}
+
 const ensureMasterDetailColumn = async (pool: mssql.ConnectionPool, tableName: string) => {
   console.log('Verificando tabla:', tableName)
   
