@@ -41,7 +41,7 @@ serve(async (req) => {
       server: data.server,
       port: parseInt(data.port),
       options: {
-        encrypt: true,
+        encrypt: false,  // Cambiado a false para conexiones locales/directas
         trustServerCertificate: true,
         enableArithAbort: true
       },
@@ -50,32 +50,15 @@ serve(async (req) => {
         min: 0,
         idleTimeoutMillis: 30000
       },
-      connectionTimeout: 30000,  // Aumentado a 30 segundos
-      requestTimeout: 30000      // Aumentado a 30 segundos
+      connectionTimeout: 15000,  // Reducido a 15 segundos para fallar más rápido si hay problemas
+      requestTimeout: 15000      // Reducido a 15 segundos
     }
 
     try {
       console.log('Iniciando conexión a SQL Server...')
       
-      // Intentar hacer ping al servidor antes de conectar
-      const tcpPingStart = Date.now()
-      try {
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 5000)
-        
-        const response = await fetch(`http://${data.server}:${data.port}`, {
-          signal: controller.signal
-        }).catch(() => null)
-        
-        clearTimeout(timeoutId)
-        
-        const tcpPingTime = Date.now() - tcpPingStart
-        console.log(`TCP Ping time: ${tcpPingTime}ms`)
-      } catch (pingError) {
-        console.log('TCP Ping falló:', pingError instanceof Error ? pingError.message : 'Error desconocido')
-      }
-
-      await mssql.connect(config)
+      // Crear un pool de conexiones
+      const pool = await mssql.connect(config)
       console.log('Conexión establecida exitosamente')
 
       let result
@@ -83,7 +66,7 @@ serve(async (req) => {
       switch (action) {
         case 'getTableStats':
           console.log('Ejecutando consulta getTableStats')
-          result = await mssql.query(`
+          result = await pool.request().query(`
             SELECT 
               t.name AS table_name,
               p.rows AS row_count,
@@ -102,7 +85,7 @@ serve(async (req) => {
           throw new Error('Acción no válida: ' + action)
       }
 
-      await mssql.close()
+      await pool.close()
 
       return new Response(
         JSON.stringify({ 
@@ -123,6 +106,16 @@ serve(async (req) => {
         name: dbError instanceof Error ? dbError.name : 'Unknown',
         stack: dbError instanceof Error ? dbError.stack : undefined
       })
+      
+      // Comprobar si el error es específico de red o conexión
+      const errorMessage = dbError instanceof Error ? dbError.message : 'Error desconocido';
+      if (errorMessage.includes('timeout') || errorMessage.includes('Failed to connect')) {
+        throw new Error(`No se pudo establecer conexión con el servidor SQL Server. 
+          Por favor, verifique que:
+          1. El servidor esté en línea y accesible
+          2. El puerto 1433 esté abierto y permitido por el firewall
+          3. Las credenciales sean correctas`);
+      }
       
       throw new Error(
         dbError instanceof Error 
