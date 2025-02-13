@@ -36,8 +36,8 @@ serve(async (req) => {
         encrypt: true,
         trustServerCertificate: true,
         port: parseInt(data.port),
-        connectTimeout: 60000, // Aumentado a 60 segundos
-        requestTimeout: 60000, // Aumentado a 60 segundos
+        connectTimeout: 60000,
+        requestTimeout: 60000,
         rowCollectionOnRequestCompletion: true,
         useUTC: true
       }
@@ -54,7 +54,7 @@ serve(async (req) => {
           connection.close();
         }
         reject(new Error('No se pudo establecer la conexión con el servidor SQL. Por favor, verifique las credenciales y que el servidor esté accesible.'))
-      }, 60000) // Aumentado a 60 segundos
+      }, 60000)
 
       connection.on('connect', (err) => {
         clearTimeout(timeoutId)
@@ -147,6 +147,27 @@ serve(async (req) => {
 
         request.on('requestCompleted', () => {
           resolve(tables);
+        });
+
+        connection.execSql(request);
+      });
+    } else if (action === 'insertCompany' || action === 'updateCompany') {
+      const query = action === 'insertCompany'
+        ? `INSERT INTO Companies (name, description) VALUES ('${data.name}', '${data.description}');`
+        : `UPDATE Companies SET name = '${data.name}', description = '${data.description}' WHERE id = ${data.id};`
+
+      result = await new Promise((resolve, reject) => {
+        const request = new Request(
+          query,
+          (err) => {
+            if (err) {
+              reject(err);
+            }
+          }
+        );
+
+        request.on('requestCompleted', () => {
+          resolve({ message: 'Compañía insertada/actualizada exitosamente' });
         });
 
         connection.execSql(request);
