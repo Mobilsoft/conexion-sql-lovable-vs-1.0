@@ -22,6 +22,8 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      console.log('🚀 Iniciando submit del formulario con valores:', values);
+      
       // Toast inicial con progress
       toastInstance = toast({
         title: "Iniciando proceso...",
@@ -61,7 +63,7 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
         tipo_empresa: 'Principal',
       };
 
-      console.log('Iniciando proceso de guardado con datos:', companyData);
+      console.log('📦 Datos preparados para enviar:', companyData);
 
       // Actualizar progress 25%
       toastInstance.update({
@@ -81,6 +83,8 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
         throw new Error(formatValidationErrors(validationErrors));
       }
 
+      console.log('✅ Validación exitosa, procediendo a enviar datos');
+
       // Actualizar progress 50%
       toastInstance.update({
         title: "Enviando datos...",
@@ -93,6 +97,8 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
         duration: 100000,
       });
 
+      console.log('🔄 Invocando Edge Function sql-server-connection...');
+      
       // Enviar al servidor SQL Server a través de la Edge Function
       const { data: response, error: functionError } = await supabase.functions.invoke('sql-server-connection', {
         body: {
@@ -101,11 +107,15 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
         }
       });
 
-      if (functionError) throw functionError;
-
-      console.log('Respuesta del servidor:', response);
+      console.log('📥 Respuesta de Edge Function:', response);
+      
+      if (functionError) {
+        console.error('❌ Error de Edge Function:', functionError);
+        throw functionError;
+      }
 
       if (!response.success) {
+        console.error('❌ Error en la respuesta:', response.error);
         throw new Error(response.error || 'Error al procesar la solicitud');
       }
 
@@ -133,6 +143,8 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
         duration: 3000,
       });
 
+      console.log('✅ Operación completada exitosamente');
+
       // Invalidar la consulta para refrescar la tabla
       await queryClient.invalidateQueries({ queryKey: ['companies'] });
       
@@ -140,7 +152,7 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
       onOpenChange(false);
       
     } catch (error: any) {
-      console.error('Error completo:', error);
+      console.error('❌ Error completo:', error);
       
       let errorDescription = "Ha ocurrido un error al procesar la solicitud.";
       
@@ -161,6 +173,8 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
       } else {
         errorDescription = error.message;
       }
+      
+      console.error('❌ Error descripción:', errorDescription);
       
       // Mostrar error con progress en rojo
       if (toastInstance) {
