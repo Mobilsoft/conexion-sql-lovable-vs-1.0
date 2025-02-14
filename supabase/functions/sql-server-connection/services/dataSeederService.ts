@@ -1,5 +1,5 @@
 
-import { Connection, Request } from 'tedious';
+import { Connection, Request } from 'npm:tedious';
 import { getConnection } from '../db/connection';
 
 export async function seedTestData(connection: Connection): Promise<void> {
