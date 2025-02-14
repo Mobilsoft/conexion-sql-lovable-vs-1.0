@@ -10,6 +10,7 @@ import {
   getCompanies,
   getCiudades,
   getDepartamentos,
+  getPaises,
   deleteCompany,
   getCodigosCIIU,
   getActividadesComerciales,
@@ -73,6 +74,9 @@ serve(async (req) => {
       case 'getDepartamentos':
         result = await getDepartamentos(pool)
         break
+      case 'getPaises':
+        result = await getPaises(pool)
+        break
       case 'deleteCompany':
         result = await deleteCompany(pool, data.nit)
         break
@@ -106,7 +110,6 @@ serve(async (req) => {
   } catch (error) {
     console.error('❌ Error:', error)
     
-    // Solo limpiar la conexión si es un error fatal de conexión
     if (error instanceof Error && 
        (error.message.includes('Failed to connect') || 
         error.message.includes('Connection closed') || 
