@@ -151,62 +151,89 @@ const createBaseTables = async (pool: mssql.ConnectionPool) => {
 const insertTestData = async (pool: mssql.ConnectionPool) => {
   console.log('Insertando datos de prueba...')
 
-  // Insertar tipos de documento
-  await pool.request().query(`
-    IF NOT EXISTS (SELECT TOP 1 1 FROM tipos_documento)
-    INSERT INTO tipos_documento (nombre, codigo) VALUES 
-    ('Cédula de Ciudadanía', 'CC'),
-    ('NIT', 'NIT'),
-    ('Cédula de Extranjería', 'CE'),
-    ('Pasaporte', 'PAS')
-  `)
+  try {
+    // Insertar tipos de documento
+    await pool.request().query(`
+      IF NOT EXISTS (SELECT TOP 1 1 FROM tipos_documento)
+      INSERT INTO tipos_documento (nombre, codigo) VALUES 
+      ('Cédula de Ciudadanía', 'CC'),
+      ('NIT', 'NIT'),
+      ('Cédula de Extranjería', 'CE'),
+      ('Pasaporte', 'PAS')
+    `)
 
-  // Insertar tipos de régimen tributario
-  await pool.request().query(`
-    IF NOT EXISTS (SELECT TOP 1 1 FROM tipos_regimen_tributario)
-    INSERT INTO tipos_regimen_tributario (nombre, descripcion) VALUES 
-    ('Régimen Simple', 'Régimen de tributación simple'),
-    ('Régimen Ordinario', 'Régimen de tributación ordinario'),
-    ('Gran Contribuyente', 'Régimen de gran contribuyente')
-  `)
+    // Insertar tipos de régimen tributario
+    await pool.request().query(`
+      IF NOT EXISTS (SELECT TOP 1 1 FROM tipos_regimen_tributario)
+      INSERT INTO tipos_regimen_tributario (nombre, descripcion) VALUES 
+      ('Régimen Simple', 'Régimen de tributación simple'),
+      ('Régimen Ordinario', 'Régimen de tributación ordinario'),
+      ('Gran Contribuyente', 'Régimen de gran contribuyente'),
+      ('No Responsable', 'No responsable de IVA')
+    `)
 
-  // Insertar país Colombia
-  await pool.request().query(`
-    IF NOT EXISTS (SELECT TOP 1 1 FROM paises)
-    INSERT INTO paises (nombre, codigo) VALUES ('Colombia', 'CO')
-  `)
+    // Insertar países
+    await pool.request().query(`
+      IF NOT EXISTS (SELECT TOP 1 1 FROM paises)
+      INSERT INTO paises (nombre, codigo) VALUES 
+      ('Colombia', 'CO'),
+      ('Estados Unidos', 'USA'),
+      ('España', 'ES'),
+      ('México', 'MX')
+    `)
 
-  // Insertar departamento Cundinamarca
-  await pool.request().query(`
-    IF NOT EXISTS (SELECT TOP 1 1 FROM departamentos)
-    INSERT INTO departamentos (nombre, codigo, pais_id)
-    SELECT 'Cundinamarca', 'CUN', id FROM paises WHERE codigo = 'CO'
-  `)
+    // Insertar departamentos
+    await pool.request().query(`
+      IF NOT EXISTS (SELECT TOP 1 1 FROM departamentos)
+      INSERT INTO departamentos (nombre, codigo, pais_id)
+      SELECT 'Cundinamarca', 'CUN', id FROM paises WHERE codigo = 'CO'
+      UNION ALL
+      SELECT 'Antioquia', 'ANT', id FROM paises WHERE codigo = 'CO'
+      UNION ALL
+      SELECT 'Valle del Cauca', 'VAL', id FROM paises WHERE codigo = 'CO'
+      UNION ALL
+      SELECT 'Atlántico', 'ATL', id FROM paises WHERE codigo = 'CO'
+    `)
 
-  // Insertar ciudad Bogotá
-  await pool.request().query(`
-    IF NOT EXISTS (SELECT TOP 1 1 FROM ciudades)
-    INSERT INTO ciudades (nombre, codigo, departamento_id)
-    SELECT 'Bogotá D.C.', 'BOG', id FROM departamentos WHERE nombre = 'Cundinamarca'
-  `)
+    // Insertar ciudades
+    await pool.request().query(`
+      IF NOT EXISTS (SELECT TOP 1 1 FROM ciudades)
+      INSERT INTO ciudades (nombre, codigo, departamento_id)
+      SELECT 'Bogotá D.C.', 'BOG', id FROM departamentos WHERE nombre = 'Cundinamarca'
+      UNION ALL
+      SELECT 'Medellín', 'MED', id FROM departamentos WHERE nombre = 'Antioquia'
+      UNION ALL
+      SELECT 'Cali', 'CAL', id FROM departamentos WHERE nombre = 'Valle del Cauca'
+      UNION ALL
+      SELECT 'Barranquilla', 'BAQ', id FROM departamentos WHERE nombre = 'Atlántico'
+    `)
 
-  // Insertar códigos CIIU
-  await pool.request().query(`
-    IF NOT EXISTS (SELECT TOP 1 1 FROM codigos_ciiu)
-    INSERT INTO codigos_ciiu (codigo, descripcion) VALUES 
-    ('6201', 'Desarrollo de sistemas informáticos'),
-    ('6202', 'Consultoría informática'),
-    ('7020', 'Actividades de consultoría de gestión')
-  `)
+    // Insertar códigos CIIU
+    await pool.request().query(`
+      IF NOT EXISTS (SELECT TOP 1 1 FROM codigos_ciiu)
+      INSERT INTO codigos_ciiu (codigo, descripcion) VALUES 
+      ('6201', 'Desarrollo de sistemas informáticos'),
+      ('6202', 'Consultoría informática'),
+      ('7020', 'Actividades de consultoría de gestión'),
+      ('4651', 'Comercio al por mayor de computadores y equipos periféricos'),
+      ('6209', 'Otras actividades de tecnología de información')
+    `)
 
-  // Insertar actividades comerciales
-  await pool.request().query(`
-    IF NOT EXISTS (SELECT TOP 1 1 FROM actividades_comerciales)
-    INSERT INTO actividades_comerciales (nombre, descripcion) VALUES 
-    ('Desarrollo de Software', 'Desarrollo de aplicaciones y sistemas'),
-    ('Consultoría TI', 'Servicios de consultoría en tecnología'),
-    ('Servicios Profesionales', 'Prestación de servicios profesionales')
-  `)
+    // Insertar actividades comerciales
+    await pool.request().query(`
+      IF NOT EXISTS (SELECT TOP 1 1 FROM actividades_comerciales)
+      INSERT INTO actividades_comerciales (nombre, descripcion) VALUES 
+      ('Desarrollo de Software', 'Desarrollo de aplicaciones y sistemas'),
+      ('Consultoría TI', 'Servicios de consultoría en tecnología'),
+      ('Servicios Profesionales', 'Prestación de servicios profesionales'),
+      ('Comercio Tecnología', 'Venta de equipos y software'),
+      ('Soporte Técnico', 'Servicios de soporte y mantenimiento')
+    `)
 
-  console.log('Datos de prueba insertados exitosamente')
+    console.log('Datos de prueba insertados exitosamente')
+  } catch (error) {
+    console.error('Error al insertar datos de prueba:', error)
+    throw error
+  }
 }
+
