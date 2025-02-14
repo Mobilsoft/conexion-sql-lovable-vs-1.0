@@ -73,6 +73,48 @@ const Companies = () => {
     }
   };
 
+  const { data: ciudades = [] } = useQuery({
+    queryKey: ['ciudades'],
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke('sql-server-connection', {
+        body: {
+          action: 'getCiudades',
+          data: {
+            server: '145.223.75.189',
+            port: '1433',
+            database: 'Taskmaster',
+            username: 'sa',
+            password: 'D3v3l0p3r2024$'
+          }
+        }
+      });
+
+      if (error) throw error;
+      return data?.data || [];
+    },
+  });
+
+  const { data: departamentos = [] } = useQuery({
+    queryKey: ['departamentos'],
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke('sql-server-connection', {
+        body: {
+          action: 'getDepartamentos',
+          data: {
+            server: '145.223.75.189',
+            port: '1433',
+            database: 'Taskmaster',
+            username: 'sa',
+            password: 'D3v3l0p3r2024$'
+          }
+        }
+      });
+
+      if (error) throw error;
+      return data?.data || [];
+    },
+  });
+
   const { data: companies = [], isLoading } = useQuery({
     queryKey: ['companies'],
     queryFn: async () => {
@@ -131,6 +173,8 @@ const Companies = () => {
                   open={open}
                   onOpenChange={setOpen}
                   editingCompany={editingCompany}
+                  ciudades={ciudades}
+                  departamentos={departamentos}
                 />
               </div>
             </div>
