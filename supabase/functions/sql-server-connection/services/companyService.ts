@@ -1,66 +1,29 @@
-
 import mssql from "npm:mssql@9.1.1"
 
-export const getCompanies = async (pool: mssql.ConnectionPool) => {
-  console.log('Obteniendo lista de compañías...');
-  return await pool.request().query(`
-    SELECT * FROM companies 
-    WHERE master_detail = 'M' 
-    ORDER BY fecha_creacion DESC
-  `);
-}
-
-export const getCodigosCIIU = async (pool: mssql.ConnectionPool) => {
-  console.log('Obteniendo códigos CIIU...');
-  return await pool.request().query(`
-    SELECT * FROM codigos_ciiu 
-    WHERE master_detail = 'M' 
-    ORDER BY codigo
-  `);
-}
-
-export const getActividadesComerciales = async (pool: mssql.ConnectionPool) => {
-  console.log('Obteniendo actividades comerciales...');
-  return await pool.request().query(`
-    SELECT * FROM actividades_comerciales 
-    WHERE master_detail = 'M' 
-    ORDER BY nombre
-  `);
-}
-
-export const getTiposRegimen = async (pool: mssql.ConnectionPool) => {
-  console.log('Obteniendo tipos de régimen...');
-  return await pool.request().query(`
-    SELECT * FROM tipos_regimen_tributario 
-    WHERE master_detail = 'M' 
-    ORDER BY nombre
-  `);
-}
-
-export const insertCompany = async (pool: mssql.ConnectionPool, companyData: any) => {
-  console.log('Insertando nueva compañía:', companyData)
+export const insertCompany = async (pool: mssql.ConnectionPool, company: any) => {
+  console.log('Insertando nueva compañía:', company)
   
   const result = await pool.request()
-    .input('nit', mssql.VarChar, companyData.nit)
-    .input('dv', mssql.VarChar, companyData.dv)
-    .input('razon_social', mssql.VarChar, companyData.razon_social)
-    .input('tipo_documento_id', mssql.Int, companyData.tipo_documento_id)
-    .input('tipo_contribuyente', mssql.VarChar, companyData.tipo_contribuyente)
-    .input('direccion', mssql.VarChar, companyData.direccion)
-    .input('direccion_principal', mssql.VarChar, companyData.direccion_principal)
-    .input('telefono', mssql.VarChar, companyData.telefono)
-    .input('telefono_movil', mssql.VarChar, companyData.telefono_movil)
-    .input('email', mssql.VarChar, companyData.email)
-    .input('correo_electronico', mssql.VarChar, companyData.correo_electronico)
-    .input('departamento_id', mssql.Int, companyData.departamento_id)
-    .input('departamento', mssql.VarChar, companyData.departamento)
-    .input('ciudad_id', mssql.Int, companyData.ciudad_id)
-    .input('ciudad', mssql.VarChar, companyData.ciudad)
-    .input('pais_id', mssql.Int, companyData.pais_id)
-    .input('codigo_ciiu_id', mssql.Int, companyData.codigo_ciiu_id)
-    .input('actividad_comercial_id', mssql.Int, companyData.actividad_comercial_id)
-    .input('tipo_regimen_id', mssql.Int, companyData.tipo_regimen_id)
-    .input('municipio', mssql.VarChar, companyData.municipio)
+    .input('nit', mssql.VarChar, company.nit)
+    .input('dv', mssql.VarChar, company.dv)
+    .input('razon_social', mssql.VarChar, company.razon_social)
+    .input('tipo_documento_id', mssql.Int, company.tipo_documento_id)
+    .input('tipo_contribuyente', mssql.VarChar, company.tipo_contribuyente)
+    .input('direccion', mssql.VarChar, company.direccion)
+    .input('direccion_principal', mssql.VarChar, company.direccion_principal)
+    .input('telefono', mssql.VarChar, company.telefono)
+    .input('telefono_movil', mssql.VarChar, company.telefono_movil)
+    .input('email', mssql.VarChar, company.email)
+    .input('correo_electronico', mssql.VarChar, company.correo_electronico)
+    .input('departamento_id', mssql.Int, company.departamento_id)
+    .input('departamento', mssql.VarChar, company.departamento)
+    .input('ciudad_id', mssql.Int, company.ciudad_id)
+    .input('ciudad', mssql.VarChar, company.ciudad)
+    .input('pais_id', mssql.Int, company.pais_id)
+    .input('codigo_ciiu_id', mssql.Int, company.codigo_ciiu_id)
+    .input('actividad_comercial_id', mssql.Int, company.actividad_comercial_id)
+    .input('tipo_regimen_id', mssql.Int, company.tipo_regimen_id)
+    .input('municipio', mssql.VarChar, company.municipio)
     .input('master_detail', mssql.VarChar, 'M')
     .query(`
       INSERT INTO companies (
@@ -82,30 +45,30 @@ export const insertCompany = async (pool: mssql.ConnectionPool, companyData: any
   return result
 }
 
-export const updateCompany = async (pool: mssql.ConnectionPool, companyData: any) => {
-  console.log('Actualizando compañía:', companyData)
+export const updateCompany = async (pool: mssql.ConnectionPool, company: any) => {
+  console.log('Actualizando compañía:', company)
   
   const result = await pool.request()
-    .input('nit', mssql.VarChar, companyData.nit)
-    .input('dv', mssql.VarChar, companyData.dv)
-    .input('razon_social', mssql.VarChar, companyData.razon_social)
-    .input('tipo_documento_id', mssql.Int, companyData.tipo_documento_id)
-    .input('tipo_contribuyente', mssql.VarChar, companyData.tipo_contribuyente)
-    .input('direccion', mssql.VarChar, companyData.direccion)
-    .input('direccion_principal', mssql.VarChar, companyData.direccion_principal)
-    .input('telefono', mssql.VarChar, companyData.telefono)
-    .input('telefono_movil', mssql.VarChar, companyData.telefono_movil)
-    .input('email', mssql.VarChar, companyData.email)
-    .input('correo_electronico', mssql.VarChar, companyData.correo_electronico)
-    .input('departamento_id', mssql.Int, companyData.departamento_id)
-    .input('departamento', mssql.VarChar, companyData.departamento)
-    .input('ciudad_id', mssql.Int, companyData.ciudad_id)
-    .input('ciudad', mssql.VarChar, companyData.ciudad)
-    .input('pais_id', mssql.Int, companyData.pais_id)
-    .input('codigo_ciiu_id', mssql.Int, companyData.codigo_ciiu_id)
-    .input('actividad_comercial_id', mssql.Int, companyData.actividad_comercial_id)
-    .input('tipo_regimen_id', mssql.Int, companyData.tipo_regimen_id)
-    .input('municipio', mssql.VarChar, companyData.municipio)
+    .input('nit', mssql.VarChar, company.nit)
+    .input('dv', mssql.VarChar, company.dv)
+    .input('razon_social', mssql.VarChar, company.razon_social)
+    .input('tipo_documento_id', mssql.Int, company.tipo_documento_id)
+    .input('tipo_contribuyente', mssql.VarChar, company.tipo_contribuyente)
+    .input('direccion', mssql.VarChar, company.direccion)
+    .input('direccion_principal', mssql.VarChar, company.direccion_principal)
+    .input('telefono', mssql.VarChar, company.telefono)
+    .input('telefono_movil', mssql.VarChar, company.telefono_movil)
+    .input('email', mssql.VarChar, company.email)
+    .input('correo_electronico', mssql.VarChar, company.correo_electronico)
+    .input('departamento_id', mssql.Int, company.departamento_id)
+    .input('departamento', mssql.VarChar, company.departamento)
+    .input('ciudad_id', mssql.Int, company.ciudad_id)
+    .input('ciudad', mssql.VarChar, company.ciudad)
+    .input('pais_id', mssql.Int, company.pais_id)
+    .input('codigo_ciiu_id', mssql.Int, company.codigo_ciiu_id)
+    .input('actividad_comercial_id', mssql.Int, company.actividad_comercial_id)
+    .input('tipo_regimen_id', mssql.Int, company.tipo_regimen_id)
+    .input('municipio', mssql.VarChar, company.municipio)
     .query(`
       UPDATE companies
       SET 
@@ -142,4 +105,43 @@ export const deleteCompany = async (pool: mssql.ConnectionPool, nit: string) => 
       DELETE FROM companies 
       WHERE nit = @nit
     `);
+}
+
+export const getCompanies = async (pool: mssql.ConnectionPool) => {
+  console.log('Obteniendo lista de compañías...');
+  return await pool.request().query(`
+    SELECT * FROM companies 
+    WHERE master_detail = 'M' 
+    ORDER BY fecha_creacion DESC
+  `);
+}
+
+export const getCodigosCIIU = async (pool: mssql.ConnectionPool) => {
+  console.log('Obteniendo códigos CIIU...');
+  return await pool.request().query(`
+    SELECT id, codigo, descripcion 
+    FROM codigos_ciiu 
+    WHERE master_detail = 'M' 
+    ORDER BY codigo
+  `);
+}
+
+export const getActividadesComerciales = async (pool: mssql.ConnectionPool) => {
+  console.log('Obteniendo actividades comerciales...');
+  return await pool.request().query(`
+    SELECT id, nombre, descripcion 
+    FROM actividades_comerciales 
+    WHERE master_detail = 'M' 
+    ORDER BY nombre
+  `);
+}
+
+export const getTiposRegimen = async (pool: mssql.ConnectionPool) => {
+  console.log('Obteniendo tipos de régimen...');
+  return await pool.request().query(`
+    SELECT id, nombre, descripcion 
+    FROM tipos_regimen_tributario 
+    WHERE master_detail = 'M' 
+    ORDER BY nombre
+  `);
 }
