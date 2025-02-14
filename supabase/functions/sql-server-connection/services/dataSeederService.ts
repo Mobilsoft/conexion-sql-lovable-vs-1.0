@@ -1,5 +1,5 @@
 
-import { Connection, Request } from 'npm:tedious';
+import { Connection } from 'npm:mssql@9.1.1';
 import { getConnection } from '../db/connection';
 
 export async function seedTestData(connection: Connection): Promise<void> {
@@ -102,17 +102,7 @@ export async function seedTestData(connection: Connection): Promise<void> {
   ];
 
   for (const query of seedQueries) {
-    await new Promise<void>((resolve, reject) => {
-      const request = new Request(query, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-
-      connection.execSql(request);
-    });
+    await connection.request().query(query);
   }
 }
 
@@ -127,7 +117,7 @@ export async function handleSeedData(connectionConfig: any) {
     return { success: false, error: error.message };
   } finally {
     if (connection) {
-      connection.close();
+      await clearConnection();
     }
   }
 }
