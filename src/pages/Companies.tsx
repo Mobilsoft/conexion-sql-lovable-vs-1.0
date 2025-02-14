@@ -1,4 +1,3 @@
-
 /**
  * Companies.tsx
  * Main component for managing company data
@@ -10,7 +9,7 @@ import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Plus, Database } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { CompaniesTable } from '@/components/CompaniesTable';
 import { CompanyDialog } from '@/components/company/CompanyDialog';
 import { toast } from '@/components/ui/use-toast';
@@ -42,19 +41,10 @@ const Companies = () => {
 
   const handleDelete = async (nit: string) => {
     try {
-      const { data, error } = await supabase.functions.invoke('sql-server-connection', {
-        body: {
-          action: 'deleteCompany',
-          data: {
-            server: '145.223.75.189',
-            port: '1433',
-            database: 'Taskmaster',
-            username: 'sa',
-            password: 'D3v3l0p3r2024$',
-            nit: nit
-          }
-        }
-      });
+      const { error } = await supabase
+        .from('companies')
+        .delete()
+        .eq('nit', nit);
 
       if (error) throw error;
 
@@ -63,49 +53,8 @@ const Companies = () => {
         description: "La compañía ha sido eliminada exitosamente.",
       });
 
+      // Refetch companies after deletion
       await queryClient.invalidateQueries({ queryKey: ['companies'] });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleSeedData = async () => {
-    try {
-      toast({
-        title: "Iniciando proceso",
-        description: "Insertando datos de prueba...",
-      });
-
-      const { data, error } = await supabase.functions.invoke('sql-server-connection', {
-        body: {
-          action: 'seedTestData',
-          data: {
-            server: '145.223.75.189',
-            port: '1433',
-            database: 'Taskmaster',
-            username: 'sa',
-            password: 'D3v3l0p3r2024$'
-          }
-        }
-      });
-
-      if (error) throw error;
-
-      if (data.success) {
-        toast({
-          title: "Éxito",
-          description: "Los datos de prueba han sido insertados correctamente.",
-        });
-        
-        // Refrescar todos los datos
-        await queryClient.invalidateQueries();
-      } else {
-        throw new Error(data.error || 'Error al insertar datos de prueba');
-      }
     } catch (error: any) {
       toast({
         title: "Error",
@@ -118,60 +67,35 @@ const Companies = () => {
   const { data: ciudades = [] } = useQuery({
     queryKey: ['ciudades'],
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('sql-server-connection', {
-        body: {
-          action: 'getCiudades',
-          data: {
-            server: '145.223.75.189',
-            port: '1433',
-            database: 'Taskmaster',
-            username: 'sa',
-            password: 'D3v3l0p3r2024$'
-          }
-        }
-      });
-
+      const { data, error } = await supabase
+        .from('ciudades')
+        .select('*')
+        .order('nombre');
       if (error) throw error;
-      return data?.data || [];
+      return data;
     },
   });
 
   const { data: departamentos = [] } = useQuery({
     queryKey: ['departamentos'],
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('sql-server-connection', {
-        body: {
-          action: 'getDepartamentos',
-          data: {
-            server: '145.223.75.189',
-            port: '1433',
-            database: 'Taskmaster',
-            username: 'sa',
-            password: 'D3v3l0p3r2024$'
-          }
-        }
-      });
-
+      const { data, error } = await supabase
+        .from('departamentos')
+        .select('*')
+        .order('nombre');
       if (error) throw error;
-      return data?.data || [];
+      return data;
     },
   });
 
   const { data: companies = [], isLoading } = useQuery({
     queryKey: ['companies'],
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('sql-server-connection', {
-        body: {
-          action: 'getCompanies',
-          data: {
-            server: '145.223.75.189',
-            port: '1433',
-            database: 'Taskmaster',
-            username: 'sa',
-            password: 'D3v3l0p3r2024$'
-          }
-        }
-      });
+      const { data, error } = await supabase
+        .from('companies')
+        .select('*')
+        .eq('master_detail', 'M')
+        .order('fecha_creacion', { ascending: false });
 
       if (error) {
         toast({
@@ -182,7 +106,7 @@ const Companies = () => {
         throw error;
       }
 
-      return data?.data || [];
+      return data;
     },
   });
 
@@ -197,16 +121,10 @@ const Companies = () => {
                 <SidebarTrigger />
                 <h1 className="ml-4 text-xl font-semibold">Registro de Compañías</h1>
               </div>
-              <div className="flex gap-2">
-                <Button onClick={handleSeedData} size="sm" variant="outline">
-                  <Database className="h-4 w-4 mr-2" />
-                  Insertar Datos de Prueba
-                </Button>
-                <Button onClick={() => setOpen(true)} size="sm">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nueva Compañía
-                </Button>
-              </div>
+              <Button onClick={() => setOpen(true)} size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Nueva Compañía
+              </Button>
             </div>
             <div className="flex-1 p-6 overflow-auto">
               <div className="max-w-6xl mx-auto space-y-6">

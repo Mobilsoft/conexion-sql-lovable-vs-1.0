@@ -1,72 +1,92 @@
 
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { corsHeaders } from './utils/cors.ts'
-import { handleGetCompanies, handleInsertCompany, handleUpdateCompany, handleDeleteCompany } from './services/companyService.ts'
-import { handleGetTableStats, handleGetTableStructure } from './services/structureService.ts'
-import { handleGetCiudades, handleGetDepartamentos } from './services/locationService.ts'
-import { handleSeedData } from './services/dataSeederService.ts'
+import { serve } from "https://deno.land/std@0.204.0/http/server.ts"
+import { getConnection, clearConnection } from "./db/connection.ts"
+import { getTableStats, getTableStructure, insertCompany, updateCompany } from "./services/tableService.ts"
+import { corsHeaders, handleCors } from "./utils/cors.ts"
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, handleCors())
   }
-
+  
   try {
-    const { action, data } = await req.json()
+    const body = await req.json()
+    console.log('Datos recibidos:', JSON.stringify(body, (key, value) => 
+      key === 'password' ? '***' : value
+    ))
 
+    const { action, data } = body
+
+    if (!action || !data) {
+      throw new Error('Se requieren los campos action y data')
+    }
+
+    const pool = await getConnection(data)
     let result
+
     switch (action) {
-      case 'getCompanies':
-        result = await handleGetCompanies(data)
-        break
-      case 'insertCompany':
-        result = await handleInsertCompany(data)
-        break
-      case 'updateCompany':
-        result = await handleUpdateCompany(data)
-        break
-      case 'deleteCompany':
-        result = await handleDeleteCompany(data)
-        break
       case 'getTableStats':
-        result = await handleGetTableStats(data)
+        console.log('Ejecutando consulta getTableStats')
+        result = await getTableStats(pool)
+        console.log('Consulta ejecutada exitosamente:', JSON.stringify(result?.recordset))
         break
+
       case 'getTableStructure':
-        result = await handleGetTableStructure(data)
+        console.log('Obteniendo estructura de tabla:', data.tableName)
+        result = await getTableStructure(pool, data.tableName)
+        console.log('Estructura de tabla obtenida exitosamente:', JSON.stringify(result?.recordset))
         break
-      case 'getCiudades':
-        result = await handleGetCiudades(data)
+
+      case 'insertCompany':
+        console.log('Insertando nueva compañía')
+        result = await insertCompany(pool, data)
+        console.log('Compañía insertada exitosamente')
         break
-      case 'getDepartamentos':
-        result = await handleGetDepartamentos(data)
+
+      case 'updateCompany':
+        console.log('Actualizando compañía')
+        result = await updateCompany(pool, data)
+        console.log('Compañía actualizada exitosamente')
         break
-      case 'seedTestData':
-        result = await handleSeedData(data)
-        break
+
       default:
-        throw new Error('Acción no soportada')
+        throw new Error('Acción no válida: ' + action)
     }
 
     return new Response(
-      JSON.stringify(result),
-      {
-        headers: {
+      JSON.stringify({ 
+        success: true, 
+        data: result?.recordset || [] 
+      }),
+      { 
+        headers: { 
           ...corsHeaders,
-          'Content-Type': 'application/json',
-        },
-        status: 200,
-      },
+          'Content-Type': 'application/json'
+        } 
+      }
     )
+
   } catch (error) {
+    console.error('Error:', error)
+    
+    // Si hay un error de conexión, limpiamos el pool global
+    if (error instanceof Error && error.message.includes('connection')) {
+      clearConnection()
+    }
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        headers: {
+      JSON.stringify({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Error interno del servidor'
+      }),
+      { 
+        status: 500,
+        headers: { 
           ...corsHeaders,
-          'Content-Type': 'application/json',
-        },
-        status: 400,
-      },
+          'Content-Type': 'application/json'
+        }
+      }
     )
   }
 })
