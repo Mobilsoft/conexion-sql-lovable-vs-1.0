@@ -1,3 +1,4 @@
+
 import mssql from "npm:mssql@9.1.1"
 
 export const insertCompany = async (pool: mssql.ConnectionPool, company: any) => {
@@ -109,39 +110,57 @@ export const deleteCompany = async (pool: mssql.ConnectionPool, nit: string) => 
 
 export const getCompanies = async (pool: mssql.ConnectionPool) => {
   console.log('Obteniendo lista de compañías...');
-  return await pool.request().query(`
+  const result = await pool.request().query(`
     SELECT * FROM companies 
     WHERE master_detail = 'M' 
     ORDER BY fecha_creacion DESC
   `);
+  return result;
 }
 
 export const getCodigosCIIU = async (pool: mssql.ConnectionPool) => {
   console.log('Obteniendo códigos CIIU...');
-  return await pool.request().query(`
+  const result = await pool.request().query(`
     SELECT id, codigo, descripcion 
     FROM codigos_ciiu 
     WHERE master_detail = 'M' 
     ORDER BY codigo
   `);
+  return result;
 }
 
 export const getActividadesComerciales = async (pool: mssql.ConnectionPool) => {
   console.log('Obteniendo actividades comerciales...');
-  return await pool.request().query(`
+  const result = await pool.request().query(`
     SELECT id, nombre, descripcion 
     FROM actividades_comerciales 
     WHERE master_detail = 'M' 
     ORDER BY nombre
   `);
+  return result;
 }
 
 export const getTiposRegimen = async (pool: mssql.ConnectionPool) => {
   console.log('Obteniendo tipos de régimen...');
-  return await pool.request().query(`
+  const result = await pool.request().query(`
     SELECT id, nombre, descripcion 
     FROM tipos_regimen_tributario 
     WHERE master_detail = 'M' 
     ORDER BY nombre
   `);
+  return result;
 }
+
+// Asegurarnos de exportar todo como un objeto
+export const companyService = {
+  insertCompany,
+  updateCompany,
+  deleteCompany,
+  getCompanies,
+  getCodigosCIIU,
+  getActividadesComerciales,
+  getTiposRegimen,
+};
+
+// Export default para compatibilidad
+export default companyService;
