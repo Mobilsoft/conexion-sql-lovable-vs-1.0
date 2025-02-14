@@ -1,6 +1,6 @@
 
 import { Connection } from 'npm:mssql@9.1.1';
-import { getConnection } from '../db/connection';
+import { getConnection, clearConnection } from '../db/connection.ts';
 
 export async function seedTestData(connection: Connection): Promise<void> {
   const seedQueries = [

@@ -1,5 +1,5 @@
 
-import mssql from "npm:mssql@9.1.1"
+import mssql from "npm:mssql@9.1.1";
 
 let globalPool: mssql.ConnectionPool | null = null;
 let lastConnectionConfig: ConnectionConfig | null = null;
@@ -22,7 +22,6 @@ export const getConnection = async (config: ConnectionConfig): Promise<mssql.Con
   // Si ya hay una conexión activa, verificamos que siga viva
   if (globalPool) {
     try {
-      // Prueba rápida para verificar la conexión
       await globalPool.request().query('SELECT 1');
       console.log('✅ Usando conexión existente');
       return globalPool;
@@ -64,51 +63,20 @@ export const getConnection = async (config: ConnectionConfig): Promise<mssql.Con
 
     console.log('🔌 Intentando conectar a:', config.server, 'puerto:', config.port);
 
-    try {
-      globalPool = await new mssql.ConnectionPool(poolConfig).connect();
-      connectionRetries = 0;
-      lastConnectionConfig = config;
-      
-      console.log('✅ Conexión establecida exitosamente');
+    globalPool = await new mssql.ConnectionPool(poolConfig).connect();
+    connectionRetries = 0;
+    lastConnectionConfig = config;
+    
+    console.log('✅ Conexión establecida exitosamente');
 
-      // Manejador de errores de conexión
-      globalPool.on('error', async (err) => {
-        console.error('❌ Error en la conexión:', err);
-        
-        if (err.code === 'ECONNCLOSED' || err.code === 'ECONNRESET' || err.code === 'PROTOCOL_CONNECTION_LOST') {
-          console.log('🔄 Conexión perdida, intentando reconexión automática...');
-          
-          if (connectionRetries < MAX_RETRIES && lastConnectionConfig) {
-            connectionRetries++;
-            await clearConnection();
-            try {
-              await sleep(RETRY_DELAY);
-              globalPool = await getConnection(lastConnectionConfig);
-              console.log(`✅ Reconexión exitosa (intento ${connectionRetries})`);
-            } catch (reconnectError) {
-              console.error(`❌ Error en reconexión (intento ${connectionRetries}):`, reconnectError);
-            }
-          } else {
-            console.error('❌ Máximo número de intentos de reconexión alcanzado');
-            await clearConnection();
-          }
-        }
-      });
+    return globalPool;
 
-    } catch (error) {
-      console.error('❌ Error al establecer conexión:', error);
-      throw error;
-    }
-
+  } catch (error) {
+    console.error('❌ Error al establecer conexión:', error);
+    throw error;
   } finally {
     isConnecting = false;
   }
-
-  if (!globalPool) {
-    throw new Error('No se pudo establecer la conexión después de múltiples intentos');
-  }
-
-  return globalPool;
 };
 
 export const clearConnection = async () => {
