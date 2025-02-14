@@ -10,6 +10,33 @@ export const getCompanies = async (pool: mssql.ConnectionPool) => {
   `);
 }
 
+export const getCodigosCIIU = async (pool: mssql.ConnectionPool) => {
+  console.log('Obteniendo códigos CIIU...');
+  return await pool.request().query(`
+    SELECT * FROM codigos_ciiu 
+    WHERE master_detail = 'M' 
+    ORDER BY codigo
+  `);
+}
+
+export const getActividadesComerciales = async (pool: mssql.ConnectionPool) => {
+  console.log('Obteniendo actividades comerciales...');
+  return await pool.request().query(`
+    SELECT * FROM actividades_comerciales 
+    WHERE master_detail = 'M' 
+    ORDER BY nombre
+  `);
+}
+
+export const getTiposRegimen = async (pool: mssql.ConnectionPool) => {
+  console.log('Obteniendo tipos de régimen...');
+  return await pool.request().query(`
+    SELECT * FROM tipos_regimen_tributario 
+    WHERE master_detail = 'M' 
+    ORDER BY nombre
+  `);
+}
+
 export const insertCompany = async (pool: mssql.ConnectionPool, companyData: any) => {
   console.log('Insertando nueva compañía:', companyData)
   

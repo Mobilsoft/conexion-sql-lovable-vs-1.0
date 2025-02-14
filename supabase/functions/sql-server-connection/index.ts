@@ -7,10 +7,13 @@ import {
   insertCompany, 
   updateCompany, 
   initializeDatabase, 
-  getCompanies, 
-  getCiudades, 
-  getDepartamentos, 
-  deleteCompany 
+  getCompanies,
+  getCiudades,
+  getDepartamentos,
+  deleteCompany,
+  getCodigosCIIU,
+  getActividadesComerciales,
+  getTiposRegimen
 } from "./services/index.ts"
 import { corsHeaders, handleCors } from "./utils/cors.ts"
 
@@ -50,45 +53,38 @@ serve(async (req) => {
     console.log('🎯 Ejecutando acción:', action)
     switch (action) {
       case 'getTableStats':
-        console.log('📊 Ejecutando consulta getTableStats')
         result = await getTableStats(pool)
         break
-
       case 'getTableStructure':
-        console.log('🔍 Obteniendo estructura de tabla:', data.tableName)
         result = await getTableStructure(pool, data.tableName)
         break
-
       case 'insertCompany':
-        console.log('➕ Insertando nueva compañía')
         result = await insertCompany(pool, data)
         break
-
       case 'updateCompany':
-        console.log('📝 Actualizando compañía')
         result = await updateCompany(pool, data)
         break
-        
       case 'getCompanies':
-        console.log('📋 Obteniendo lista de compañías')
         result = await getCompanies(pool)
         break
-
       case 'getCiudades':
-        console.log('🏙️ Obteniendo lista de ciudades')
         result = await getCiudades(pool)
         break
-
       case 'getDepartamentos':
-        console.log('🗺️ Obteniendo lista de departamentos')
         result = await getDepartamentos(pool)
         break
-
       case 'deleteCompany':
-        console.log('❌ Eliminando compañía')
         result = await deleteCompany(pool, data.nit)
         break
-
+      case 'getCodigosCIIU':
+        result = await getCodigosCIIU(pool)
+        break
+      case 'getActividadesComerciales':
+        result = await getActividadesComerciales(pool)
+        break
+      case 'getTiposRegimen':
+        result = await getTiposRegimen(pool)
+        break
       default:
         throw new Error('Acción no válida: ' + action)
     }
