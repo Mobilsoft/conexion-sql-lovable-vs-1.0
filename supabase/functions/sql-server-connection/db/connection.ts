@@ -69,6 +69,24 @@ export const getConnection = async (config: ConnectionConfig): Promise<mssql.Con
     
     console.log('✅ Conexión establecida exitosamente');
 
+    // Configurar manejador de errores de conexión
+    globalPool.on('error', async (err) => {
+      console.error('❌ Error en la conexión:', err);
+      if (err.code === 'ECONNCLOSED' || err.code === 'ECONNRESET') {
+        console.log('🔄 Intentando reconectar...');
+        if (connectionRetries < MAX_RETRIES && lastConnectionConfig) {
+          connectionRetries++;
+          await clearConnection();
+          try {
+            await sleep(RETRY_DELAY);
+            await getConnection(lastConnectionConfig);
+          } catch (reconnectError) {
+            console.error('❌ Error en reconexión:', reconnectError);
+          }
+        }
+      }
+    });
+
     return globalPool;
 
   } catch (error) {
