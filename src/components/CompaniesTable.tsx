@@ -28,8 +28,6 @@ import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { Company } from "@/types/company";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 
 interface CompaniesTableProps {
   companies: Company[];
@@ -40,22 +38,6 @@ interface CompaniesTableProps {
 
 export function CompaniesTable({ companies, onEdit, onDelete, isLoading }: CompaniesTableProps) {
   const [deleteNit, setDeleteNit] = useState<string | null>(null);
-
-  const { data: ciudades = [] } = useQuery({
-    queryKey: ['ciudades'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('ciudades')
-        .select('*');
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const getCiudadNombre = (ciudadId: number) => {
-    const ciudad = ciudades.find(c => c.id === ciudadId);
-    return ciudad?.nombre || 'N/A';
-  };
 
   const handleDelete = (nit: string) => {
     onDelete(nit);
@@ -116,9 +98,9 @@ export function CompaniesTable({ companies, onEdit, onDelete, isLoading }: Compa
                 <TableCell>{company.nit}</TableCell>
                 <TableCell>{company.razon_social}</TableCell>
                 <TableCell>{company.tipo_empresa}</TableCell>
-                <TableCell>{getCiudadNombre(company.ciudad_id)}</TableCell>
-                <TableCell>{company.telefono_movil || company.telefono_fijo}</TableCell>
-                <TableCell>{company.correo_electronico}</TableCell>
+                <TableCell>{company.municipio}</TableCell>
+                <TableCell>{company.telefono}</TableCell>
+                <TableCell>{company.email}</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
