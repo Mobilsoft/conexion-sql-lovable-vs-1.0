@@ -82,36 +82,37 @@ const SqlConnectionForm = () => {
     }
   };
 
-  // Si hay datos de conexión, solo mostramos el tablero
-  if (connectionData) {
-    return <DatabaseStats stats={tableStats} connectionData={connectionData} />;
-  }
-
   return (
-    <Card className="w-full max-w-2xl p-8 space-y-8 bg-white/90 dark:bg-slate-900/90 border-0 shadow-lg">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="space-y-8"
-      >
-        <FormHeader />
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <ConnectionFields form={form} />
-            <div className="pt-4">
-              <Button
-                type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-lg font-semibold rounded-lg"
-                disabled={isLoading}
-              >
-                {isLoading ? 'Conectando...' : 'Conectar'}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </motion.div>
-    </Card>
+    <>
+      {connectionData ? (
+        <DatabaseStats stats={tableStats} connectionData={connectionData} />
+      ) : (
+        <Card className="w-full max-w-2xl p-8 space-y-8 bg-white/90 dark:bg-slate-900/90 border-0 shadow-lg">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="space-y-8"
+          >
+            <FormHeader />
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <ConnectionFields form={form} />
+                <div className="pt-4">
+                  <Button
+                    type="submit"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-lg font-semibold rounded-lg"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Conectando...' : 'Conectar'}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </motion.div>
+        </Card>
+      )}
+    </>
   );
 };
 
