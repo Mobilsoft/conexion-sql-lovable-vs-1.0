@@ -2,7 +2,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { corsHeaders } from './utils/cors.ts'
 import { companyService } from './services/companyService.ts'
-import { getConnection, clearConnection } from './db/connection.ts'
+import { getConnection } from './db/connection.ts'
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -50,7 +50,6 @@ serve(async (req) => {
           throw new Error('Acción no soportada')
       }
 
-      console.log('✅ Operación completada exitosamente')
       return new Response(
         JSON.stringify({ success: true, data: result.recordset || result }),
         {
@@ -58,10 +57,9 @@ serve(async (req) => {
           status: 200,
         },
       )
-    } finally {
-      if (connection) {
-        await clearConnection()
-      }
+    } catch (error) {
+      console.error('❌ Error en la operación:', error)
+      throw error
     }
   } catch (error) {
     console.error('❌ Error:', error)
