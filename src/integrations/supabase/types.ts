@@ -155,6 +155,7 @@ export type Database = {
           categoria: string | null
           ciudad: string | null
           ciudad_id: number | null
+          codigo_ciiu: string | null
           codigo_ciiu_id: number | null
           codigo_ciuu: string | null
           comentarios: string | null
@@ -209,6 +210,7 @@ export type Database = {
           categoria?: string | null
           ciudad?: string | null
           ciudad_id?: number | null
+          codigo_ciiu?: string | null
           codigo_ciiu_id?: number | null
           codigo_ciuu?: string | null
           comentarios?: string | null
@@ -263,6 +265,7 @@ export type Database = {
           categoria?: string | null
           ciudad?: string | null
           ciudad_id?: number | null
+          codigo_ciiu?: string | null
           codigo_ciiu_id?: number | null
           codigo_ciuu?: string | null
           comentarios?: string | null
@@ -726,6 +729,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tipos_contribuyente: {
+        Row: {
+          codigo: string | null
+          created_at: string | null
+          descripcion: string | null
+          id: number
+          master_detail: string | null
+          nombre: string
+          updated_at: string | null
+        }
+        Insert: {
+          codigo?: string | null
+          created_at?: string | null
+          descripcion?: string | null
+          id?: never
+          master_detail?: string | null
+          nombre: string
+          updated_at?: string | null
+        }
+        Update: {
+          codigo?: string | null
+          created_at?: string | null
+          descripcion?: string | null
+          id?: never
+          master_detail?: string | null
+          nombre?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       tipos_documento: {
         Row: {

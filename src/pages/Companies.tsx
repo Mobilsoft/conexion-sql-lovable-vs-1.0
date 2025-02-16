@@ -31,7 +31,8 @@ export const formSchema = z.object({
   codigo_ciiu_id: z.string(),
   actividad_comercial_id: z.string(),
   tipo_regimen_id: z.string(),
-  municipio: z.string().min(1, "El municipio es requerido")
+  municipio: z.string().min(1, "El municipio es requerido"),
+  master_detail: z.string().default('M')
 });
 
 const Companies = () => {

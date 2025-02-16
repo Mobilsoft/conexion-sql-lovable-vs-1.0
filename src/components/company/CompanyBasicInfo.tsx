@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Building2, Mail, Phone } from "lucide-react";
@@ -10,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Ciudad, Departamento } from "@/types/company";
 import { useEffect } from "react";
 import { calculateDV } from "@/utils/dvCalculator";
@@ -26,15 +28,16 @@ interface CompanyBasicInfoProps {
 export function CompanyBasicInfo({ form, ciudades, departamentos }: CompanyBasicInfoProps) {
   const nit = useWatch({ control: form.control, name: "nit" });
   const selectedCiudadId = useWatch({ control: form.control, name: "ciudad_id" });
+  const tipoDocumento = useWatch({ control: form.control, name: "tipo_documento_id" });
 
   useEffect(() => {
-    if (nit) {
+    if (nit && tipoDocumento === "2") { // 2 = NIT
       const dv = calculateDV(nit);
       form.setValue("dv", dv);
     } else {
       form.setValue("dv", "");
     }
-  }, [nit, form]);
+  }, [nit, tipoDocumento, form]);
 
   useEffect(() => {
     if (selectedCiudadId) {
@@ -124,8 +127,9 @@ export function CompanyBasicInfo({ form, ciudades, departamentos }: CompanyBasic
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="Responsable de IVA">Responsable de IVA</SelectItem>
-                  <SelectItem value="No Responsable de IVA">No Responsable de IVA</SelectItem>
+                  <SelectItem value="PJ-RC">Persona Jurídica - Régimen Común</SelectItem>
+                  <SelectItem value="PJ-GC">Persona Jurídica - Gran Contribuyente</SelectItem>
+                  <SelectItem value="PJ-RS">Persona Jurídica - Régimen Simplificado</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -248,6 +252,23 @@ export function CompanyBasicInfo({ form, ciudades, departamentos }: CompanyBasic
                 readOnly
                 value={departamentos.find(d => d.id.toString() === field.value)?.nombre || ''}
                 className="bg-gray-100"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="master_detail"
+        render={({ field }) => (
+          <FormItem className="col-span-2 flex flex-col">
+            <FormLabel>Registro Principal</FormLabel>
+            <FormControl>
+              <Switch
+                checked={field.value === 'M'}
+                onCheckedChange={(checked) => field.onChange(checked ? 'M' : 'D')}
               />
             </FormControl>
             <FormMessage />
