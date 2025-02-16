@@ -1,4 +1,3 @@
-
 import mssql from "npm:mssql@9.1.1"
 
 export const getTableStats = async (pool: mssql.ConnectionPool) => {
@@ -182,6 +181,30 @@ export const updateCompany = async (pool: mssql.ConnectionPool, companyData: any
 
   return result
 }
+
+export const insertData = async (pool: mssql.ConnectionPool, tableName: string, data: any) => {
+  console.log('Insertando datos en la tabla:', tableName, 'Datos:', data);
+
+  // Construir la consulta dinámicamente
+  const columns = Object.keys(data);
+  const values = Object.values(data);
+  const params = columns.map((_, i) => `@p${i}`);
+
+  const query = `
+    INSERT INTO ${tableName} (${columns.join(', ')})
+    VALUES (${params.join(', ')})
+  `;
+
+  const request = pool.request();
+  
+  // Agregar parámetros dinámicamente
+  values.forEach((value, index) => {
+    request.input(`p${index}`, value);
+  });
+
+  console.log('Query a ejecutar:', query);
+  return await request.query(query);
+};
 
 const ensureMasterDetailColumn = async (pool: mssql.ConnectionPool, tableName: string) => {
   console.log('Verificando tabla:', tableName)

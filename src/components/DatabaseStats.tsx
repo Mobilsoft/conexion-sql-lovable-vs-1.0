@@ -8,12 +8,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
-import { Database, FileText } from "lucide-react";
+import { Database, FileText, FormInput } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableStructureDialog } from "./TableStructureDialog";
 import { DynamicForm } from "./DynamicForm";
 import { useState } from 'react';
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { DynamicFormField, TableStructure } from "@/types/table-structure";
@@ -33,48 +33,45 @@ const DatabaseStats = ({ stats, connectionData }: { stats: TableStats[], connect
     queryKey: ['tableStructure', formTable],
     queryFn: async () => {
       if (!formTable) return null;
-      const { data, error } = await supabase
-        .from('table_structures')
-        .select('*')
-        .eq('table_name', formTable);
+      const { data, error } = await supabase.functions.invoke('sql-server-connection', {
+        body: {
+          action: 'getTableStructure',
+          data: {
+            ...connectionData,
+            tableName: formTable
+          }
+        }
+      });
 
       if (error) throw error;
-      return data as TableStructure[];
+      return data.data as TableStructure[];
     },
     enabled: !!formTable,
   });
 
   const mapStructureToFields = (structure: TableStructure[]): DynamicFormField[] => {
-    return structure.map(field => ({
+    return structure?.map(field => ({
       name: field.column_name,
       type: field.data_type.includes('int') ? 'number' : 'text',
       required: !field.is_nullable,
       defaultValue: field.column_default,
-    }));
+    })) || [];
   };
-
-  if (!stats?.length) return null;
 
   const handleSaveForm = async (data: any) => {
     if (!formTable) return;
     
-    // Validar que la tabla existe en el esquema
-    const validTables = ['clientes', 'companies', 'sql_connections', 'table_structures', 
-                        'task_attachments', 'tasks', 'users', 'task_comments'];
-    
-    if (!validTables.includes(formTable.toLowerCase())) {
-      toast({
-        title: "Error",
-        description: "Tabla no válida",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
-      const { error } = await supabase
-        .from(formTable.toLowerCase() as any)
-        .insert([data]);
+      const { error } = await supabase.functions.invoke('sql-server-connection', {
+        body: {
+          action: 'insertData',
+          data: {
+            ...connectionData,
+            tableName: formTable,
+            rowData: data
+          }
+        }
+      });
 
       if (error) throw error;
 
@@ -114,13 +111,20 @@ const DatabaseStats = ({ stats, connectionData }: { stats: TableStats[], connect
               <TableCell className="font-medium">{stat.table_name}</TableCell>
               <TableCell className="text-right">{stat.row_count.toLocaleString()}</TableCell>
               <TableCell className="text-right">{stat.size_in_kb.toFixed(2)}</TableCell>
-              <TableCell className="text-right">
+              <TableCell className="text-right space-x-2">
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setSelectedTable(stat.table_name)}
                 >
                   <FileText className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setFormTable(stat.table_name)}
+                >
+                  <FormInput className="h-4 w-4" />
                 </Button>
               </TableCell>
             </TableRow>
