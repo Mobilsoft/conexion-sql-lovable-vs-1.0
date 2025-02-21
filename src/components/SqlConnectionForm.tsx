@@ -68,7 +68,7 @@ const SqlConnectionForm = () => {
 
       toast({
         title: "Conexión exitosa",
-        description: "Se ha establecido la conexión con el servidor SQL.",
+        description: "Se ha establecido la conexión con el servidor SQL." + data.database,
         duration: 3000,
       });
 
