@@ -63,7 +63,7 @@ const SqlConnectionForm = () => {
       }
 
       const resultado = await response.json();
-      setTableStats(resultado.data);
+      //setTableStats(resultado.data);
       setConnectionData(data);
 
       toast({
