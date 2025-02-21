@@ -21,7 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 const SqlConnectionForm = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [tableStats, setTableStats] = useState<TableStats[]>([]);
+  const [tableStats, setTableStats] = useState<any>([]);
   const [connectionData, setConnectionData] = useState<any>(null);
 
   const form = useForm<SqlConnectionFormValues>({
@@ -62,13 +62,17 @@ const SqlConnectionForm = () => {
         throw new Error("Error desconocido en la conexión");
       }
 
-      const resultado = await response.json();
-      //setTableStats(resultado.data);
+      await fetch("http://localhost:3000/database/tables")
+      .then((response) => response.json()) // Convertir la respuesta a JSON
+      .then((data) => setTableStats(data))
+      .catch((error) => console.error("Error en la petición:", error));
+      
+      
       setConnectionData(data);
 
       toast({
         title: "Conexión exitosa",
-        description: ` Se ha establecido la conexión con el servidor SQL. ${data.database}`,
+        description: ` Se ha establecido la conexión con el servidor SQL ${data.database}.`,
         duration: 3000,
       });
 

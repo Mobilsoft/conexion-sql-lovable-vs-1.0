@@ -24,7 +24,7 @@ interface TableStats {
   size_in_kb: number;
 }
 
-const DatabaseStats = ({ stats, connectionData }: { stats: TableStats[], connectionData: any }) => {
+const DatabaseStats = ({ stats, connectionData }: { stats: any[], connectionData: any }) => {
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
   const [formTable, setFormTable] = useState<string | null>(null);
   const { toast } = useToast();
@@ -107,22 +107,22 @@ const DatabaseStats = ({ stats, connectionData }: { stats: TableStats[], connect
         </TableHeader>
         <TableBody>
           {stats.map((stat) => (
-            <TableRow key={stat.table_name}>
-              <TableCell className="font-medium">{stat.table_name}</TableCell>
-              <TableCell className="text-right">{stat.row_count.toLocaleString()}</TableCell>
-              <TableCell className="text-right">{stat.size_in_kb.toFixed(2)}</TableCell>
+            <TableRow key={stat.TableName}>
+              <TableCell className="font-medium">{stat.TableName}</TableCell>
+              <TableCell className="text-right">{stat.RowCounts.toLocaleString()}</TableCell>
+              <TableCell className="text-right">{stat.TotalSizeMB.toFixed(2)}</TableCell>
               <TableCell className="text-right space-x-2">
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setSelectedTable(stat.table_name)}
+                  onClick={() => setSelectedTable(stat.TableName)}
                 >
                   <FileText className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setFormTable(stat.table_name)}
+                  onClick={() => setFormTable(stat.TableName)}
                 >
                   <FormInput className="h-4 w-4" />
                 </Button>
