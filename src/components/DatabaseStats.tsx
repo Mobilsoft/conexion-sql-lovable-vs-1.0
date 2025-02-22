@@ -24,6 +24,8 @@ interface TableStats {
   size_in_kb: number;
 }
 
+type KnownTables = 'gen_empresas' | 'gen_usuarios' | 'table_structures';
+
 const DatabaseStats = ({ stats, connectionData }: { stats: any[], connectionData: any }) => {
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
   const [formTable, setFormTable] = useState<string | null>(null);
@@ -47,7 +49,8 @@ const DatabaseStats = ({ stats, connectionData }: { stats: any[], connectionData
       const { data, error } = await supabase
         .from('table_structures')
         .select('*')
-        .eq('table_name', formTable);
+        .eq('table_name', formTable)
+        .order('id');
 
       if (error) throw error;
       return data as TableStructure[];
@@ -59,6 +62,11 @@ const DatabaseStats = ({ stats, connectionData }: { stats: any[], connectionData
     if (!formTable) return;
     
     try {
+      // Validamos que la tabla sea una de las conocidas
+      if (!isKnownTable(formTable)) {
+        throw new Error('Tabla no soportada para inserción');
+      }
+
       const { error } = await supabase
         .from(formTable)
         .insert([data]);
@@ -71,12 +79,19 @@ const DatabaseStats = ({ stats, connectionData }: { stats: any[], connectionData
       });
       
     } catch (error: any) {
+      console.error('Error al guardar:', error);
       toast({
         title: "Error",
         description: error.message,
         variant: "destructive",
       });
     }
+  };
+
+  // Función auxiliar para validar tablas conocidas
+  const isKnownTable = (table: string): table is KnownTables => {
+    const knownTables = ['gen_empresas', 'gen_usuarios', 'table_structures'];
+    return knownTables.includes(table);
   };
 
   return (
