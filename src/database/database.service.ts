@@ -68,18 +68,18 @@ export class DatabaseService {
   async getClients(): Promise<any[]> {
     const sql = `
       SELECT 
-        IdTercero as id,
-        Nombres as nombre,
-        Apellidos as apellido,
-        NumeroDocumento as documento,
-        Telefono1 as telefono,
-        Email as email,
-        DireccionPrincipal as direccion,
-        Ciudad as ciudad,
-        Estado as estado
-      FROM MAE_Terceros
-      WHERE TipoTercero = 'Cliente'
-      ORDER BY FechaCreacion DESC
+        id,
+        nombre,
+        apellidos as apellido,
+        documento,
+        telefono,
+        email,
+        direccion,
+        ciudad,
+        estado
+      FROM dbo.gen_usuarios
+      WHERE tipo = 'Cliente'
+      ORDER BY fecha_creacion DESC
     `;
     return this.executeQuery(sql);
   }
@@ -87,26 +87,26 @@ export class DatabaseService {
   async getCompanies(): Promise<any[]> {
     const sql = `
       SELECT 
-        IdEmpresa as id,
-        NIT,
-        DigitoVerificacion as dv,
-        RazonSocial,
-        TipoDocumento as tipo_documento_id,
-        TipoContribuyente as tipo_contribuyente,
-        DireccionPrincipal as direccion,
-        Telefono1 as telefono,
-        Email as email,
-        Departamento as departamento_id,
-        Ciudad as ciudad_id,
-        Pais as pais_id,
-        CodigoCIIU as codigo_ciiu_id,
-        ActividadComercial as actividad_comercial_id,
-        TipoRegimen as tipo_regimen_id,
-        Ciudad as municipio,
-        Estado as estado_empresa
-      FROM MAE_Empresas
-      WHERE TipoEmpresa = 'Principal'
-      ORDER BY FechaCreacion DESC
+        id,
+        nit,
+        dv,
+        razon_social as RazonSocial,
+        tipo_documento as tipo_documento_id,
+        tipo_contribuyente,
+        direccion,
+        telefono,
+        email,
+        departamento_id,
+        ciudad_id,
+        pais_id,
+        codigo_ciiu as codigo_ciiu_id,
+        actividad_comercial as actividad_comercial_id,
+        tipo_regimen as tipo_regimen_id,
+        ciudad as municipio,
+        estado as estado_empresa
+      FROM dbo.companies
+      WHERE tipo = 'Principal'
+      ORDER BY fecha_creacion DESC
     `;
     return this.executeQuery(sql);
   }
