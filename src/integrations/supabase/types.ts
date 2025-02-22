@@ -14,24 +14,24 @@ export type Database = {
           created_at: string | null
           descripcion: string | null
           id: number
-          master_detail: string | null
           nombre: string
+          tabla_master: string | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
           descripcion?: string | null
           id?: number
-          master_detail?: string | null
           nombre: string
+          tabla_master?: string | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
           descripcion?: string | null
           id?: number
-          master_detail?: string | null
           nombre?: string
+          tabla_master?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -42,8 +42,8 @@ export type Database = {
           created_at: string | null
           departamento_id: number | null
           id: number
-          master_detail: string | null
           nombre: string
+          tabla_master: string | null
           updated_at: string | null
         }
         Insert: {
@@ -51,8 +51,8 @@ export type Database = {
           created_at?: string | null
           departamento_id?: number | null
           id?: number
-          master_detail?: string | null
           nombre: string
+          tabla_master?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -60,8 +60,8 @@ export type Database = {
           created_at?: string | null
           departamento_id?: number | null
           id?: number
-          master_detail?: string | null
           nombre?: string
+          tabla_master?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -84,8 +84,8 @@ export type Database = {
           email: string
           estado: string
           id: number
-          master_detail: string | null
           nombre: string
+          tabla_master: string | null
           telefono: string
           updated_at: string | null
         }
@@ -98,8 +98,8 @@ export type Database = {
           email: string
           estado: string
           id?: number
-          master_detail?: string | null
           nombre: string
+          tabla_master?: string | null
           telefono: string
           updated_at?: string | null
         }
@@ -112,8 +112,8 @@ export type Database = {
           email?: string
           estado?: string
           id?: number
-          master_detail?: string | null
           nombre?: string
+          tabla_master?: string | null
           telefono?: string
           updated_at?: string | null
         }
@@ -125,7 +125,7 @@ export type Database = {
           created_at: string | null
           descripcion: string
           id: number
-          master_detail: string | null
+          tabla_master: string | null
           updated_at: string | null
         }
         Insert: {
@@ -133,7 +133,7 @@ export type Database = {
           created_at?: string | null
           descripcion: string
           id?: number
-          master_detail?: string | null
+          tabla_master?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -141,7 +141,7 @@ export type Database = {
           created_at?: string | null
           descripcion?: string
           id?: number
-          master_detail?: string | null
+          tabla_master?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -172,7 +172,6 @@ export type Database = {
           fecha_actualizacion: string | null
           fecha_constitucion: string | null
           fecha_creacion: string | null
-          master_detail: string | null
           municipio: string
           naturaleza_empresa: string | null
           nit: string
@@ -192,6 +191,7 @@ export type Database = {
           segundo_apellido: string | null
           segundo_nombre: string | null
           sucursales: boolean | null
+          tabla_master: string | null
           telefono: string
           telefono_fijo: string | null
           telefono_movil: string | null
@@ -227,7 +227,6 @@ export type Database = {
           fecha_actualizacion?: string | null
           fecha_constitucion?: string | null
           fecha_creacion?: string | null
-          master_detail?: string | null
           municipio: string
           naturaleza_empresa?: string | null
           nit: string
@@ -247,6 +246,7 @@ export type Database = {
           segundo_apellido?: string | null
           segundo_nombre?: string | null
           sucursales?: boolean | null
+          tabla_master?: string | null
           telefono: string
           telefono_fijo?: string | null
           telefono_movil?: string | null
@@ -282,7 +282,6 @@ export type Database = {
           fecha_actualizacion?: string | null
           fecha_constitucion?: string | null
           fecha_creacion?: string | null
-          master_detail?: string | null
           municipio?: string
           naturaleza_empresa?: string | null
           nit?: string
@@ -302,6 +301,7 @@ export type Database = {
           segundo_apellido?: string | null
           segundo_nombre?: string | null
           sucursales?: boolean | null
+          tabla_master?: string | null
           telefono?: string
           telefono_fijo?: string | null
           telefono_movil?: string | null
@@ -418,27 +418,27 @@ export type Database = {
           codigo: string | null
           created_at: string | null
           id: number
-          master_detail: string | null
           nombre: string
           pais_id: number | null
+          tabla_master: string | null
           updated_at: string | null
         }
         Insert: {
           codigo?: string | null
           created_at?: string | null
           id?: number
-          master_detail?: string | null
           nombre: string
           pais_id?: number | null
+          tabla_master?: string | null
           updated_at?: string | null
         }
         Update: {
           codigo?: string | null
           created_at?: string | null
           id?: number
-          master_detail?: string | null
           nombre?: string
           pais_id?: number | null
+          tabla_master?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -456,24 +456,24 @@ export type Database = {
           codigo: string | null
           created_at: string | null
           id: number
-          master_detail: string | null
           nombre: string
+          tabla_master: string | null
           updated_at: string | null
         }
         Insert: {
           codigo?: string | null
           created_at?: string | null
           id?: number
-          master_detail?: string | null
           nombre: string
+          tabla_master?: string | null
           updated_at?: string | null
         }
         Update: {
           codigo?: string | null
           created_at?: string | null
           id?: number
-          master_detail?: string | null
           nombre?: string
+          tabla_master?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -484,10 +484,10 @@ export type Database = {
           database: string
           id: number
           last_connected: string | null
-          master_detail: string | null
           password: string
           port: string
           server: string
+          tabla_master: string | null
           updated_at: string | null
           use_windows_auth: boolean | null
           username: string
@@ -497,10 +497,10 @@ export type Database = {
           database: string
           id: number
           last_connected?: string | null
-          master_detail?: string | null
           password: string
           port: string
           server: string
+          tabla_master?: string | null
           updated_at?: string | null
           use_windows_auth?: boolean | null
           username: string
@@ -510,10 +510,10 @@ export type Database = {
           database?: string
           id?: number
           last_connected?: string | null
-          master_detail?: string | null
           password?: string
           port?: string
           server?: string
+          tabla_master?: string | null
           updated_at?: string | null
           use_windows_auth?: boolean | null
           username?: string
@@ -528,8 +528,8 @@ export type Database = {
           data_type: string
           id: number
           is_nullable: boolean
-          master_detail: string | null
           sql_connection_id: number | null
+          tabla_master: string | null
           table_name: string
           updated_at: string | null
         }
@@ -540,8 +540,8 @@ export type Database = {
           data_type: string
           id?: number
           is_nullable: boolean
-          master_detail?: string | null
           sql_connection_id?: number | null
+          tabla_master?: string | null
           table_name: string
           updated_at?: string | null
         }
@@ -552,8 +552,8 @@ export type Database = {
           data_type?: string
           id?: number
           is_nullable?: boolean
-          master_detail?: string | null
           sql_connection_id?: number | null
+          tabla_master?: string | null
           table_name?: string
           updated_at?: string | null
         }
@@ -575,7 +575,7 @@ export type Database = {
           file_type: string
           file_url: string
           id: string
-          master_detail: string | null
+          tabla_master: string | null
           task_id: string
           uploaded_by: string
         }
@@ -586,7 +586,7 @@ export type Database = {
           file_type: string
           file_url: string
           id?: string
-          master_detail?: string | null
+          tabla_master?: string | null
           task_id: string
           uploaded_by: string
         }
@@ -597,7 +597,7 @@ export type Database = {
           file_type?: string
           file_url?: string
           id?: string
-          master_detail?: string | null
+          tabla_master?: string | null
           task_id?: string
           uploaded_by?: string
         }
@@ -623,7 +623,7 @@ export type Database = {
           comment: string
           created_at: string | null
           id: string
-          master_detail: string | null
+          tabla_master: string | null
           task_id: string
           updated_at: string | null
           user_id: string
@@ -632,7 +632,7 @@ export type Database = {
           comment: string
           created_at?: string | null
           id?: string
-          master_detail?: string | null
+          tabla_master?: string | null
           task_id: string
           updated_at?: string | null
           user_id: string
@@ -641,7 +641,7 @@ export type Database = {
           comment?: string
           created_at?: string | null
           id?: string
-          master_detail?: string | null
+          tabla_master?: string | null
           task_id?: string
           updated_at?: string | null
           user_id?: string
@@ -672,9 +672,9 @@ export type Database = {
           description: string | null
           due_date: string | null
           id: string
-          master_detail: string | null
           priority: string
           status: string
+          tabla_master: string | null
           title: string
           updated_at: string | null
         }
@@ -686,9 +686,9 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           id?: string
-          master_detail?: string | null
           priority?: string
           status?: string
+          tabla_master?: string | null
           title: string
           updated_at?: string | null
         }
@@ -700,9 +700,9 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           id?: string
-          master_detail?: string | null
           priority?: string
           status?: string
+          tabla_master?: string | null
           title?: string
           updated_at?: string | null
         }
@@ -736,8 +736,8 @@ export type Database = {
           created_at: string | null
           descripcion: string | null
           id: number
-          master_detail: string | null
           nombre: string
+          tabla_master: string | null
           updated_at: string | null
         }
         Insert: {
@@ -745,8 +745,8 @@ export type Database = {
           created_at?: string | null
           descripcion?: string | null
           id?: never
-          master_detail?: string | null
           nombre: string
+          tabla_master?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -754,8 +754,8 @@ export type Database = {
           created_at?: string | null
           descripcion?: string | null
           id?: never
-          master_detail?: string | null
           nombre?: string
+          tabla_master?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -765,24 +765,24 @@ export type Database = {
           codigo: string | null
           created_at: string | null
           id: number
-          master_detail: string | null
           nombre: string
+          tabla_master: string | null
           updated_at: string | null
         }
         Insert: {
           codigo?: string | null
           created_at?: string | null
           id?: number
-          master_detail?: string | null
           nombre: string
+          tabla_master?: string | null
           updated_at?: string | null
         }
         Update: {
           codigo?: string | null
           created_at?: string | null
           id?: number
-          master_detail?: string | null
           nombre?: string
+          tabla_master?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -792,24 +792,24 @@ export type Database = {
           created_at: string | null
           descripcion: string | null
           id: number
-          master_detail: string | null
           nombre: string
+          tabla_master: string | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
           descripcion?: string | null
           id?: number
-          master_detail?: string | null
           nombre: string
+          tabla_master?: string | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
           descripcion?: string | null
           id?: number
-          master_detail?: string | null
           nombre?: string
+          tabla_master?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -819,27 +819,27 @@ export type Database = {
           created_at: string | null
           email: string
           id: string
-          master_detail: string | null
           password_hash: string
           role: string
+          tabla_master: string | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
           email: string
           id?: string
-          master_detail?: string | null
           password_hash: string
           role?: string
+          tabla_master?: string | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
           email?: string
           id?: string
-          master_detail?: string | null
           password_hash?: string
           role?: string
+          tabla_master?: string | null
           updated_at?: string | null
         }
         Relationships: []
