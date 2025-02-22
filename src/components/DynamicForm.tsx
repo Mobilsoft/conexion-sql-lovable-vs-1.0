@@ -16,10 +16,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useEffect } from "react";
 import { DynamicFormField } from "@/types/table-structure";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DynamicFormProps {
   open: boolean;
@@ -38,7 +42,47 @@ export function DynamicForm({
   onSave, 
   initialData 
 }: DynamicFormProps) {
-  // Construir el esquema de validación dinámicamente
+  // Consultas para obtener datos de las tablas relacionadas
+  const { data: ciudades = [] } = useQuery({
+    queryKey: ['ciudades'],
+    queryFn: async () => {
+      const { data } = await supabase.from('ciudades').select('*');
+      return data || [];
+    }
+  });
+
+  const { data: tiposRegimen = [] } = useQuery({
+    queryKey: ['tipos_regimen'],
+    queryFn: async () => {
+      const { data } = await supabase.from('tipos_regimen_tributario').select('*');
+      return data || [];
+    }
+  });
+
+  const { data: tiposContribuyente = [] } = useQuery({
+    queryKey: ['tipos_contribuyente'],
+    queryFn: async () => {
+      const { data } = await supabase.from('tipos_contribuyente').select('*');
+      return data || [];
+    }
+  });
+
+  const { data: actividadesComerciales = [] } = useQuery({
+    queryKey: ['actividades_comerciales'],
+    queryFn: async () => {
+      const { data } = await supabase.from('actividades_comerciales').select('*');
+      return data || [];
+    }
+  });
+
+  // Filtrar campos que no deben mostrarse
+  const visibleFields = fields.filter(field => (
+    !field.name.startsWith('id_') && // Ocultar campos ID
+    !field.name.includes('fecha_actualizacion') &&
+    !field.name.includes('fecha_creacion')
+  ));
+
+  // Generar el esquema de validación dinámicamente
   const generateValidationSchema = () => {
     const schemaFields: { [key: string]: any } = {};
     fields.forEach((field) => {
@@ -46,6 +90,8 @@ export function DynamicForm({
         schemaFields[field.name] = field.required 
           ? z.number()
           : z.number().nullable();
+      } else if (field.name === 'estado') {
+        schemaFields[field.name] = z.boolean();
       } else {
         schemaFields[field.name] = field.required 
           ? z.string()
@@ -67,14 +113,127 @@ export function DynamicForm({
   }, [initialData, form]);
 
   const onSubmit = (data: any) => {
-    onSave(data);
+    // Formatear números antes de enviar
+    const formattedData = Object.entries(data).reduce((acc, [key, value]) => {
+      if (typeof value === 'number') {
+        return { ...acc, [key]: new Intl.NumberFormat('es-CO').format(value) };
+      }
+      return { ...acc, [key]: value };
+    }, {});
+
+    onSave(formattedData);
     form.reset();
     onOpenChange(false);
   };
 
+  const renderFormField = (field: DynamicFormField) => {
+    // Si es un campo relacionado (selector)
+    if (field.name.startsWith('id_')) {
+      const relationName = field.name.replace('id_', '');
+      let options: any[] = [];
+      
+      switch (relationName) {
+        case 'ciudad':
+          options = ciudades;
+          break;
+        case 'tipo_regimen':
+          options = tiposRegimen;
+          break;
+        case 'tipo_contribuyente':
+          options = tiposContribuyente;
+          break;
+        case 'actividad_comercial':
+          options = actividadesComerciales;
+          break;
+      }
+
+      return (
+        <FormField
+          key={field.name}
+          control={form.control}
+          name={field.name}
+          render={({ field: formField }) => (
+            <FormItem className="col-span-1">
+              <FormLabel>{field.name.replace(/_/g, ' ').toUpperCase()}</FormLabel>
+              <Select onValueChange={formField.onChange} value={formField.value?.toString()}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder={`Seleccione ${field.name.replace(/_/g, ' ')}`} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {options.map((option) => (
+                    <SelectItem key={option.id} value={option.id.toString()}>
+                      {option.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      );
+    }
+
+    // Si es el campo estado
+    if (field.name === 'estado') {
+      return (
+        <FormField
+          key={field.name}
+          control={form.control}
+          name={field.name}
+          render={({ field: formField }) => (
+            <FormItem className="col-span-1 flex flex-col">
+              <FormLabel>Estado</FormLabel>
+              <FormControl>
+                <Switch
+                  checked={formField.value}
+                  onCheckedChange={formField.onChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      );
+    }
+
+    // Campo normal
+    return (
+      <FormField
+        key={field.name}
+        control={form.control}
+        name={field.name}
+        render={({ field: formField }) => (
+          <FormItem className="col-span-1">
+            <FormLabel>{field.name.replace(/_/g, ' ').toUpperCase()}</FormLabel>
+            <FormControl>
+              <Input 
+                {...formField} 
+                type={field.type === 'number' ? 'text' : 'text'}
+                placeholder={`Ingrese ${field.name.replace(/_/g, ' ')}`}
+                onChange={(e) => {
+                  if (field.type === 'number') {
+                    // Formatear números mientras se escriben
+                    const value = e.target.value.replace(/[^0-9]/g, '');
+                    formField.onChange(value ? parseInt(value) : '');
+                  } else {
+                    formField.onChange(e);
+                  }
+                }}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    );
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle>
             {initialData ? `Editar ${tableName}` : `Nuevo ${tableName}`}
@@ -82,27 +241,8 @@ export function DynamicForm({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {fields.map((field) => (
-                <FormField
-                  key={field.name}
-                  control={form.control}
-                  name={field.name}
-                  render={({ field: formField }) => (
-                    <FormItem>
-                      <FormLabel>{field.name}</FormLabel>
-                      <FormControl>
-                        <Input 
-                          {...formField} 
-                          type={field.type === 'number' ? 'number' : 'text'}
-                          placeholder={`Ingrese ${field.name}`}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              ))}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {visibleFields.map(renderFormField)}
             </div>
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
