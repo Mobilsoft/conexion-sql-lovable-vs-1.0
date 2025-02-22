@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { validateCompanyData, formatValidationErrors } from '@/utils/validationUtils';
 import { Company } from '@/types/company';
@@ -21,7 +20,6 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      // Toast inicial con progress
       toast({
         title: "Iniciando proceso...",
         description: (
@@ -60,9 +58,6 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
         tipo_empresa: 'Principal',
       };
 
-      console.log('Iniciando proceso de guardado con datos:', companyData);
-
-      // Toast de validación
       toast({
         title: "Validando datos...",
         description: (
@@ -74,90 +69,45 @@ export function useCompanyForm({ onOpenChange, editingCompany, departamentos, ci
         duration: 5000,
       });
 
-      // Toast de envío
-      toast({
-        title: "Enviando datos...",
-        description: (
-          <div className="w-full space-y-2">
-            <p>Enviando información al servidor</p>
-            <Progress value={50} className="w-full" />
-          </div>
-        ),
-        duration: 5000,
+      const url = editingCompany 
+        ? `http://localhost:3000/companies/${values.nit}`
+        : 'http://localhost:3000/companies';
+
+      const response = await fetch(url, {
+        method: editingCompany ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(companyData),
       });
 
-      // Enviar al servidor SQL Server
-      const { data, error } = await supabase.functions.invoke('sql-server-connection', {
-        body: {
-          action: editingCompany ? 'updateCompany' : 'insertCompany',
-          data: companyData
-        }
-      });
-
-      if (error) throw error;
-
-      console.log('Respuesta del servidor:', data);
-
-      toast({
-        title: "Procesando respuesta...",
-        description: (
-          <div className="w-full space-y-2">
-            <p>Verificando respuesta del servidor</p>
-            <Progress value={75} className="w-full" />
-          </div>
-        ),
-        duration: 5000,
-      });
-      
-      if (data.success) {
-        toast({
-          title: editingCompany ? "¡Actualización Exitosa!" : "¡Registro Exitoso!",
-          description: (
-            <div className="w-full space-y-2">
-              <p>{`La compañía ${companyData.razon_social} ha sido ${editingCompany ? 'actualizada' : 'registrada'} correctamente.`}</p>
-              <Progress value={100} className="w-full" />
-            </div>
-          ),
-          duration: 3000,
-        });
-
-        // Invalidar la consulta para refrescar la tabla
-        await queryClient.invalidateQueries({ queryKey: ['companies'] });
-        
-        // Cerrar el diálogo y reiniciar el formulario
-        onOpenChange(false);
-      } else {
-        throw new Error(data.error || 'Error al procesar la solicitud');
+      if (!response.ok) {
+        throw new Error('Error al procesar la solicitud');
       }
+
+      toast({
+        title: editingCompany ? "¡Actualización Exitosa!" : "¡Registro Exitoso!",
+        description: (
+          <div className="w-full space-y-2">
+            <p>{`La compañía ${companyData.razon_social} ha sido ${editingCompany ? 'actualizada' : 'registrada'} correctamente.`}</p>
+            <Progress value={100} className="w-full" />
+          </div>
+        ),
+        duration: 3000,
+      });
+
+      await queryClient.invalidateQueries({ queryKey: ['companies'] });
+      onOpenChange(false);
       
     } catch (error: any) {
       console.error('Error completo:', error);
       
-      let errorDescription = "Ha ocurrido un error al procesar la solicitud.";
-      
-      if (error.message.includes('violates foreign key constraint')) {
-        const fieldMatch = error.message.match(/companies_(\w+)_fkey/);
-        if (fieldMatch) {
-          const fieldName = fieldMatch[1];
-          errorDescription = `Error en el campo ${fieldName}: La referencia seleccionada no es válida.`;
-        }
-      } else if (error.message.includes('value too long')) {
-        const columnMatch = error.message.match(/column "([^"]+)"/);
-        if (columnMatch) {
-          const fieldName = columnMatch[1];
-          errorDescription = `Error en el campo ${fieldName}: El valor ingresado es demasiado largo.`;
-        }
-      } else if (error.message.includes('duplicate key')) {
-        errorDescription = "Ya existe una compañía con este NIT en el sistema.";
-      }
-      
-      // Mostrar error con progress en rojo
       toast({
         variant: "destructive",
         title: "Error en el Proceso",
         description: (
           <div className="w-full space-y-2">
-            <p>{errorDescription}</p>
+            <p>{error.message}</p>
             <Progress value={100} className="w-full bg-red-200" />
           </div>
         ),

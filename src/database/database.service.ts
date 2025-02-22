@@ -64,4 +64,32 @@ export class DatabaseService {
       this.connection.execSql(request);
     });
   }
+
+  async getClients(): Promise<any[]> {
+    const sql = `
+      SELECT 
+        id,
+        nombre,
+        apellido,
+        documento,
+        telefono,
+        email,
+        direccion,
+        ciudad,
+        estado
+      FROM Clientes
+      ORDER BY fecha_creacion DESC
+    `;
+    return this.executeQuery(sql);
+  }
+
+  async getCompanies(): Promise<any[]> {
+    const sql = `
+      SELECT *
+      FROM Companies
+      WHERE master_detail = 'M'
+      ORDER BY fecha_creacion DESC
+    `;
+    return this.executeQuery(sql);
+  }
 }

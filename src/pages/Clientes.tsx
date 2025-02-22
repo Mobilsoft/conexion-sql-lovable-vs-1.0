@@ -8,7 +8,6 @@ import { Cliente } from '@/types/cliente';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 
 const Clientes = () => {
@@ -19,44 +18,41 @@ const Clientes = () => {
   const { data: clientes = [], isLoading } = useQuery({
     queryKey: ['clientes'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('clientes')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        toast({
-          title: "Error al cargar clientes",
-          description: error.message,
-          variant: "destructive",
-        });
-        throw error;
+      const response = await fetch('http://localhost:3000/clientes');
+      if (!response.ok) {
+        throw new Error('Error al cargar clientes');
       }
-
-      return data;
+      return response.json();
     },
   });
 
   const handleSave = async (cliente: Cliente) => {
     try {
       if (editingCliente) {
-        const { error } = await supabase
-          .from('clientes')
-          .update(cliente)
-          .eq('id', cliente.id);
+        const response = await fetch(`http://localhost:3000/clientes/${cliente.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(cliente),
+        });
 
-        if (error) throw error;
+        if (!response.ok) throw new Error('Error al actualizar cliente');
 
         toast({
           title: "Cliente actualizado",
           description: "Los datos del cliente han sido actualizados exitosamente.",
         });
       } else {
-        const { error } = await supabase
-          .from('clientes')
-          .insert([cliente]);
+        const response = await fetch('http://localhost:3000/clientes', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(cliente),
+        });
 
-        if (error) throw error;
+        if (!response.ok) throw new Error('Error al crear cliente');
 
         toast({
           title: "Cliente registrado",
@@ -83,12 +79,11 @@ const Clientes = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      const { error } = await supabase
-        .from('clientes')
-        .delete()
-        .eq('id', id);
+      const response = await fetch(`http://localhost:3000/clientes/${id}`, {
+        method: 'DELETE',
+      });
 
-      if (error) throw error;
+      if (!response.ok) throw new Error('Error al eliminar cliente');
 
       queryClient.invalidateQueries({ queryKey: ['clientes'] });
       toast({
