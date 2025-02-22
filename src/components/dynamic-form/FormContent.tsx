@@ -1,4 +1,3 @@
-
 import { DynamicFormField } from "@/types/table-structure";
 import { SwitchField } from "./fields/SwitchField";
 import { SelectField } from "./fields/SelectField";
@@ -20,7 +19,75 @@ export function FormContent({ fields, form, onTipoDocumentoChange }: FormContent
     actividadesComerciales 
   } = useRelatedData();
 
+  const getOptionsForField = (field: DynamicFormField) => {
+    if (!field.properties?.reference_table) return [];
+
+    switch (field.properties.reference_table) {
+      case 'tipos_documento':
+        return tiposDocumento;
+      case 'ciudades':
+        return ciudades;
+      case 'departamentos':
+        return departamentos;
+      case 'tipos_regimen':
+        return tiposRegimen;
+      case 'actividades_comerciales':
+        return actividadesComerciales;
+      default:
+        return [];
+    }
+  };
+
   const renderFormField = (field: DynamicFormField) => {
+    // Si el campo tiene propiedades extendidas, las usamos
+    if (field.properties) {
+      switch (field.properties.display_type) {
+        case 'switch':
+          return <SwitchField key={field.name} field={field} form={form} />;
+        
+        case 'select':
+          return (
+            <SelectField 
+              key={field.name}
+              field={field}
+              form={form}
+              options={getOptionsForField(field)}
+              onTipoDocumentoChange={onTipoDocumentoChange}
+            />
+          );
+        
+        case 'numeric':
+          return (
+            <InputField 
+              key={field.name} 
+              field={{
+                ...field,
+                type: 'number',
+                format: field.properties.format_pattern
+              }} 
+              form={form} 
+            />
+          );
+
+        case 'calendar':
+          return (
+            <InputField 
+              key={field.name} 
+              field={{
+                ...field,
+                type: 'date',
+                format: field.properties.format_pattern
+              }} 
+              form={form} 
+            />
+          );
+
+        default:
+          return <InputField key={field.name} field={field} form={form} />;
+      }
+    }
+
+    // Comportamiento existente para campos sin propiedades extendidas
     // Campos tipo switch
     if (field.name === 'estado' || field.name === 'tabla_master') {
       return <SwitchField key={field.name} field={field} form={form} />;
