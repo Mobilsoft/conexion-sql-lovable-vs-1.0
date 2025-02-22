@@ -25,11 +25,11 @@ const SqlConnectionForm = () => {
   const form = useForm<SqlConnectionFormValues>({
     resolver: zodResolver(sqlConnectionSchema),
     defaultValues: {
-      server: process.env.DB_HOST || "localhost",
-      port: process.env.DB_PORT || "5432",
-      database: process.env.DB_NAME || "postgres",
-      username: process.env.DB_USER || "postgres",
-      password: process.env.DB_PASSWORD || "",
+      server: import.meta.env.VITE_DB_HOST || "localhost",
+      port: import.meta.env.VITE_DB_PORT || "5432",
+      database: import.meta.env.VITE_DB_NAME || "postgres",
+      username: import.meta.env.VITE_DB_USER || "postgres",
+      password: import.meta.env.VITE_DB_PASSWORD || "",
       useWindowsAuth: false,
     },
   });
