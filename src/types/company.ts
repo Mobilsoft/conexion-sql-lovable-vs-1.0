@@ -1,4 +1,3 @@
-
 export interface CodigoCIIU {
   id: number;
   codigo: string;
@@ -41,6 +40,24 @@ export interface TipoDocumento {
   id: number;
   nombre: string;
   codigo: string | null;
+}
+
+export interface CompanyFormData {
+  nit: string;
+  dv: string;
+  razon_social: string;
+  tipo_documento_id: string;
+  tipo_contribuyente: string;
+  direccion: string;
+  telefono: string;
+  email: string;
+  pais_id: string;
+  departamento_id: string;
+  ciudad_id: string;
+  codigo_ciiu_id: string;
+  actividad_comercial_id: string;
+  tipo_regimen_id: string;
+  municipio: string;
 }
 
 export interface Company {
@@ -89,5 +106,5 @@ export interface Company {
   comentarios: string | null;
   fecha_creacion?: string;
   fecha_actualizacion?: string;
-  master_detail?: string;
+  tabla_master?: string;
 }
