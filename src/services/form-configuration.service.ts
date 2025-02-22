@@ -2,11 +2,37 @@
 import { DatabaseService } from '@/database/database.service';
 import { FormConfiguration } from '@/types/form-configuration';
 import { TYPES } from 'tedious';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class FormConfigurationService {
   constructor(private readonly db: DatabaseService) {}
 
-  async save(config: Omit<FormConfiguration, 'id' | 'fecha_creacion' | 'fecha_actualizacion'>) {
+  async getFormConfiguration(formId: number): Promise<FormConfiguration | null> {
+    const sql = `
+      SELECT *
+      FROM app_form_configurations
+      WHERE form_id = @form_id
+      AND estado = 1;
+    `;
+
+    const parameters = [
+      { name: 'form_id', type: TYPES.Int, value: formId }
+    ];
+
+    const results = await this.db.executeQuery<FormConfiguration>(sql, parameters);
+    if (results.length === 0) return null;
+    
+    const config = results[0];
+    return {
+      ...config,
+      configuracion: typeof config.configuracion === 'string' 
+        ? JSON.parse(config.configuracion)
+        : config.configuracion
+    };
+  }
+
+  async saveConfiguration(config: Omit<FormConfiguration, 'id' | 'fecha_creacion' | 'fecha_actualizacion'>) {
     const sql = `
       INSERT INTO app_form_configurations (
         form_id,
@@ -38,31 +64,7 @@ export class FormConfigurationService {
     return this.db.executeQuery(sql, parameters);
   }
 
-  async getByFormId(formId: number): Promise<FormConfiguration | null> {
-    const sql = `
-      SELECT *
-      FROM app_form_configurations
-      WHERE form_id = @form_id
-      AND estado = 1;
-    `;
-
-    const parameters = [
-      { name: 'form_id', type: TYPES.Int, value: formId }
-    ];
-
-    const results = await this.db.executeQuery<FormConfiguration>(sql, parameters);
-    if (results.length === 0) return null;
-    
-    const config = results[0];
-    return {
-      ...config,
-      configuracion: typeof config.configuracion === 'string' 
-        ? JSON.parse(config.configuracion)
-        : config.configuracion
-    };
-  }
-
-  async update(id: number, config: Partial<FormConfiguration>) {
+  async updateConfiguration(id: number, config: Partial<FormConfiguration>) {
     const sql = `
       UPDATE app_form_configurations
       SET 

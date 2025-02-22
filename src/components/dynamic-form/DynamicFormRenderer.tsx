@@ -1,7 +1,6 @@
 
 import { useEffect, useState } from "react";
 import { FormConfiguration, FormFieldConfiguration } from "@/types/form-configuration";
-import { FormConfigurationService } from "@/services/form-configuration.service";
 import { Form } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
@@ -15,13 +14,15 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { FormConfigurationService } from "@/services/form-configuration.service";
 
 interface DynamicFormRendererProps {
-  formName: string;
+  formId: number;
+  configService: FormConfigurationService;
   onSubmit?: (data: any) => void;
 }
 
-export const DynamicFormRenderer = ({ formName, onSubmit }: DynamicFormRendererProps) => {
+export const DynamicFormRenderer = ({ formId, configService, onSubmit }: DynamicFormRendererProps) => {
   const [config, setConfig] = useState<FormConfiguration | null>(null);
   const { toast } = useToast();
   const form = useForm();
@@ -29,7 +30,7 @@ export const DynamicFormRenderer = ({ formName, onSubmit }: DynamicFormRendererP
   useEffect(() => {
     const loadConfig = async () => {
       try {
-        const configuration = await FormConfigurationService.getByName(formName);
+        const configuration = await configService.getFormConfiguration(formId);
         setConfig(configuration);
       } catch (error: any) {
         toast({
@@ -41,7 +42,7 @@ export const DynamicFormRenderer = ({ formName, onSubmit }: DynamicFormRendererP
     };
 
     loadConfig();
-  }, [formName]);
+  }, [formId, configService]);
 
   const renderField = (field: FormFieldConfiguration) => {
     switch (field.type) {
@@ -109,7 +110,7 @@ export const DynamicFormRenderer = ({ formName, onSubmit }: DynamicFormRendererP
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <Accordion type="single" collapsible className="w-full">
-          {config.components.map((component: any, index) => {
+          {config.configuracion.components.map((component: any, index) => {
             if (component.type === 'accordion') {
               return (
                 <AccordionItem key={index} value={`item-${index}`}>

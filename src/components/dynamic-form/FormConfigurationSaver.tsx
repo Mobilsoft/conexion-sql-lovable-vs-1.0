@@ -6,17 +6,18 @@ import { useToast } from "@/hooks/use-toast";
 import { FormConfiguration } from "@/types/form-configuration";
 
 interface FormConfigurationSaverProps {
-  configuration: FormConfiguration;
+  configuration: Omit<FormConfiguration, 'id' | 'fecha_creacion' | 'fecha_actualizacion'>;
+  configService: FormConfigurationService;
 }
 
-export const FormConfigurationSaver = ({ configuration }: FormConfigurationSaverProps) => {
+export const FormConfigurationSaver = ({ configuration, configService }: FormConfigurationSaverProps) => {
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await FormConfigurationService.save(configuration);
+      await configService.saveConfiguration(configuration);
       toast({
         title: "Éxito",
         description: "Configuración guardada correctamente",
