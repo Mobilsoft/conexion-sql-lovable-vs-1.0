@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -14,7 +13,6 @@ import DatabaseStats from "./DatabaseStats";
 import {
   sqlConnectionSchema,
   type SqlConnectionFormValues,
-  type TableStats,
 } from "@/types/sql-connection";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -27,11 +25,11 @@ const SqlConnectionForm = () => {
   const form = useForm<SqlConnectionFormValues>({
     resolver: zodResolver(sqlConnectionSchema),
     defaultValues: {
-      server: "145.223.75.189",
-      port: "1433",
-      database: "MobilPos",
-      username: "sa",
-      password: "D3v3l0p3r2024$",
+      server: process.env.DB_HOST || "localhost",
+      port: process.env.DB_PORT || "5432",
+      database: process.env.DB_NAME || "postgres",
+      username: process.env.DB_USER || "postgres",
+      password: process.env.DB_PASSWORD || "",
       useWindowsAuth: false,
     },
   });
@@ -39,40 +37,17 @@ const SqlConnectionForm = () => {
   const onSubmit = async (data: SqlConnectionFormValues) => {
     setIsLoading(true);
     try {
-      console.log("Enviando datos de conexión:", {
-        ...data,
-        password: "***********",
-      });
-
-      const response = await fetch("http://localhost:3000/connection", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          server: data.server,
-          port: Number(data.port),
-          database: data.database,
-          user: data.username,
-          password: data.password
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Error desconocido en la conexión");
-      }
-
-      await fetch("http://localhost:3000/database/tables")
-      .then((response) => response.json()) // Convertir la respuesta a JSON
-      .then((data) => setTableStats(data))
-      .catch((error) => console.error("Error en la petición:", error));
+      // Obtener estadísticas de las tablas usando la función RPC de Supabase
+      const { data: stats, error } = await supabase.rpc('get_table_stats');
       
-      
+      if (error) throw error;
+
+      setTableStats(stats);
       setConnectionData(data);
 
       toast({
         title: "Conexión exitosa",
-        description: ` Se ha establecido la conexión con el servidor SQL ${data.database}.`,
+        description: `Se ha establecido la conexión con la base de datos ${data.database}.`,
         duration: 3000,
       });
 
@@ -80,9 +55,7 @@ const SqlConnectionForm = () => {
       console.error("Error al conectar:", error);
       toast({
         title: "Error de conexión",
-        description:
-          error.message ||
-          "No se pudo establecer la conexión con el servidor SQL.",
+        description: error.message || "No se pudo establecer la conexión con la base de datos.",
         variant: "destructive",
         duration: 3000,
       });

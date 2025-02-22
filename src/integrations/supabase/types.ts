@@ -484,6 +484,120 @@ export type Database = {
         }
         Relationships: []
       }
+      gen_empresas: {
+        Row: {
+          actividad_comercial_id: number | null
+          ciudad_id: number | null
+          codigo_ciiu: number | null
+          created_at: string | null
+          departamento_id: number | null
+          direccion: string
+          dv: string
+          email: string
+          estado_empresa: string | null
+          id: number
+          municipio: string
+          nit: string
+          pais_id: number | null
+          razon_social: string
+          tabla_master: string | null
+          telefono: string
+          tipo_contribuyente: string
+          tipo_documento_id: number | null
+          tipo_regimen_id: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          actividad_comercial_id?: number | null
+          ciudad_id?: number | null
+          codigo_ciiu?: number | null
+          created_at?: string | null
+          departamento_id?: number | null
+          direccion: string
+          dv: string
+          email: string
+          estado_empresa?: string | null
+          id?: number
+          municipio: string
+          nit: string
+          pais_id?: number | null
+          razon_social: string
+          tabla_master?: string | null
+          telefono: string
+          tipo_contribuyente: string
+          tipo_documento_id?: number | null
+          tipo_regimen_id?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          actividad_comercial_id?: number | null
+          ciudad_id?: number | null
+          codigo_ciiu?: number | null
+          created_at?: string | null
+          departamento_id?: number | null
+          direccion?: string
+          dv?: string
+          email?: string
+          estado_empresa?: string | null
+          id?: number
+          municipio?: string
+          nit?: string
+          pais_id?: number | null
+          razon_social?: string
+          tabla_master?: string | null
+          telefono?: string
+          tipo_contribuyente?: string
+          tipo_documento_id?: number | null
+          tipo_regimen_id?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      gen_usuarios: {
+        Row: {
+          apellidos: string
+          ciudad: string
+          created_at: string | null
+          direccion: string
+          documento: string
+          email: string
+          estado: string | null
+          id: number
+          nombre: string
+          telefono: string
+          tipo: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          apellidos: string
+          ciudad: string
+          created_at?: string | null
+          direccion: string
+          documento: string
+          email: string
+          estado?: string | null
+          id?: number
+          nombre: string
+          telefono: string
+          tipo?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          apellidos?: string
+          ciudad?: string
+          created_at?: string | null
+          direccion?: string
+          documento?: string
+          email?: string
+          estado?: string | null
+          id?: number
+          nombre?: string
+          telefono?: string
+          tipo?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       paises: {
         Row: {
           codigo: string | null

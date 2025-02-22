@@ -29,49 +29,39 @@ const DatabaseStats = ({ stats, connectionData }: { stats: any[], connectionData
   const [formTable, setFormTable] = useState<string | null>(null);
   const { toast } = useToast();
 
+  // Obtenemos las estadísticas de las tablas usando la función get_table_stats
+  const { data: tableStats } = useQuery({
+    queryKey: ['tableStats'],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_table_stats');
+      if (error) throw error;
+      return data as TableStats[];
+    },
+  });
+
   const { data: tableStructure } = useQuery({
     queryKey: ['tableStructure', formTable],
     queryFn: async () => {
       if (!formTable) return null;
-      const { data, error } = await supabase.functions.invoke('sql-server-connection', {
-        body: {
-          action: 'getTableStructure',
-          data: {
-            ...connectionData,
-            tableName: formTable
-          }
-        }
-      });
+      
+      const { data, error } = await supabase
+        .from('table_structures')
+        .select('*')
+        .eq('table_name', formTable);
 
       if (error) throw error;
-      return data.data as TableStructure[];
+      return data as TableStructure[];
     },
     enabled: !!formTable,
   });
-
-  const mapStructureToFields = (structure: TableStructure[]): DynamicFormField[] => {
-    return structure?.map(field => ({
-      name: field.column_name,
-      type: field.data_type.includes('int') ? 'number' : 'text',
-      required: !field.is_nullable,
-      defaultValue: field.column_default,
-    })) || [];
-  };
 
   const handleSaveForm = async (data: any) => {
     if (!formTable) return;
     
     try {
-      const { error } = await supabase.functions.invoke('sql-server-connection', {
-        body: {
-          action: 'insertData',
-          data: {
-            ...connectionData,
-            tableName: formTable,
-            rowData: data
-          }
-        }
-      });
+      const { error } = await supabase
+        .from(formTable)
+        .insert([data]);
 
       if (error) throw error;
 
@@ -79,6 +69,7 @@ const DatabaseStats = ({ stats, connectionData }: { stats: any[], connectionData
         title: "Éxito",
         description: "Datos guardados correctamente",
       });
+      
     } catch (error: any) {
       toast({
         title: "Error",
@@ -106,23 +97,23 @@ const DatabaseStats = ({ stats, connectionData }: { stats: any[], connectionData
           </TableRow>
         </TableHeader>
         <TableBody>
-          {stats.map((stat) => (
-            <TableRow key={stat.TableName}>
-              <TableCell className="font-medium">{stat.TableName}</TableCell>
-              <TableCell className="text-right">{stat.RowCounts.toLocaleString()}</TableCell>
-              <TableCell className="text-right">{stat.TotalSizeMB.toFixed(2)}</TableCell>
+          {(tableStats || []).map((stat) => (
+            <TableRow key={stat.table_name}>
+              <TableCell className="font-medium">{stat.table_name}</TableCell>
+              <TableCell className="text-right">{stat.row_count.toLocaleString()}</TableCell>
+              <TableCell className="text-right">{stat.size_in_kb.toFixed(2)}</TableCell>
               <TableCell className="text-right space-x-2">
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setSelectedTable(stat.TableName)}
+                  onClick={() => setSelectedTable(stat.table_name)}
                 >
                   <FileText className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setFormTable(stat.TableName)}
+                  onClick={() => setFormTable(stat.table_name)}
                 >
                   <FormInput className="h-4 w-4" />
                 </Button>
@@ -143,7 +134,12 @@ const DatabaseStats = ({ stats, connectionData }: { stats: any[], connectionData
         <DynamicForm
           open={!!formTable}
           onOpenChange={(open) => !open && setFormTable(null)}
-          fields={mapStructureToFields(tableStructure)}
+          fields={tableStructure.map(field => ({
+            name: field.column_name,
+            type: field.data_type.includes('int') ? 'number' : 'text',
+            required: !field.is_nullable,
+            defaultValue: field.column_default,
+          }))}
           tableName={formTable || ''}
           onSave={handleSaveForm}
         />
