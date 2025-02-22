@@ -20,10 +20,11 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { DynamicFormField } from "@/types/table-structure";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { calculateDV } from "@/utils/dvCalculator";
 
 interface DynamicFormProps {
   open: boolean;
@@ -42,11 +43,38 @@ export function DynamicForm({
   onSave, 
   initialData 
 }: DynamicFormProps) {
+  const [selectedTipoDoc, setSelectedTipoDoc] = useState<string>('');
+
   // Consultas para obtener datos de las tablas relacionadas
+  const { data: tiposDocumento = [] } = useQuery({
+    queryKey: ['tipos_documento'],
+    queryFn: async () => {
+      const { data } = await supabase.from('tipos_documento').select('*');
+      return data || [];
+    }
+  });
+
   const { data: ciudades = [] } = useQuery({
     queryKey: ['ciudades'],
     queryFn: async () => {
-      const { data } = await supabase.from('ciudades').select('*');
+      const { data } = await supabase
+        .from('ciudades')
+        .select(`
+          id,
+          nombre,
+          departamento:departamentos (
+            id,
+            nombre
+          )
+        `);
+      return data || [];
+    }
+  });
+
+  const { data: departamentos = [] } = useQuery({
+    queryKey: ['departamentos'],
+    queryFn: async () => {
+      const { data } = await supabase.from('departamentos').select('*');
       return data || [];
     }
   });
@@ -55,14 +83,6 @@ export function DynamicForm({
     queryKey: ['tipos_regimen'],
     queryFn: async () => {
       const { data } = await supabase.from('tipos_regimen_tributario').select('*');
-      return data || [];
-    }
-  });
-
-  const { data: tiposContribuyente = [] } = useQuery({
-    queryKey: ['tipos_contribuyente'],
-    queryFn: async () => {
-      const { data } = await supabase.from('tipos_contribuyente').select('*');
       return data || [];
     }
   });
@@ -77,7 +97,6 @@ export function DynamicForm({
 
   // Filtrar campos que no deben mostrarse
   const visibleFields = fields.filter(field => (
-    !field.name.startsWith('id_') && // Ocultar campos ID
     !field.name.includes('fecha_actualizacion') &&
     !field.name.includes('fecha_creacion')
   ));
@@ -90,8 +109,8 @@ export function DynamicForm({
         schemaFields[field.name] = field.required 
           ? z.number()
           : z.number().nullable();
-      } else if (field.name === 'estado') {
-        schemaFields[field.name] = z.boolean();
+      } else if (field.name === 'estado' || field.name === 'master_detail') {
+        schemaFields[field.name] = z.boolean().or(z.string());
       } else {
         schemaFields[field.name] = field.required 
           ? z.string()
@@ -106,6 +125,23 @@ export function DynamicForm({
     defaultValues: initialData || {},
   });
 
+  // Watch para el número de documento y tipo de documento
+  const numeroDocumento = form.watch('numero_documento');
+  const tipoDocumentoId = form.watch('tipo_documento_id');
+
+  useEffect(() => {
+    if (tipoDocumentoId) {
+      setSelectedTipoDoc(tipoDocumentoId);
+    }
+  }, [tipoDocumentoId]);
+
+  useEffect(() => {
+    if (selectedTipoDoc === '31' && numeroDocumento) { // 31 = NIT
+      const dv = calculateDV(numeroDocumento);
+      form.setValue('dv', dv);
+    }
+  }, [numeroDocumento, selectedTipoDoc, form]);
+
   useEffect(() => {
     if (initialData) {
       form.reset(initialData);
@@ -118,6 +154,12 @@ export function DynamicForm({
       if (typeof value === 'number') {
         return { ...acc, [key]: new Intl.NumberFormat('es-CO').format(value) };
       }
+      if (key === 'master_detail') {
+        return { ...acc, [key]: value === true ? 'M' : 'D' };
+      }
+      if (key === 'estado') {
+        return { ...acc, [key]: value === true ? 1 : 0 };
+      }
       return { ...acc, [key]: value };
     }, {});
 
@@ -127,6 +169,31 @@ export function DynamicForm({
   };
 
   const renderFormField = (field: DynamicFormField) => {
+    // Campos tipo switch
+    if (field.name === 'estado' || field.name === 'master_detail') {
+      return (
+        <FormField
+          key={field.name}
+          control={form.control}
+          name={field.name}
+          render={({ field: formField }) => (
+            <FormItem className="col-span-1 flex flex-col">
+              <FormLabel>
+                {field.name === 'master_detail' ? 'Registro Principal' : 'Estado'}
+              </FormLabel>
+              <FormControl>
+                <Switch
+                  checked={formField.value === true || formField.value === 'M' || formField.value === 1}
+                  onCheckedChange={formField.onChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      );
+    }
+
     // Si es un campo relacionado (selector)
     if (field.name.startsWith('id_')) {
       const relationName = field.name.replace('id_', '');
@@ -136,11 +203,14 @@ export function DynamicForm({
         case 'ciudad':
           options = ciudades;
           break;
+        case 'departamento':
+          options = departamentos;
+          break;
+        case 'tipo_documento':
+          options = tiposDocumento;
+          break;
         case 'tipo_regimen':
           options = tiposRegimen;
-          break;
-        case 'tipo_contribuyente':
-          options = tiposContribuyente;
           break;
         case 'actividad_comercial':
           options = actividadesComerciales;
@@ -155,7 +225,15 @@ export function DynamicForm({
           render={({ field: formField }) => (
             <FormItem className="col-span-1">
               <FormLabel>{field.name.replace(/_/g, ' ').toUpperCase()}</FormLabel>
-              <Select onValueChange={formField.onChange} value={formField.value?.toString()}>
+              <Select 
+                onValueChange={(value) => {
+                  formField.onChange(value);
+                  if (field.name === 'tipo_documento_id') {
+                    setSelectedTipoDoc(value);
+                  }
+                }} 
+                value={formField.value?.toString()}
+              >
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder={`Seleccione ${field.name.replace(/_/g, ' ')}`} />
@@ -165,33 +243,11 @@ export function DynamicForm({
                   {options.map((option) => (
                     <SelectItem key={option.id} value={option.id.toString()}>
                       {option.nombre}
+                      {option.departamento && ` - ${option.departamento.nombre}`}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      );
-    }
-
-    // Si es el campo estado
-    if (field.name === 'estado') {
-      return (
-        <FormField
-          key={field.name}
-          control={form.control}
-          name={field.name}
-          render={({ field: formField }) => (
-            <FormItem className="col-span-1 flex flex-col">
-              <FormLabel>Estado</FormLabel>
-              <FormControl>
-                <Switch
-                  checked={formField.value}
-                  onCheckedChange={formField.onChange}
-                />
-              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -222,6 +278,11 @@ export function DynamicForm({
                     formField.onChange(e);
                   }
                 }}
+                value={
+                  field.type === 'number' && formField.value
+                    ? new Intl.NumberFormat('es-CO').format(formField.value)
+                    : formField.value || ''
+                }
               />
             </FormControl>
             <FormMessage />
