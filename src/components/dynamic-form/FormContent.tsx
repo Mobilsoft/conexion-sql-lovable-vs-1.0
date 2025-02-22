@@ -1,3 +1,4 @@
+
 import { DynamicFormField } from "@/types/table-structure";
 import { SwitchField } from "./fields/SwitchField";
 import { SelectField } from "./fields/SelectField";
@@ -63,7 +64,10 @@ export function FormContent({ fields, form, onTipoDocumentoChange }: FormContent
               field={{
                 ...field,
                 type: 'number',
-                format: field.properties.format_pattern
+                properties: {
+                  ...field.properties,
+                  format_pattern: field.properties.format_pattern
+                }
               }} 
               form={form} 
             />
@@ -76,7 +80,10 @@ export function FormContent({ fields, form, onTipoDocumentoChange }: FormContent
               field={{
                 ...field,
                 type: 'date',
-                format: field.properties.format_pattern
+                properties: {
+                  ...field.properties,
+                  format_pattern: field.properties.format_pattern
+                }
               }} 
               form={form} 
             />
@@ -87,7 +94,6 @@ export function FormContent({ fields, form, onTipoDocumentoChange }: FormContent
       }
     }
 
-    // Comportamiento existente para campos sin propiedades extendidas
     // Campos tipo switch
     if (field.name === 'estado' || field.name === 'tabla_master') {
       return <SwitchField key={field.name} field={field} form={form} />;
