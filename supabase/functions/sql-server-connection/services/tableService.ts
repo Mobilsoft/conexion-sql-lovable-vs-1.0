@@ -67,9 +67,9 @@ export const getTableStructure = async (pool: mssql.ConnectionPool, tableName: s
         OBJECT_SCHEMA_NAME(c.object_id) as schema_name,
         c.collation_name,
         CASE 
-          WHEN c.name = 'master_detail' THEN 1
+          WHEN c.name = 'ismaster' THEN 1
           ELSE 0
-        END AS is_master_detail
+        END AS ismaster
       FROM sys.columns c
       INNER JOIN sys.types t 
         ON c.user_type_id = t.user_type_id
@@ -215,17 +215,17 @@ const ensureMasterDetailColumn = async (pool: mssql.ConnectionPool, tableName: s
       SELECT COUNT(*) as exists_count
       FROM sys.columns c
       WHERE c.object_id = OBJECT_ID(@tableName)
-      AND c.name = 'master_detail'
+      AND c.name = 'ismaster'
     `)
 
   if (columnExists.recordset[0].exists_count === 0) {
-    console.log('Agregando columna master_detail a la tabla:', tableName)
+    console.log('Agregando columna ismaster a la tabla:', tableName)
     await pool.request()
       .input('tableName', mssql.VarChar, tableName)
       .query(`
         ALTER TABLE ${tableName}
-        ADD master_detail char(1) DEFAULT 'M'
+        ADD ismaster bit DEFAULT 1
       `)
-    console.log('Columna master_detail agregada exitosamente a:', tableName)
+    console.log('Columna ismaster agregada exitosamente a:', tableName)
   }
 }
