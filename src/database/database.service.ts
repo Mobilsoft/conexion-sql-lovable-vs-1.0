@@ -18,7 +18,7 @@ export class DatabaseService {
         },
       },
       options: {
-        database: 'Taskmaster',
+        database: 'Mobilpos',
         port: 1433,
         encrypt: true,
         trustServerCertificate: true,
@@ -68,27 +68,45 @@ export class DatabaseService {
   async getClients(): Promise<any[]> {
     const sql = `
       SELECT 
-        id,
-        nombre,
-        apellido,
-        documento,
-        telefono,
-        email,
-        direccion,
-        ciudad,
-        estado
-      FROM Clientes
-      ORDER BY fecha_creacion DESC
+        IdTercero as id,
+        Nombres as nombre,
+        Apellidos as apellido,
+        NumeroDocumento as documento,
+        Telefono1 as telefono,
+        Email as email,
+        DireccionPrincipal as direccion,
+        Ciudad as ciudad,
+        Estado as estado
+      FROM MAE_Terceros
+      WHERE TipoTercero = 'Cliente'
+      ORDER BY FechaCreacion DESC
     `;
     return this.executeQuery(sql);
   }
 
   async getCompanies(): Promise<any[]> {
     const sql = `
-      SELECT *
-      FROM Companies
-      WHERE master_detail = 'M'
-      ORDER BY fecha_creacion DESC
+      SELECT 
+        IdEmpresa as id,
+        NIT,
+        DigitoVerificacion as dv,
+        RazonSocial,
+        TipoDocumento as tipo_documento_id,
+        TipoContribuyente as tipo_contribuyente,
+        DireccionPrincipal as direccion,
+        Telefono1 as telefono,
+        Email as email,
+        Departamento as departamento_id,
+        Ciudad as ciudad_id,
+        Pais as pais_id,
+        CodigoCIIU as codigo_ciiu_id,
+        ActividadComercial as actividad_comercial_id,
+        TipoRegimen as tipo_regimen_id,
+        Ciudad as municipio,
+        Estado as estado_empresa
+      FROM MAE_Empresas
+      WHERE TipoEmpresa = 'Principal'
+      ORDER BY FechaCreacion DESC
     `;
     return this.executeQuery(sql);
   }
