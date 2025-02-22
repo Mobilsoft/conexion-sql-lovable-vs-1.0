@@ -1,48 +1,89 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import { FormConfiguration } from "@/types/form-configuration";
+import { DatabaseService } from '@/database/database.service';
+import { FormConfiguration } from '@/types/form-configuration';
+import { TYPES } from 'tedious';
 
-export const FormConfigurationService = {
-  async save(config: Omit<FormConfiguration, 'id'>) {
-    const { data, error } = await supabase
-      .from('form_configurations')
-      .insert([{
-        name: config.name,
-        description: config.description || '',
-        configuration: config,
-        is_active: true
-      }])
-      .select()
-      .single();
+export class FormConfigurationService {
+  constructor(private readonly db: DatabaseService) {}
 
-    if (error) throw error;
-    return data;
-  },
+  async save(config: Omit<FormConfiguration, 'id' | 'fecha_creacion' | 'fecha_actualizacion'>) {
+    const sql = `
+      INSERT INTO app_form_configurations (
+        form_id,
+        nombre,
+        descripcion,
+        configuracion,
+        estado,
+        tabla_master
+      )
+      VALUES (
+        @form_id,
+        @nombre,
+        @descripcion,
+        @configuracion,
+        @estado,
+        @tabla_master
+      );
+    `;
 
-  async getByName(name: string) {
-    const { data, error } = await supabase
-      .from('form_configurations')
-      .select('*')
-      .eq('name', name)
-      .eq('is_active', true)
-      .single();
+    const parameters = [
+      { name: 'form_id', type: TYPES.Int, value: config.form_id },
+      { name: 'nombre', type: TYPES.NVarChar, value: config.nombre },
+      { name: 'descripcion', type: TYPES.NVarChar, value: config.descripcion || null },
+      { name: 'configuracion', type: TYPES.NVarChar, value: JSON.stringify(config.configuracion) },
+      { name: 'estado', type: TYPES.Bit, value: config.estado },
+      { name: 'tabla_master', type: TYPES.Char, value: config.tabla_master }
+    ];
 
-    if (error) throw error;
-    return data?.configuration as FormConfiguration;
-  },
-
-  async update(id: string, config: Partial<FormConfiguration>) {
-    const { data, error } = await supabase
-      .from('form_configurations')
-      .update({
-        configuration: config,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
+    return this.db.executeQuery(sql, parameters);
   }
-};
+
+  async getByFormId(formId: number): Promise<FormConfiguration | null> {
+    const sql = `
+      SELECT *
+      FROM app_form_configurations
+      WHERE form_id = @form_id
+      AND estado = 1;
+    `;
+
+    const parameters = [
+      { name: 'form_id', type: TYPES.Int, value: formId }
+    ];
+
+    const results = await this.db.executeQuery<FormConfiguration>(sql, parameters);
+    if (results.length === 0) return null;
+    
+    const config = results[0];
+    return {
+      ...config,
+      configuracion: typeof config.configuracion === 'string' 
+        ? JSON.parse(config.configuracion)
+        : config.configuracion
+    };
+  }
+
+  async update(id: number, config: Partial<FormConfiguration>) {
+    const sql = `
+      UPDATE app_form_configurations
+      SET 
+        nombre = @nombre,
+        descripcion = @descripcion,
+        configuracion = @configuracion,
+        estado = @estado,
+        tabla_master = @tabla_master,
+        fecha_actualizacion = GETDATE()
+      WHERE id = @id;
+    `;
+
+    const parameters = [
+      { name: 'id', type: TYPES.Int, value: id },
+      { name: 'nombre', type: TYPES.NVarChar, value: config.nombre },
+      { name: 'descripcion', type: TYPES.NVarChar, value: config.descripcion || null },
+      { name: 'configuracion', type: TYPES.NVarChar, value: JSON.stringify(config.configuracion) },
+      { name: 'estado', type: TYPES.Bit, value: config.estado },
+      { name: 'tabla_master', type: TYPES.Char, value: config.tabla_master }
+    ];
+
+    return this.db.executeQuery(sql, parameters);
+  }
+}

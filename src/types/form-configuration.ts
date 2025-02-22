@@ -1,4 +1,28 @@
 
+export interface Module {
+  id: number;
+  nombre: string;
+  descripcion?: string;
+  icono?: string;
+  orden?: number;
+  estado: boolean;
+  fecha_creacion?: string;
+  fecha_actualizacion?: string;
+}
+
+export interface Form {
+  id: number;
+  module_id: number;
+  nombre: string;
+  descripcion?: string;
+  ruta?: string;
+  icono?: string;
+  orden?: number;
+  estado: boolean;
+  fecha_creacion?: string;
+  fecha_actualizacion?: string;
+}
+
 export interface FormFieldConfiguration {
   type: string;
   label: string;
@@ -32,13 +56,20 @@ export interface FormAccordionConfiguration {
 }
 
 export interface FormConfiguration {
-  id?: string;
-  name: string;
-  description?: string;
-  display: string;
-  settings: {
-    title: string;
-    theme: string;
+  id: number;
+  form_id: number;
+  nombre: string;
+  descripcion?: string;
+  configuracion: {
+    display: string;
+    settings: {
+      title: string;
+      theme: string;
+    };
+    components: (FormFieldConfiguration | FormAccordionConfiguration)[];
   };
-  components: (FormFieldConfiguration | FormAccordionConfiguration)[];
+  estado: boolean;
+  tabla_master: 'M' | 'D';
+  fecha_creacion?: string;
+  fecha_actualizacion?: string;
 }
