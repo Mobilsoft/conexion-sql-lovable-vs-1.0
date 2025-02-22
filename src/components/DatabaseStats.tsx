@@ -24,7 +24,17 @@ interface TableStats {
   size_in_kb: number;
 }
 
-type KnownTables = 'gen_empresas' | 'gen_usuarios' | 'table_structures';
+type KnownTables = 
+  | 'cio_customers' 
+  | 'cio_products' 
+  | 'cio_product_categories' 
+  | 'cio_brands' 
+  | 'cio_sales' 
+  | 'cio_sale_details' 
+  | 'cio_inventory' 
+  | 'gen_empresas' 
+  | 'gen_usuarios' 
+  | 'table_structures';
 
 const DatabaseStats = ({ stats, connectionData }: { stats: any[], connectionData: any }) => {
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
@@ -90,7 +100,18 @@ const DatabaseStats = ({ stats, connectionData }: { stats: any[], connectionData
 
   // Función auxiliar para validar tablas conocidas
   const isKnownTable = (table: string): table is KnownTables => {
-    const knownTables = ['gen_empresas', 'gen_usuarios', 'table_structures'];
+    const knownTables = [
+      'cio_customers',
+      'cio_products',
+      'cio_product_categories',
+      'cio_brands',
+      'cio_sales',
+      'cio_sale_details',
+      'cio_inventory',
+      'gen_empresas',
+      'gen_usuarios',
+      'table_structures'
+    ];
     return knownTables.includes(table);
   };
 

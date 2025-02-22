@@ -36,6 +36,317 @@ export type Database = {
         }
         Relationships: []
       }
+      cio_brands: {
+        Row: {
+          descripcion: string | null
+          estado: boolean | null
+          fecha_actualizacion: string | null
+          fecha_creacion: string | null
+          id: number
+          master_detail: string | null
+          nombre: string
+        }
+        Insert: {
+          descripcion?: string | null
+          estado?: boolean | null
+          fecha_actualizacion?: string | null
+          fecha_creacion?: string | null
+          id?: number
+          master_detail?: string | null
+          nombre: string
+        }
+        Update: {
+          descripcion?: string | null
+          estado?: boolean | null
+          fecha_actualizacion?: string | null
+          fecha_creacion?: string | null
+          id?: number
+          master_detail?: string | null
+          nombre?: string
+        }
+        Relationships: []
+      }
+      cio_customers: {
+        Row: {
+          apellido: string
+          direccion: string
+          email: string
+          estado: boolean | null
+          fecha_actualizacion: string | null
+          fecha_creacion: string | null
+          id: number
+          id_ciudad: number
+          id_tipo_documento: number
+          master_detail: string | null
+          nombre: string
+          numero_documento: string
+          razon_social: string
+          telefono: string
+        }
+        Insert: {
+          apellido: string
+          direccion: string
+          email: string
+          estado?: boolean | null
+          fecha_actualizacion?: string | null
+          fecha_creacion?: string | null
+          id?: number
+          id_ciudad: number
+          id_tipo_documento: number
+          master_detail?: string | null
+          nombre: string
+          numero_documento: string
+          razon_social: string
+          telefono: string
+        }
+        Update: {
+          apellido?: string
+          direccion?: string
+          email?: string
+          estado?: boolean | null
+          fecha_actualizacion?: string | null
+          fecha_creacion?: string | null
+          id?: number
+          id_ciudad?: number
+          id_tipo_documento?: number
+          master_detail?: string | null
+          nombre?: string
+          numero_documento?: string
+          razon_social?: string
+          telefono?: string
+        }
+        Relationships: []
+      }
+      cio_inventory: {
+        Row: {
+          cantidad: number
+          documento_referencia: string | null
+          fecha_actualizacion: string | null
+          fecha_creacion: string | null
+          fecha_movimiento: string | null
+          id: number
+          id_producto: number
+          master_detail: string | null
+          observaciones: string | null
+          tipo_movimiento: string
+        }
+        Insert: {
+          cantidad: number
+          documento_referencia?: string | null
+          fecha_actualizacion?: string | null
+          fecha_creacion?: string | null
+          fecha_movimiento?: string | null
+          id?: number
+          id_producto: number
+          master_detail?: string | null
+          observaciones?: string | null
+          tipo_movimiento: string
+        }
+        Update: {
+          cantidad?: number
+          documento_referencia?: string | null
+          fecha_actualizacion?: string | null
+          fecha_creacion?: string | null
+          fecha_movimiento?: string | null
+          id?: number
+          id_producto?: number
+          master_detail?: string | null
+          observaciones?: string | null
+          tipo_movimiento?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_inventory_product"
+            columns: ["id_producto"]
+            isOneToOne: false
+            referencedRelation: "cio_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cio_product_categories: {
+        Row: {
+          descripcion: string | null
+          estado: boolean | null
+          fecha_actualizacion: string | null
+          fecha_creacion: string | null
+          id: number
+          master_detail: string | null
+          nombre: string
+        }
+        Insert: {
+          descripcion?: string | null
+          estado?: boolean | null
+          fecha_actualizacion?: string | null
+          fecha_creacion?: string | null
+          id?: number
+          master_detail?: string | null
+          nombre: string
+        }
+        Update: {
+          descripcion?: string | null
+          estado?: boolean | null
+          fecha_actualizacion?: string | null
+          fecha_creacion?: string | null
+          id?: number
+          master_detail?: string | null
+          nombre?: string
+        }
+        Relationships: []
+      }
+      cio_products: {
+        Row: {
+          codigo: string
+          descripcion: string | null
+          estado: boolean | null
+          fecha_actualizacion: string | null
+          fecha_creacion: string | null
+          id: number
+          id_categoria: number
+          id_marca: number | null
+          master_detail: string | null
+          nombre: string
+          precio_compra: number
+          precio_venta: number
+          stock_actual: number | null
+          stock_maximo: number | null
+          stock_minimo: number | null
+        }
+        Insert: {
+          codigo: string
+          descripcion?: string | null
+          estado?: boolean | null
+          fecha_actualizacion?: string | null
+          fecha_creacion?: string | null
+          id?: number
+          id_categoria: number
+          id_marca?: number | null
+          master_detail?: string | null
+          nombre: string
+          precio_compra: number
+          precio_venta: number
+          stock_actual?: number | null
+          stock_maximo?: number | null
+          stock_minimo?: number | null
+        }
+        Update: {
+          codigo?: string
+          descripcion?: string | null
+          estado?: boolean | null
+          fecha_actualizacion?: string | null
+          fecha_creacion?: string | null
+          id?: number
+          id_categoria?: number
+          id_marca?: number | null
+          master_detail?: string | null
+          nombre?: string
+          precio_compra?: number
+          precio_venta?: number
+          stock_actual?: number | null
+          stock_maximo?: number | null
+          stock_minimo?: number | null
+        }
+        Relationships: []
+      }
+      cio_sale_details: {
+        Row: {
+          cantidad: number
+          descuento: number | null
+          fecha_actualizacion: string | null
+          fecha_creacion: string | null
+          id: number
+          id_producto: number
+          id_venta: number
+          master_detail: string | null
+          precio_unitario: number
+          subtotal: number
+        }
+        Insert: {
+          cantidad: number
+          descuento?: number | null
+          fecha_actualizacion?: string | null
+          fecha_creacion?: string | null
+          id?: number
+          id_producto: number
+          id_venta: number
+          master_detail?: string | null
+          precio_unitario: number
+          subtotal: number
+        }
+        Update: {
+          cantidad?: number
+          descuento?: number | null
+          fecha_actualizacion?: string | null
+          fecha_creacion?: string | null
+          id?: number
+          id_producto?: number
+          id_venta?: number
+          master_detail?: string | null
+          precio_unitario?: number
+          subtotal?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_sale_details_product"
+            columns: ["id_producto"]
+            isOneToOne: false
+            referencedRelation: "cio_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_sale_details_sale"
+            columns: ["id_venta"]
+            isOneToOne: false
+            referencedRelation: "cio_sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cio_sales: {
+        Row: {
+          descuento: number | null
+          estado: boolean | null
+          fecha_actualizacion: string | null
+          fecha_creacion: string | null
+          fecha_venta: string | null
+          id: number
+          id_cliente: number
+          iva: number | null
+          master_detail: string | null
+          numero_factura: string
+          subtotal: number
+          total: number
+        }
+        Insert: {
+          descuento?: number | null
+          estado?: boolean | null
+          fecha_actualizacion?: string | null
+          fecha_creacion?: string | null
+          fecha_venta?: string | null
+          id?: number
+          id_cliente: number
+          iva?: number | null
+          master_detail?: string | null
+          numero_factura: string
+          subtotal: number
+          total: number
+        }
+        Update: {
+          descuento?: number | null
+          estado?: boolean | null
+          fecha_actualizacion?: string | null
+          fecha_creacion?: string | null
+          fecha_venta?: string | null
+          id?: number
+          id_cliente?: number
+          iva?: number | null
+          master_detail?: string | null
+          numero_factura?: string
+          subtotal?: number
+          total?: number
+        }
+        Relationships: []
+      }
       ciudades: {
         Row: {
           codigo: string | null
