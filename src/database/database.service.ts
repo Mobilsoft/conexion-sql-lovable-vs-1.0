@@ -104,7 +104,7 @@ export class DatabaseService {
         tipo_regimen as tipo_regimen_id,
         ciudad as municipio,
         estado as estado_empresa
-      FROM dbo.companies
+      FROM dbo.gen_companies
       WHERE tipo = 'Principal'
       ORDER BY fecha_creacion DESC
     `;
