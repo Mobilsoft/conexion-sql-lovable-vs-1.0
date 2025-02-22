@@ -1,75 +1,78 @@
-
 export interface Module {
-  id: number;
-  nombre: string;
-  descripcion?: string;
-  icono?: string;
-  orden?: number;
-  estado: boolean;
-  fecha_creacion?: string;
-  fecha_actualizacion?: string;
+    id: number;
+    nombre: string;
+    descripcion?: string;
+    icono?: string;
+    orden?: number;
+    estado: boolean;
+    fecha_creacion?: string;
+    fecha_actualizacion?: string;
 }
 
 export interface Form {
-  id: number;
-  module_id: number;
-  nombre: string;
-  descripcion?: string;
-  ruta?: string;
-  icono?: string;
-  orden?: number;
-  estado: boolean;
-  fecha_creacion?: string;
-  fecha_actualizacion?: string;
+    id: number;
+    module_id: number;
+    nombre: string;
+    descripcion?: string;
+    ruta?: string;
+    icono?: string;
+    orden?: number;
+    tipo_formulario: 'S' | 'M' | 'D'; // Simple, Master, Detail
+    master_form_id?: number;
+    estado: boolean;
+    fecha_creacion?: string;
+    fecha_actualizacion?: string;
 }
 
 export interface FormFieldConfiguration {
-  type: string;
-  label: string;
-  key: string;
-  placeholder?: string;
-  input: boolean;
-  tableView: boolean;
-  disabled?: boolean;
-  defaultValue?: any;
-  data?: {
-    values?: Array<{ label: string; value: string }>;
-    url?: string;
-  };
-  prefix?: {
-    icon?: string;
-  };
+    type: string;
+    label: string;
+    key: string;
+    placeholder?: string;
+    input: boolean;
+    tableView: boolean;
+    disabled?: boolean;
+    defaultValue?: any;
+    data?: {
+        values?: Array<{ label: string; value: string }>;
+        url?: string;
+    };
+    prefix?: {
+        icon?: string;
+    };
 }
 
 export interface FormSectionConfiguration {
-  type: 'section';
-  label: string;
-  key: string;
-  components: FormFieldConfiguration[];
+    type: 'section';
+    label: string;
+    key: string;
+    components: FormFieldConfiguration[];
 }
 
 export interface FormAccordionConfiguration {
-  type: 'accordion';
-  label: string;
-  key: string;
-  components: (FormFieldConfiguration | FormSectionConfiguration)[];
+    type: 'accordion';
+    label: string;
+    key: string;
+    components: (FormFieldConfiguration | FormSectionConfiguration)[];
 }
 
 export interface FormConfiguration {
-  id: number;
-  form_id: number;
-  nombre: string;
-  descripcion?: string;
-  configuracion: {
-    display: string;
-    settings: {
-      title: string;
-      theme: string;
+    id: number;
+    form_id: number;
+    nombre: string;
+    descripcion?: string;
+    configuracion: {
+        display: string;
+        settings: {
+            title: string;
+            theme: string;
+            tipo_registro?: 'M' | 'D'; // Master o Detail
+            master_form_id?: number; // ID del formulario maestro si es un detalle
+        };
+        components: (FormFieldConfiguration | FormAccordionConfiguration)[];
     };
-    components: (FormFieldConfiguration | FormAccordionConfiguration)[];
-  };
-  estado: boolean;
-  tabla_master: 'M' | 'D';
-  fecha_creacion?: string;
-  fecha_actualizacion?: string;
+    estado: boolean;
+    tabla_master: 'M' | 'D';
+    fecha_creacion?: string;
+    fecha_actualizacion?: string;
 }

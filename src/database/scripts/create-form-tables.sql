@@ -20,10 +20,13 @@ CREATE TABLE ap_forms (
     ruta VARCHAR(255),
     icono VARCHAR(50),
     orden INT,
+    tipo_formulario CHAR(1) DEFAULT 'S', -- 'S': Simple, 'M': Master, 'D': Detail
+    master_form_id INT NULL, -- Referencia al formulario maestro si es un detalle
     estado BIT DEFAULT 1,
     fecha_creacion DATETIME DEFAULT GETDATE(),
     fecha_actualizacion DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (module_id) REFERENCES ap_modules(id)
+    FOREIGN KEY (module_id) REFERENCES ap_modules(id),
+    FOREIGN KEY (master_form_id) REFERENCES ap_forms(id)
 );
 
 -- Renombrar y modificar la tabla de configuraciones
@@ -40,7 +43,7 @@ BEGIN
         descripcion TEXT,
         configuracion NVARCHAR(MAX),
         estado BIT DEFAULT 1,
-        tabla_master CHAR(1) DEFAULT 'D',
+        tabla_master CHAR(1) DEFAULT 'D', -- 'M': Master, 'D': Detail
         fecha_creacion DATETIME DEFAULT GETDATE(),
         fecha_actualizacion DATETIME DEFAULT GETDATE(),
         FOREIGN KEY (form_id) REFERENCES ap_forms(id)
