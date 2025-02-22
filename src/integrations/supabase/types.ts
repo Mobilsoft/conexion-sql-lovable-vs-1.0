@@ -115,7 +115,15 @@ export type Database = {
           razon_social?: string
           telefono?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_customer_tipo_documento"
+            columns: ["id_tipo_documento"]
+            isOneToOne: false
+            referencedRelation: "cio_tipos_documento"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cio_inventory: {
         Row: {
@@ -344,6 +352,39 @@ export type Database = {
           numero_factura?: string
           subtotal?: number
           total?: number
+        }
+        Relationships: []
+      }
+      cio_tipos_documento: {
+        Row: {
+          codigo: string
+          descripcion: string | null
+          estado: boolean | null
+          fecha_actualizacion: string | null
+          fecha_creacion: string | null
+          id: number
+          master_detail: string | null
+          nombre: string
+        }
+        Insert: {
+          codigo: string
+          descripcion?: string | null
+          estado?: boolean | null
+          fecha_actualizacion?: string | null
+          fecha_creacion?: string | null
+          id?: number
+          master_detail?: string | null
+          nombre: string
+        }
+        Update: {
+          codigo?: string
+          descripcion?: string | null
+          estado?: boolean | null
+          fecha_actualizacion?: string | null
+          fecha_creacion?: string | null
+          id?: number
+          master_detail?: string | null
+          nombre?: string
         }
         Relationships: []
       }
