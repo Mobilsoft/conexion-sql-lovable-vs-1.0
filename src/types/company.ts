@@ -43,11 +43,11 @@ export interface TipoDocumento {
 }
 
 export interface CompanyFormData {
+  tipo_documento_id: string;
   nit: string;
   dv: string;
-  razon_social: string;
-  tipo_documento_id: string;
   tipo_contribuyente: string;
+  razon_social: string;
   direccion: string;
   telefono: string;
   email: string;
@@ -58,6 +58,7 @@ export interface CompanyFormData {
   actividad_comercial_id: string;
   tipo_regimen_id: string;
   municipio: string;
+  tabla_master: string;
 }
 
 export interface Company {

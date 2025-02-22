@@ -26,6 +26,7 @@ export const formSchema = z.object({
   actividad_comercial_id: z.string(),
   tipo_regimen_id: z.string(),
   municipio: z.string(),
+  tabla_master: z.string().default('D'),
 });
 
 export default function Companies() {

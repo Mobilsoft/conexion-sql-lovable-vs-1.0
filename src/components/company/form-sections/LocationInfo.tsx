@@ -80,7 +80,7 @@ export function LocationInfo({ form, ciudades, departamentos }: LocationInfoProp
 
       <FormField
         control={form.control}
-        name="master_detail"
+        name="tabla_master"
         render={({ field }) => (
           <FormItem className="col-span-2 flex flex-col">
             <FormLabel>Registro Principal</FormLabel>
