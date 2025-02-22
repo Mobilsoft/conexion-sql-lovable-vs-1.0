@@ -19,9 +19,10 @@ import {
 interface CustomerFormProps {
   form: any;
   tiposDocumento: any[];
+  ciudades: any[];
 }
 
-export function CustomerForm({ form, tiposDocumento }: CustomerFormProps) {
+export function CustomerForm({ form, tiposDocumento, ciudades }: CustomerFormProps) {
   return (
     <div className="grid grid-cols-2 gap-6">
       <FormField
@@ -96,6 +97,20 @@ export function CustomerForm({ form, tiposDocumento }: CustomerFormProps) {
 
       <FormField
         control={form.control}
+        name="razon_social"
+        render={({ field }) => (
+          <FormItem className="col-span-2">
+            <FormLabel>Razón Social</FormLabel>
+            <FormControl>
+              <Input placeholder="Razón social" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
         name="email"
         render={({ field }) => (
           <FormItem>
@@ -131,6 +146,34 @@ export function CustomerForm({ form, tiposDocumento }: CustomerFormProps) {
             <FormControl>
               <Input placeholder="Dirección" {...field} />
             </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="id_ciudad"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Ciudad</FormLabel>
+            <Select 
+              onValueChange={val => field.onChange(parseInt(val))}
+              value={field.value?.toString()}
+            >
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccione ciudad" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {ciudades.map((ciudad) => (
+                  <SelectItem key={ciudad.id} value={ciudad.id.toString()}>
+                    {ciudad.nombre}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <FormMessage />
           </FormItem>
         )}

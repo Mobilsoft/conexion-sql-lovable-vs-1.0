@@ -24,6 +24,8 @@ const customerSchema = z.object({
   telefono: z.string().min(1, "El teléfono es requerido"),
   direccion: z.string().min(1, "La dirección es requerida"),
   estado: z.boolean().default(true),
+  id_ciudad: z.number().min(1, "La ciudad es requerida"),
+  razon_social: z.string().min(1, "La razón social es requerida"),
 });
 
 type CustomerFormValues = z.infer<typeof customerSchema>;
@@ -49,6 +51,8 @@ export function CustomerDialog({ open, onOpenChange, customer }: CustomerDialogP
       telefono: "",
       direccion: "",
       estado: true,
+      id_ciudad: 0,
+      razon_social: "",
     },
   });
 
@@ -65,16 +69,35 @@ export function CustomerDialog({ open, onOpenChange, customer }: CustomerDialogP
     },
   });
 
+  const { data: ciudades } = useQuery({
+    queryKey: ['ciudades'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('ciudades')
+        .select('*')
+        .order('nombre');
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const onSubmit = async (data: CustomerFormValues) => {
     try {
       const { error } = customer?.id 
         ? await supabase
             .from('cio_customers')
-            .update(data)
+            .update({
+              ...data,
+              master_detail: 'M'
+            })
             .eq('id', customer.id)
         : await supabase
             .from('cio_customers')
-            .insert([data]);
+            .insert([{
+              ...data,
+              master_detail: 'M'
+            }]);
 
       if (error) throw error;
 
@@ -109,7 +132,11 @@ export function CustomerDialog({ open, onOpenChange, customer }: CustomerDialogP
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <CustomerForm form={form} tiposDocumento={tiposDocumento || []} />
+            <CustomerForm 
+              form={form} 
+              tiposDocumento={tiposDocumento || []} 
+              ciudades={ciudades || []}
+            />
             <div className="flex justify-end gap-4">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancelar
