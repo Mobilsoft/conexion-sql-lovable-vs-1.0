@@ -29,7 +29,7 @@ const SqlConnectionForm = () => {
     defaultValues: {
       server: "145.223.75.189",
       port: "1433",
-      database: "Taskmaster",
+      database: "MobilPos",
       username: "sa",
       password: "D3v3l0p3r2024$",
       useWindowsAuth: false,
