@@ -451,6 +451,39 @@ export type Database = {
           },
         ]
       }
+      form_configurations: {
+        Row: {
+          configuration: Json
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          tabla_master: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          configuration: Json
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          tabla_master?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          configuration?: Json
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          tabla_master?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       paises: {
         Row: {
           codigo: string | null
