@@ -11,24 +11,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Form } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import { CustomerForm } from "./CustomerForm";
-
-const customerSchema = z.object({
-  nombre: z.string().min(1, "El nombre es requerido"),
-  apellido: z.string().min(1, "El apellido es requerido"),
-  id_tipo_documento: z.number().min(1, "El tipo de documento es requerido"),
-  numero_documento: z.string().min(1, "El número de documento es requerido"),
-  email: z.string().email("Email inválido"),
-  telefono: z.string().min(1, "El teléfono es requerido"),
-  direccion: z.string().min(1, "La dirección es requerida"),
-  estado: z.boolean().default(true),
-  id_ciudad: z.number().min(1, "La ciudad es requerida"),
-  razon_social: z.string().min(1, "La razón social es requerida"),
-});
-
-type CustomerFormValues = z.infer<typeof customerSchema>;
+import { DynamicForm } from "@/components/DynamicForm";
+import { DynamicFormField } from "@/types/table-structure";
 
 interface CustomerDialogProps {
   open: boolean;
@@ -40,64 +24,108 @@ export function CustomerDialog({ open, onOpenChange, customer }: CustomerDialogP
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const form = useForm<CustomerFormValues>({
-    resolver: zodResolver(customerSchema),
-    defaultValues: customer || {
-      nombre: "",
-      apellido: "",
-      id_tipo_documento: 0,
-      numero_documento: "",
-      email: "",
-      telefono: "",
-      direccion: "",
-      estado: true,
-      id_ciudad: 0,
-      razon_social: "",
+  // Definición de los campos del formulario
+  const fields: DynamicFormField[] = [
+    {
+      name: "nombre",
+      type: "text",
+      required: true,
+      properties: {
+        display_type: "text"
+      }
     },
-  });
-
-  const { data: tiposDocumento } = useQuery({
-    queryKey: ['tiposDocumento'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('cio_tipos_documento')
-        .select('*')
-        .order('nombre');
-
-      if (error) throw error;
-      return data;
+    {
+      name: "apellido",
+      type: "text",
+      required: true,
+      properties: {
+        display_type: "text"
+      }
     },
-  });
-
-  const { data: ciudades } = useQuery({
-    queryKey: ['ciudades'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('ciudades')
-        .select('*')
-        .order('nombre');
-
-      if (error) throw error;
-      return data;
+    {
+      name: "id_tipo_documento",
+      type: "number",
+      required: true,
+      properties: {
+        display_type: "select",
+        reference_table: "tipos_documento"
+      }
     },
-  });
+    {
+      name: "numero_documento",
+      type: "text",
+      required: true,
+      properties: {
+        display_type: "text"
+      }
+    },
+    {
+      name: "razon_social",
+      type: "text",
+      required: true,
+      properties: {
+        display_type: "text"
+      }
+    },
+    {
+      name: "email",
+      type: "text",
+      required: true,
+      properties: {
+        display_type: "text"
+      }
+    },
+    {
+      name: "telefono",
+      type: "text",
+      required: true,
+      properties: {
+        display_type: "text"
+      }
+    },
+    {
+      name: "direccion",
+      type: "text",
+      required: true,
+      properties: {
+        display_type: "text"
+      }
+    },
+    {
+      name: "id_ciudad",
+      type: "number",
+      required: true,
+      properties: {
+        display_type: "select",
+        reference_table: "ciudades"
+      }
+    },
+    {
+      name: "estado",
+      type: "boolean",
+      required: false,
+      properties: {
+        display_type: "switch"
+      }
+    }
+  ];
 
-  const onSubmit = async (data: CustomerFormValues) => {
+  const handleSave = async (data: any) => {
     try {
+      const formattedData = {
+        ...data,
+        master_detail: 'M',
+        estado: data.estado === true
+      };
+
       const { error } = customer?.id 
         ? await supabase
             .from('cio_customers')
-            .update({
-              ...data,
-              master_detail: 'M'
-            })
+            .update(formattedData)
             .eq('id', customer.id)
         : await supabase
             .from('cio_customers')
-            .insert([{
-              ...data,
-              master_detail: 'M'
-            }]);
+            .insert([formattedData]);
 
       if (error) throw error;
 
@@ -110,7 +138,6 @@ export function CustomerDialog({ open, onOpenChange, customer }: CustomerDialogP
 
       queryClient.invalidateQueries({ queryKey: ['customers'] });
       onOpenChange(false);
-      form.reset();
 
     } catch (error: any) {
       console.error('Error:', error);
@@ -130,23 +157,14 @@ export function CustomerDialog({ open, onOpenChange, customer }: CustomerDialogP
             {customer?.id ? "Editar Cliente" : "Nuevo Cliente"}
           </DialogTitle>
         </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <CustomerForm 
-              form={form} 
-              tiposDocumento={tiposDocumento || []} 
-              ciudades={ciudades || []}
-            />
-            <div className="flex justify-end gap-4">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancelar
-              </Button>
-              <Button type="submit">
-                {customer?.id ? "Actualizar" : "Crear"}
-              </Button>
-            </div>
-          </form>
-        </Form>
+        <DynamicForm
+          fields={fields}
+          tableName="Cliente"
+          onSave={handleSave}
+          initialData={customer}
+          open={open}
+          onOpenChange={onOpenChange}
+        />
       </DialogContent>
     </Dialog>
   );
