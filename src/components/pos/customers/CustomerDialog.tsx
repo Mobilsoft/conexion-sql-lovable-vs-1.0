@@ -1,7 +1,5 @@
 
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -31,7 +29,13 @@ export function CustomerDialog({ open, onOpenChange, customer }: CustomerDialogP
       type: "text",
       required: true,
       properties: {
-        display_type: "text"
+        id: 1,
+        table_name: "cio_customers",
+        column_name: "nombre",
+        display_type: "text",
+        is_required: true,
+        orden: 1,
+        estado: true
       }
     },
     {
@@ -39,7 +43,13 @@ export function CustomerDialog({ open, onOpenChange, customer }: CustomerDialogP
       type: "text",
       required: true,
       properties: {
-        display_type: "text"
+        id: 2,
+        table_name: "cio_customers",
+        column_name: "apellido",
+        display_type: "text",
+        is_required: true,
+        orden: 2,
+        estado: true
       }
     },
     {
@@ -47,8 +57,16 @@ export function CustomerDialog({ open, onOpenChange, customer }: CustomerDialogP
       type: "number",
       required: true,
       properties: {
+        id: 3,
+        table_name: "cio_customers",
+        column_name: "id_tipo_documento",
         display_type: "select",
-        reference_table: "tipos_documento"
+        reference_table: "tipos_documento",
+        reference_value_field: "id",
+        reference_display_field: "nombre",
+        is_required: true,
+        orden: 3,
+        estado: true
       }
     },
     {
@@ -56,7 +74,13 @@ export function CustomerDialog({ open, onOpenChange, customer }: CustomerDialogP
       type: "text",
       required: true,
       properties: {
-        display_type: "text"
+        id: 4,
+        table_name: "cio_customers",
+        column_name: "numero_documento",
+        display_type: "text",
+        is_required: true,
+        orden: 4,
+        estado: true
       }
     },
     {
@@ -64,7 +88,13 @@ export function CustomerDialog({ open, onOpenChange, customer }: CustomerDialogP
       type: "text",
       required: true,
       properties: {
-        display_type: "text"
+        id: 5,
+        table_name: "cio_customers",
+        column_name: "razon_social",
+        display_type: "text",
+        is_required: true,
+        orden: 5,
+        estado: true
       }
     },
     {
@@ -72,7 +102,13 @@ export function CustomerDialog({ open, onOpenChange, customer }: CustomerDialogP
       type: "text",
       required: true,
       properties: {
-        display_type: "text"
+        id: 6,
+        table_name: "cio_customers",
+        column_name: "email",
+        display_type: "text",
+        is_required: true,
+        orden: 6,
+        estado: true
       }
     },
     {
@@ -80,7 +116,13 @@ export function CustomerDialog({ open, onOpenChange, customer }: CustomerDialogP
       type: "text",
       required: true,
       properties: {
-        display_type: "text"
+        id: 7,
+        table_name: "cio_customers",
+        column_name: "telefono",
+        display_type: "text",
+        is_required: true,
+        orden: 7,
+        estado: true
       }
     },
     {
@@ -88,7 +130,13 @@ export function CustomerDialog({ open, onOpenChange, customer }: CustomerDialogP
       type: "text",
       required: true,
       properties: {
-        display_type: "text"
+        id: 8,
+        table_name: "cio_customers",
+        column_name: "direccion",
+        display_type: "text",
+        is_required: true,
+        orden: 8,
+        estado: true
       }
     },
     {
@@ -96,8 +144,16 @@ export function CustomerDialog({ open, onOpenChange, customer }: CustomerDialogP
       type: "number",
       required: true,
       properties: {
+        id: 9,
+        table_name: "cio_customers",
+        column_name: "id_ciudad",
         display_type: "select",
-        reference_table: "ciudades"
+        reference_table: "ciudades",
+        reference_value_field: "id",
+        reference_display_field: "nombre",
+        is_required: true,
+        orden: 9,
+        estado: true
       }
     },
     {
@@ -105,7 +161,13 @@ export function CustomerDialog({ open, onOpenChange, customer }: CustomerDialogP
       type: "boolean",
       required: false,
       properties: {
-        display_type: "switch"
+        id: 10,
+        table_name: "cio_customers",
+        column_name: "estado",
+        display_type: "switch",
+        is_required: false,
+        orden: 10,
+        estado: true
       }
     }
   ];
