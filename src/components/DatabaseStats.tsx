@@ -9,18 +9,111 @@ import { DatabaseStatsTable } from "./database/DatabaseStatsTable";
 import { TableStats } from "@/types/database-stats";
 import { mockTableStructures } from "@/mocks/tableStructures";
 import { filterExcludedFields } from "@/utils/database-utils";
+import { supabase } from "@/integrations/supabase/client";
 
 const DatabaseStats = ({ stats, connectionData }: { stats: TableStats[], connectionData: any }) => {
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
   const [formTable, setFormTable] = useState<string | null>(null);
+  const [tableFields, setTableFields] = useState<any[]>([]);
   const { toast } = useToast();
+
+  const handleOpenForm = async (tableName: string) => {
+    try {
+      // Get the structure for the selected table first
+      let structureData;
+      
+      if (import.meta.env.DEV && connectionData.server === "localhost") {
+        // Use mock data in local development
+        structureData = mockTableStructures[tableName] || [];
+      } else {
+        // Call the edge function to get the structure
+        const { data: result, error } = await supabase.functions.invoke(
+          'sql-server-connection/structure', 
+          {
+            body: JSON.stringify({
+              ...connectionData,
+              tableName
+            }),
+            method: 'POST',
+          }
+        );
+
+        if (error) throw new Error(error.message);
+        if (!result.success) throw new Error(result.error);
+        
+        structureData = result.data.recordset || [];
+      }
+      
+      // Map the structure to form fields
+      const fields = structureData.map((field: any) => ({
+        name: field.column_name,
+        type: field.data_type.includes('int') ? 'number' : 
+              field.data_type === 'boolean' ? 'boolean' : 'text',
+        required: !field.is_nullable,
+        defaultValue: field.column_default,
+        properties: {
+          id: field.id || 0,
+          table_name: tableName,
+          column_name: field.column_name,
+          display_type: field.column_name === 'id_tipo_documento' || 
+                        field.column_name === 'id_ciudad' ? 'select' : 
+                        field.data_type === 'boolean' ? 'switch' : 'text',
+          reference_table: field.column_name === 'id_tipo_documento' ? 'tipos_documento' :
+                          field.column_name === 'id_ciudad' ? 'ciudades' : undefined,
+          reference_value_field: field.column_name === 'id_tipo_documento' || 
+                                field.column_name === 'id_ciudad' ? 'id' : undefined,
+          reference_display_field: field.column_name === 'id_tipo_documento' || 
+                                  field.column_name === 'id_ciudad' ? 'nombre' : undefined,
+          is_required: !field.is_nullable,
+          orden: 0,
+          estado: true
+        }
+      }));
+      
+      // Store the fields and open the form
+      setTableFields(fields);
+      setFormTable(tableName);
+      
+    } catch (error: any) {
+      console.error('Error loading form structure:', error);
+      toast({
+        title: "Error",
+        description: `No se pudo cargar la estructura de la tabla: ${error.message}`,
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleSaveForm = async (data: any) => {
     if (!formTable) return;
     
     try {
-      // Simular guardado exitoso
-      console.log('Guardando datos:', data);
+      console.log('Guardando datos en tabla:', formTable, data);
+      
+      if (import.meta.env.DEV && connectionData.server === "localhost") {
+        // In development, just show a success message
+        toast({
+          title: "Éxito",
+          description: "Datos guardados correctamente (simulado)",
+        });
+        return;
+      }
+      
+      // Call the edge function to save the data
+      const { data: result, error } = await supabase.functions.invoke(
+        'sql-server-connection/insertData', 
+        {
+          body: JSON.stringify({
+            ...connectionData,
+            tableName: formTable,
+            data
+          }),
+          method: 'POST',
+        }
+      );
+
+      if (error) throw new Error(error.message);
+      if (!result.success) throw new Error(result.error);
       
       toast({
         title: "Éxito",
@@ -31,7 +124,7 @@ const DatabaseStats = ({ stats, connectionData }: { stats: TableStats[], connect
       console.error('Error al guardar:', error);
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Error al guardar los datos",
         variant: "destructive",
       });
     }
@@ -49,7 +142,7 @@ const DatabaseStats = ({ stats, connectionData }: { stats: TableStats[], connect
       <DatabaseStatsTable
         stats={stats}
         onViewStructure={(tableName) => setSelectedTable(tableName)}
-        onOpenForm={(tableName) => setFormTable(tableName)}
+        onOpenForm={(tableName) => handleOpenForm(tableName)}
       />
 
       <TableStructureDialog
@@ -59,29 +152,13 @@ const DatabaseStats = ({ stats, connectionData }: { stats: TableStats[], connect
         connectionData={connectionData}
       />
 
-      {formTable && mockTableStructures[formTable] && (
+      {formTable && (
         <DynamicForm
           open={!!formTable}
           onOpenChange={(open) => !open && setFormTable(null)}
-          fields={filterExcludedFields(mockTableStructures[formTable]).map(field => ({
-            name: field.column_name,
-            type: field.data_type.includes('int') ? 'number' : 'text',
-            required: !field.is_nullable,
-            defaultValue: field.column_default,
-            properties: {
-              id: field.id,
-              table_name: field.table_name,
-              column_name: field.column_name,
-              display_type: field.column_name === 'id_tipo_documento' || field.column_name === 'id_ciudad' ? 'select' : 
-                            field.data_type === 'boolean' ? 'switch' : 'text',
-              reference_table: field.column_name === 'id_tipo_documento' ? 'tipos_documento' :
-                              field.column_name === 'id_ciudad' ? 'ciudades' : undefined,
-              reference_value_field: field.column_name === 'id_tipo_documento' || field.column_name === 'id_ciudad' ? 'id' : undefined,
-              reference_display_field: field.column_name === 'id_tipo_documento' || field.column_name === 'id_ciudad' ? 'nombre' : undefined,
-              is_required: !field.is_nullable,
-              orden: field.id,
-              estado: true
-            }
+          fields={filterExcludedFields(tableFields).map(field => ({
+            ...field,
+            type: field.type === 'boolean' ? 'boolean' : field.type
           }))}
           tableName={formTable || ''}
           onSave={handleSaveForm}

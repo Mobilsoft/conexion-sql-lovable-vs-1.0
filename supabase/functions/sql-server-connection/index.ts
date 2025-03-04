@@ -1,7 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { corsHeaders } from "./utils/cors.ts";
-import { getTableStats, getTableStructure } from "./services/tableService.ts";
+import { getTableStats, getTableStructure, insertData } from "./services/tableService.ts";
 import { getConnection, clearConnection } from "./db/connection.ts";
 
 console.log("SQL Server Connection Edge Function started");
@@ -49,7 +49,7 @@ serve(async (req) => {
           
           // Get table stats
           const tableStats = await getTableStats(pool);
-          console.log(`Retrieved stats for ${tableStats.length} tables`);
+          console.log(`Retrieved stats for ${tableStats.recordset.length} tables`);
           
           return new Response(
             JSON.stringify({ 
@@ -92,7 +92,7 @@ serve(async (req) => {
           });
           
           const tableStructure = await getTableStructure(pool, data.tableName);
-          console.log(`Retrieved structure for table ${data.tableName} with ${tableStructure.length} columns`);
+          console.log(`Retrieved structure for table ${data.tableName} with ${tableStructure.recordset.length} columns`);
           
           return new Response(
             JSON.stringify({ 
@@ -107,6 +107,49 @@ serve(async (req) => {
             JSON.stringify({ 
               success: false, 
               error: `Failed to get table structure: ${error.message}` 
+            }),
+            { status: 500, headers }
+          );
+        }
+      }
+      
+      // Insert data endpoint
+      if (path === "insertData") {
+        try {
+          console.log(`Inserting data into table: ${data.tableName}`);
+          
+          if (!data.tableName || !data.data) {
+            return new Response(
+              JSON.stringify({ error: "Table name and data are required" }),
+              { status: 400, headers }
+            );
+          }
+          
+          const pool = await getConnection({
+            server: data.server,
+            port: data.port,
+            database: data.database || "Mobilpos", // Default to Mobilpos if not specified
+            username: data.username,
+            password: data.password
+          });
+          
+          const result = await insertData(pool, data.tableName, data.data);
+          console.log(`Data inserted into table ${data.tableName} successfully`);
+          
+          return new Response(
+            JSON.stringify({ 
+              success: true, 
+              message: "Data inserted successfully",
+              data: result
+            }),
+            { status: 200, headers }
+          );
+        } catch (error) {
+          console.error("Error inserting data:", error.message);
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              error: `Failed to insert data: ${error.message}` 
             }),
             { status: 500, headers }
           );
