@@ -27,7 +27,7 @@ const SqlConnectionForm = () => {
     defaultValues: {
       server: import.meta.env.VITE_DB_HOST || "localhost",
       port: import.meta.env.VITE_DB_PORT || "5432",
-      database: import.meta.env.VITE_DB_NAME || "postgres",
+      database: import.meta.env.VITE_DB_NAME || "Mobilpos",
       username: import.meta.env.VITE_DB_USER || "postgres",
       password: import.meta.env.VITE_DB_PASSWORD || "",
       useWindowsAuth: false,
