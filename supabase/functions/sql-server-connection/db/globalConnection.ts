@@ -77,16 +77,19 @@ class GlobalConnection {
       server: config.server,
       port: parseInt(config.port),
       options: {
-        encrypt: true, // Para conexiones Azure recomendamos true
-        trustServerCertificate: true, // Para desarrollo local
+        encrypt: true, 
+        trustServerCertificate: true,
         enableArithAbort: true,
-        connectTimeout: 30000, // Aumentar el timeout para conexiones lentas
-        requestTimeout: 30000
+        connectTimeout: 60000, // Aumentar el timeout para conexiones lentas
+        requestTimeout: 60000,
+        validateConnection: true, // Validar conexión activamente
+        camelCaseColumns: true, // Convertir nombres de columnas a camelCase
       },
       pool: {
         max: 10,
         min: 0,
-        idleTimeoutMillis: 300000
+        idleTimeoutMillis: 300000,
+        acquireTimeoutMillis: 60000 // Tiempo de espera para adquirir una conexión
       }
     };
 

@@ -27,9 +27,9 @@ const SqlConnectionForm = () => {
     resolver: zodResolver(sqlConnectionSchema),
     defaultValues: {
       server: import.meta.env.VITE_DB_HOST || "localhost",
-      port: import.meta.env.VITE_DB_PORT || "5432",
+      port: import.meta.env.VITE_DB_PORT || "1433",
       database: import.meta.env.VITE_DB_NAME || "Mobilpos",
-      username: import.meta.env.VITE_DB_USER || "postgres",
+      username: import.meta.env.VITE_DB_USER || "sa",
       password: import.meta.env.VITE_DB_PASSWORD || "",
       useWindowsAuth: false,
     },
@@ -38,10 +38,17 @@ const SqlConnectionForm = () => {
   const onSubmit = async (data: SqlConnectionFormValues) => {
     setIsLoading(true);
     try {
-      console.info("Enviando datos de conexión:", data);
+      console.info("Enviando datos de conexión:", {
+        server: data.server,
+        port: data.port,
+        database: data.database,
+        username: data.username,
+        useWindowsAuth: data.useWindowsAuth,
+        // No mostramos la contraseña por seguridad
+      });
       
-      // Siempre intentar conectarse al servidor real
-      console.log("Intentando conexión real al servidor SQL:", data.server);
+      // Intentar conectar al servidor SQL
+      console.log("Intentando conexión con SQL Server:", data.server);
       const { data: connectionResult, error } = await supabase.functions.invoke(
         'sql-server-connection/connect', 
         {
@@ -50,12 +57,19 @@ const SqlConnectionForm = () => {
         }
       );
 
-      if (error) throw new Error(error.message);
-      if (!connectionResult.success) throw new Error(connectionResult.error);
-
-      console.log("Connection result:", connectionResult);
+      if (error) {
+        console.error("Error en la función Edge:", error);
+        throw new Error(`Error en la petición: ${error.message}`);
+      }
       
-      // Format the result data to match the expected TableStats format
+      if (!connectionResult.success) {
+        console.error("La conexión falló:", connectionResult.error);
+        throw new Error(connectionResult.error);
+      }
+
+      console.log("Resultado de la conexión:", connectionResult);
+      
+      // Formatear los resultados de estadísticas de tablas
       let formattedStats: TableStats[] = [];
       
       if (connectionResult.data && connectionResult.data.recordset) {
@@ -81,7 +95,7 @@ const SqlConnectionForm = () => {
         title: "Error de conexión",
         description: error.message || "No se pudo establecer la conexión con la base de datos.",
         variant: "destructive",
-        duration: 3000,
+        duration: 5000,
       });
       setTableStats([]);
       setConnectionData(null);
