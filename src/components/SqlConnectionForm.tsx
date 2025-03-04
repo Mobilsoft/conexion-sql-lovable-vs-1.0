@@ -13,14 +13,15 @@ import DatabaseStats from "./DatabaseStats";
 import {
   sqlConnectionSchema,
   type SqlConnectionFormValues,
+  type TableStats,
 } from "@/types/sql-connection";
 import { supabase } from "@/integrations/supabase/client";
 
 const SqlConnectionForm = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [tableStats, setTableStats] = useState<any>([]);
-  const [connectionData, setConnectionData] = useState<any>(null);
+  const [tableStats, setTableStats] = useState<TableStats[]>([]);
+  const [connectionData, setConnectionData] = useState<SqlConnectionFormValues | null>(null);
 
   const form = useForm<SqlConnectionFormValues>({
     resolver: zodResolver(sqlConnectionSchema),
@@ -39,25 +40,50 @@ const SqlConnectionForm = () => {
     try {
       console.info("Enviando datos de conexión:", data);
       
-      // Simular conexión exitosa para desarrollo
-      // En producción, esto se conectaría al servicio real
-      const mockStats = [
-        { table_name: "cio_customers", row_count: 150, size_in_kb: 256.5 },
-        { table_name: "cio_products", row_count: 500, size_in_kb: 480.2 },
-        { table_name: "cio_sales", row_count: 1200, size_in_kb: 930.8 },
-        { table_name: "cio_inventory", row_count: 800, size_in_kb: 540.3 },
-        { table_name: "gen_empresas", row_count: 50, size_in_kb: 120.7 },
-        { table_name: "gen_usuarios", row_count: 75, size_in_kb: 95.2 }
-      ];
-      
-      setTableStats(mockStats);
-      setConnectionData(data);
+      // In development mode, if server is localhost, use mock data
+      if (import.meta.env.DEV && data.server === "localhost") {
+        console.log("Using mock data for local development");
+        const mockStats = [
+          { table_name: "cio_customers", row_count: 150, size_in_kb: 256.5 },
+          { table_name: "cio_products", row_count: 500, size_in_kb: 480.2 },
+          { table_name: "cio_sales", row_count: 1200, size_in_kb: 930.8 },
+          { table_name: "cio_inventory", row_count: 800, size_in_kb: 540.3 },
+          { table_name: "gen_empresas", row_count: 50, size_in_kb: 120.7 },
+          { table_name: "gen_usuarios", row_count: 75, size_in_kb: 95.2 }
+        ];
+        
+        setTableStats(mockStats);
+        setConnectionData(data);
 
-      toast({
-        title: "Conexión exitosa",
-        description: `Se ha establecido la conexión con la base de datos ${data.database}.`,
-        duration: 3000,
-      });
+        toast({
+          title: "Conexión simulada exitosa",
+          description: `Se ha establecido una conexión simulada con la base de datos ${data.database}.`,
+          duration: 3000,
+        });
+      } else {
+        // In production or when connecting to a real server, use the edge function
+        const { data: connectionResult, error } = await supabase.functions.invoke(
+          'sql-server-connection/connect', 
+          {
+            body: JSON.stringify(data),
+            method: 'POST',
+          }
+        );
+
+        if (error) throw new Error(error.message);
+        if (!connectionResult.success) throw new Error(connectionResult.error);
+
+        console.log("Connection result:", connectionResult);
+        
+        setTableStats(connectionResult.data);
+        setConnectionData(data);
+
+        toast({
+          title: "Conexión exitosa",
+          description: `Se ha establecido la conexión con la base de datos ${data.database}.`,
+          duration: 3000,
+        });
+      }
 
     } catch (error: any) {
       console.error("Error al conectar:", error);
