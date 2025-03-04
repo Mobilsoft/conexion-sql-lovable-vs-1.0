@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Database } from "lucide-react";
 import { TableStructureDialog } from "./TableStructureDialog";
@@ -164,7 +163,7 @@ const DatabaseStats = ({ stats, connectionData }: { stats: TableStats[], connect
         <DynamicForm
           open={!!formTable}
           onOpenChange={(open) => !open && setFormTable(null)}
-          fields={filterExcludedFields(tableFields).map(field => ({
+          fields={tableFields.map(field => ({
             ...field,
             type: field.type === 'boolean' ? 'boolean' : field.type
           }))}
