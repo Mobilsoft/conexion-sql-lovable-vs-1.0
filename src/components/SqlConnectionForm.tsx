@@ -75,7 +75,18 @@ const SqlConnectionForm = () => {
 
         console.log("Connection result:", connectionResult);
         
-        setTableStats(connectionResult.data);
+        // Format the result data to match the expected TableStats format
+        let formattedStats: TableStats[] = [];
+        
+        if (connectionResult.data && connectionResult.data.recordset) {
+          formattedStats = connectionResult.data.recordset.map((item: any) => ({
+            table_name: item.table_name,
+            row_count: typeof item.row_count === 'string' ? parseInt(item.row_count, 10) : item.row_count,
+            size_in_kb: typeof item.size_in_kb === 'number' ? item.size_in_kb : 0
+          }));
+        }
+        
+        setTableStats(formattedStats);
         setConnectionData(data);
 
         toast({
