@@ -35,12 +35,12 @@ serve(async (req) => {
       // Connection endpoint
       if (path === "connect") {
         try {
-          console.log(`Connecting to SQL Server: ${data.server}:${data.port}/${data.database}`);
+          console.log(`Conectando a SQL Server: ${data.server}:${data.port}/${data.database} con usuario ${data.username}`);
           
           const pool = await getConnection({
             server: data.server,
             port: data.port,
-            database: data.database || "Mobilpos", // Default to Mobilpos if not specified
+            database: data.database,
             username: data.username,
             password: data.password
           });
@@ -86,7 +86,7 @@ serve(async (req) => {
           const pool = await getConnection({
             server: data.server,
             port: data.port,
-            database: data.database || "Mobilpos", // Default to Mobilpos if not specified
+            database: data.database,
             username: data.username,
             password: data.password
           });
@@ -128,7 +128,7 @@ serve(async (req) => {
           const pool = await getConnection({
             server: data.server,
             port: data.port,
-            database: data.database || "Mobilpos", // Default to Mobilpos if not specified
+            database: data.database,
             username: data.username,
             password: data.password
           });

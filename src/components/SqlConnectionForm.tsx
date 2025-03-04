@@ -40,61 +40,40 @@ const SqlConnectionForm = () => {
     try {
       console.info("Enviando datos de conexión:", data);
       
-      // In development mode, if server is localhost, use mock data
-      if (import.meta.env.DEV && data.server === "localhost") {
-        console.log("Using mock data for local development");
-        const mockStats = [
-          { table_name: "cio_customers", row_count: 150, size_in_kb: 256.5 },
-          { table_name: "cio_products", row_count: 500, size_in_kb: 480.2 },
-          { table_name: "cio_sales", row_count: 1200, size_in_kb: 930.8 },
-          { table_name: "cio_inventory", row_count: 800, size_in_kb: 540.3 },
-          { table_name: "gen_empresas", row_count: 50, size_in_kb: 120.7 },
-          { table_name: "gen_usuarios", row_count: 75, size_in_kb: 95.2 }
-        ];
-        
-        setTableStats(mockStats);
-        setConnectionData(data);
-
-        toast({
-          title: "Conexión simulada exitosa",
-          description: `Se ha establecido una conexión simulada con la base de datos ${data.database}.`,
-          duration: 3000,
-        });
-      } else {
-        // In production or when connecting to a real server, use the edge function
-        const { data: connectionResult, error } = await supabase.functions.invoke(
-          'sql-server-connection/connect', 
-          {
-            body: JSON.stringify(data),
-            method: 'POST',
-          }
-        );
-
-        if (error) throw new Error(error.message);
-        if (!connectionResult.success) throw new Error(connectionResult.error);
-
-        console.log("Connection result:", connectionResult);
-        
-        // Format the result data to match the expected TableStats format
-        let formattedStats: TableStats[] = [];
-        
-        if (connectionResult.data && connectionResult.data.recordset) {
-          formattedStats = connectionResult.data.recordset.map((item: any) => ({
-            table_name: item.table_name,
-            row_count: typeof item.row_count === 'string' ? parseInt(item.row_count, 10) : item.row_count,
-            size_in_kb: typeof item.size_in_kb === 'number' ? item.size_in_kb : 0
-          }));
+      // Siempre intentar conectarse al servidor real
+      console.log("Intentando conexión real al servidor SQL:", data.server);
+      const { data: connectionResult, error } = await supabase.functions.invoke(
+        'sql-server-connection/connect', 
+        {
+          body: JSON.stringify(data),
+          method: 'POST',
         }
-        
-        setTableStats(formattedStats);
-        setConnectionData(data);
+      );
 
-        toast({
-          title: "Conexión exitosa",
-          description: `Se ha establecido la conexión con la base de datos ${data.database}.`,
-          duration: 3000,
-        });
+      if (error) throw new Error(error.message);
+      if (!connectionResult.success) throw new Error(connectionResult.error);
+
+      console.log("Connection result:", connectionResult);
+      
+      // Format the result data to match the expected TableStats format
+      let formattedStats: TableStats[] = [];
+      
+      if (connectionResult.data && connectionResult.data.recordset) {
+        formattedStats = connectionResult.data.recordset.map((item: any) => ({
+          table_name: item.table_name,
+          row_count: typeof item.row_count === 'string' ? parseInt(item.row_count, 10) : item.row_count,
+          size_in_kb: typeof item.size_in_kb === 'number' ? item.size_in_kb : 0
+        }));
       }
+      
+      setTableStats(formattedStats);
+      setConnectionData(data);
+
+      toast({
+        title: "Conexión exitosa",
+        description: `Se ha establecido la conexión con la base de datos ${data.database} en ${data.server}.`,
+        duration: 3000,
+      });
 
     } catch (error: any) {
       console.error("Error al conectar:", error);
