@@ -14,7 +14,6 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { useQuery } from "@tanstack/react-query"
-import { supabase } from "@/integrations/supabase/client"
 import { Loader2 } from "lucide-react"
 
 interface TableStructure {
@@ -34,30 +33,74 @@ interface TableStructureDialogProps {
   connectionData: any;
 }
 
+// Datos de estructura de tabla simulados para desarrollo
+const mockStructures: Record<string, TableStructure[]> = {
+  "cio_customers": [
+    { column_name: "id", data_type: "integer", is_nullable: false, column_default: "nextval('cio_customers_id_seq'::regclass)", max_length: 0, precision: 0, scale: 0 },
+    { column_name: "nombre", data_type: "character varying", is_nullable: false, column_default: null, max_length: 255, precision: 0, scale: 0 },
+    { column_name: "apellido", data_type: "character varying", is_nullable: false, column_default: null, max_length: 255, precision: 0, scale: 0 },
+    { column_name: "numero_documento", data_type: "character varying", is_nullable: false, column_default: null, max_length: 20, precision: 0, scale: 0 },
+    { column_name: "razon_social", data_type: "character varying", is_nullable: false, column_default: null, max_length: 255, precision: 0, scale: 0 },
+    { column_name: "email", data_type: "character varying", is_nullable: false, column_default: null, max_length: 255, precision: 0, scale: 0 },
+    { column_name: "telefono", data_type: "character varying", is_nullable: false, column_default: null, max_length: 20, precision: 0, scale: 0 },
+    { column_name: "direccion", data_type: "text", is_nullable: false, column_default: null, max_length: 0, precision: 0, scale: 0 },
+    { column_name: "id_tipo_documento", data_type: "integer", is_nullable: false, column_default: null, max_length: 0, precision: 0, scale: 0 },
+    { column_name: "id_ciudad", data_type: "integer", is_nullable: false, column_default: null, max_length: 0, precision: 0, scale: 0 },
+    { column_name: "estado", data_type: "boolean", is_nullable: true, column_default: "true", max_length: 0, precision: 0, scale: 0 },
+    { column_name: "master_detail", data_type: "character", is_nullable: true, column_default: "'M'::bpchar", max_length: 1, precision: 0, scale: 0 },
+    { column_name: "fecha_creacion", data_type: "timestamp with time zone", is_nullable: true, column_default: "CURRENT_TIMESTAMP", max_length: 0, precision: 0, scale: 0 },
+    { column_name: "fecha_actualizacion", data_type: "timestamp with time zone", is_nullable: true, column_default: "CURRENT_TIMESTAMP", max_length: 0, precision: 0, scale: 0 }
+  ],
+  "cio_products": [
+    { column_name: "id", data_type: "integer", is_nullable: false, column_default: "nextval('cio_products_id_seq'::regclass)", max_length: 0, precision: 0, scale: 0 },
+    { column_name: "nombre", data_type: "character varying", is_nullable: false, column_default: null, max_length: 255, precision: 0, scale: 0 },
+    { column_name: "codigo", data_type: "character varying", is_nullable: false, column_default: null, max_length: 50, precision: 0, scale: 0 },
+    { column_name: "descripcion", data_type: "text", is_nullable: true, column_default: null, max_length: 0, precision: 0, scale: 0 },
+    { column_name: "precio_compra", data_type: "numeric", is_nullable: false, column_default: null, max_length: 0, precision: 10, scale: 2 },
+    { column_name: "precio_venta", data_type: "numeric", is_nullable: false, column_default: null, max_length: 0, precision: 10, scale: 2 },
+    { column_name: "id_categoria", data_type: "integer", is_nullable: false, column_default: null, max_length: 0, precision: 0, scale: 0 },
+    { column_name: "id_marca", data_type: "integer", is_nullable: true, column_default: null, max_length: 0, precision: 0, scale: 0 },
+    { column_name: "stock_actual", data_type: "integer", is_nullable: true, column_default: "0", max_length: 0, precision: 0, scale: 0 },
+    { column_name: "stock_minimo", data_type: "integer", is_nullable: true, column_default: "0", max_length: 0, precision: 0, scale: 0 },
+    { column_name: "stock_maximo", data_type: "integer", is_nullable: true, column_default: "0", max_length: 0, precision: 0, scale: 0 },
+    { column_name: "estado", data_type: "boolean", is_nullable: true, column_default: "true", max_length: 0, precision: 0, scale: 0 },
+    { column_name: "master_detail", data_type: "character", is_nullable: true, column_default: "'M'::bpchar", max_length: 1, precision: 0, scale: 0 },
+    { column_name: "fecha_creacion", data_type: "timestamp with time zone", is_nullable: true, column_default: "CURRENT_TIMESTAMP", max_length: 0, precision: 0, scale: 0 },
+    { column_name: "fecha_actualizacion", data_type: "timestamp with time zone", is_nullable: true, column_default: "CURRENT_TIMESTAMP", max_length: 0, precision: 0, scale: 0 }
+  ],
+  "gen_empresas": [
+    { column_name: "id", data_type: "integer", is_nullable: false, column_default: "nextval('gen_empresas_id_seq'::regclass)", max_length: 0, precision: 0, scale: 0 },
+    { column_name: "nit", data_type: "character varying", is_nullable: false, column_default: null, max_length: 20, precision: 0, scale: 0 },
+    { column_name: "dv", data_type: "character varying", is_nullable: false, column_default: null, max_length: 1, precision: 0, scale: 0 },
+    { column_name: "razon_social", data_type: "text", is_nullable: false, column_default: null, max_length: 0, precision: 0, scale: 0 },
+    { column_name: "tipo_contribuyente", data_type: "character varying", is_nullable: false, column_default: null, max_length: 50, precision: 0, scale: 0 },
+    { column_name: "direccion", data_type: "text", is_nullable: false, column_default: null, max_length: 0, precision: 0, scale: 0 },
+    { column_name: "telefono", data_type: "character varying", is_nullable: false, column_default: null, max_length: 20, precision: 0, scale: 0 },
+    { column_name: "email", data_type: "character varying", is_nullable: false, column_default: null, max_length: 255, precision: 0, scale: 0 },
+    { column_name: "municipio", data_type: "character varying", is_nullable: false, column_default: null, max_length: 100, precision: 0, scale: 0 },
+    { column_name: "estado_empresa", data_type: "character varying", is_nullable: true, column_default: "'Activo'::character varying", max_length: 20, precision: 0, scale: 0 },
+    { column_name: "tabla_master", data_type: "character", is_nullable: true, column_default: "'D'::bpchar", max_length: 1, precision: 0, scale: 0 },
+    { column_name: "created_at", data_type: "timestamp with time zone", is_nullable: true, column_default: "CURRENT_TIMESTAMP", max_length: 0, precision: 0, scale: 0 },
+    { column_name: "updated_at", data_type: "timestamp with time zone", is_nullable: true, column_default: "CURRENT_TIMESTAMP", max_length: 0, precision: 0, scale: 0 }
+  ]
+};
+
 export function TableStructureDialog({ 
   open, 
   onOpenChange, 
-  tableName,
-  connectionData 
+  tableName
 }: TableStructureDialogProps) {
   const { data: structure, isLoading } = useQuery({
     queryKey: ['tableStructure', tableName],
     queryFn: async () => {
-      const { data: response, error } = await supabase.functions.invoke('sql-server-connection', {
-        body: {
-          action: 'getTableStructure',
-          data: {
-            ...connectionData,
-            tableName
-          }
-        }
-      })
-
-      if (error) throw error
-      return response.data as TableStructure[]
+      // Simular tiempo de carga
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Devolver datos simulados o un array vacío si no existe la tabla
+      return mockStructures[tableName] || [];
     },
     enabled: open
-  })
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -98,5 +141,5 @@ export function TableStructureDialog({
         )}
       </DialogContent>
     </Dialog>
-  )
+  );
 }

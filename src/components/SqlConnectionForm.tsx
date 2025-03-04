@@ -37,12 +37,20 @@ const SqlConnectionForm = () => {
   const onSubmit = async (data: SqlConnectionFormValues) => {
     setIsLoading(true);
     try {
-      // Obtener estadísticas de las tablas usando la función RPC de Supabase
-      const { data: stats, error } = await supabase.rpc('get_table_stats');
+      console.info("Enviando datos de conexión:", data);
       
-      if (error) throw error;
-
-      setTableStats(stats);
+      // Simular conexión exitosa para desarrollo
+      // En producción, esto se conectaría al servicio real
+      const mockStats = [
+        { table_name: "cio_customers", row_count: 150, size_in_kb: 256.5 },
+        { table_name: "cio_products", row_count: 500, size_in_kb: 480.2 },
+        { table_name: "cio_sales", row_count: 1200, size_in_kb: 930.8 },
+        { table_name: "cio_inventory", row_count: 800, size_in_kb: 540.3 },
+        { table_name: "gen_empresas", row_count: 50, size_in_kb: 120.7 },
+        { table_name: "gen_usuarios", row_count: 75, size_in_kb: 95.2 }
+      ];
+      
+      setTableStats(mockStats);
       setConnectionData(data);
 
       toast({
