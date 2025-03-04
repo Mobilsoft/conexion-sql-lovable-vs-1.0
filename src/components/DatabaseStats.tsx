@@ -10,17 +10,18 @@ import { TableStats } from "@/types/database-stats";
 import { mockTableStructures } from "@/mocks/tableStructures";
 import { filterExcludedFields } from "@/utils/database-utils";
 import { supabase } from "@/integrations/supabase/client";
+import { DynamicFormField, TableStructure } from "@/types/table-structure";
 
 const DatabaseStats = ({ stats, connectionData }: { stats: TableStats[], connectionData: any }) => {
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
   const [formTable, setFormTable] = useState<string | null>(null);
-  const [tableFields, setTableFields] = useState<any[]>([]);
+  const [tableFields, setTableFields] = useState<DynamicFormField[]>([]);
   const { toast } = useToast();
 
   const handleOpenForm = async (tableName: string) => {
     try {
       // Get the structure for the selected table first
-      let structureData;
+      let structureData: TableStructure[];
       
       if (import.meta.env.DEV && connectionData.server === "localhost") {
         // Use mock data in local development
@@ -44,11 +45,10 @@ const DatabaseStats = ({ stats, connectionData }: { stats: TableStats[], connect
         structureData = result.data.recordset || [];
       }
       
-      // Map the structure to form fields
-      const fields = structureData.map((field: any) => ({
+      // Map the structure to form fields with the correct properties
+      const fields: DynamicFormField[] = structureData.map((field: TableStructure) => ({
         name: field.column_name,
-        type: field.data_type.includes('int') ? 'number' : 
-              field.data_type === 'boolean' ? 'boolean' : 'text',
+        type: getFieldType(field.data_type),
         required: !field.is_nullable,
         defaultValue: field.column_default,
         properties: {
@@ -82,6 +82,14 @@ const DatabaseStats = ({ stats, connectionData }: { stats: TableStats[], connect
         variant: "destructive",
       });
     }
+  };
+
+  // Helper function to map SQL data types to form field types
+  const getFieldType = (dataType: string): string => {
+    if (dataType.includes('int')) return 'number';
+    if (dataType === 'boolean' || dataType === 'bit') return 'boolean';
+    if (dataType.includes('date') || dataType.includes('time')) return 'date';
+    return 'text';
   };
 
   const handleSaveForm = async (data: any) => {
