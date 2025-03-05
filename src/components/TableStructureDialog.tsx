@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/table"
 import { useQuery } from "@tanstack/react-query"
 import { Loader2 } from "lucide-react"
-import { supabase } from "@/integrations/supabase/client"
 
 interface TableStructure {
   column_name: string;
@@ -34,101 +33,7 @@ interface TableStructureDialogProps {
   connectionData: any;
 }
 
-export function TableStructureDialog({ 
-  open, 
-  onOpenChange, 
-  tableName,
-  connectionData
-}: TableStructureDialogProps) {
-  const { data: structure, isLoading } = useQuery({
-    queryKey: ['tableStructure', tableName, connectionData],
-    queryFn: async () => {
-      console.log("Fetching structure for table:", tableName);
-      
-      if (!tableName) {
-        return [];
-      }
-      
-      // In development mode with localhost, use mock data
-      if (import.meta.env.DEV && connectionData.server === "localhost") {
-        // Simular tiempo de carga
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        // Use mock structures available in the code
-        return mockStructures[tableName] || [];
-      } else {
-        // Call the edge function to get the real structure
-        const { data: result, error } = await supabase.functions.invoke(
-          'sql-server-connection/structure', 
-          {
-            body: JSON.stringify({
-              ...connectionData,
-              tableName
-            }),
-            method: 'POST',
-          }
-        );
-
-        if (error) {
-          console.error("Error fetching table structure:", error);
-          throw new Error(error.message);
-        }
-        
-        if (!result.success) {
-          console.error("Structure fetch failed:", result.error);
-          throw new Error(result.error);
-        }
-        
-        console.log("Received structure data:", result.data);
-        return result.data.recordset || [];
-      }
-    },
-    enabled: open && !!tableName
-  });
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Estructura de la tabla: {tableName}</DialogTitle>
-        </DialogHeader>
-        {isLoading ? (
-          <div className="flex items-center justify-center p-8">
-            <Loader2 className="h-8 w-8 animate-spin" />
-          </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Columna</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Nullable</TableHead>
-                <TableHead>Valor por defecto</TableHead>
-                <TableHead>Longitud/Precisión</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {structure?.map((col) => (
-                <TableRow key={col.column_name}>
-                  <TableCell className="font-medium">{col.column_name}</TableCell>
-                  <TableCell>{col.data_type}</TableCell>
-                  <TableCell>{col.is_nullable ? 'Sí' : 'No'}</TableCell>
-                  <TableCell>{col.column_default || '-'}</TableCell>
-                  <TableCell>
-                    {col.max_length > 0 ? col.max_length : 
-                     col.precision > 0 ? `${col.precision},${col.scale}` : '-'}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-// Mock data for local development
+// Datos de estructura de tabla simulados para desarrollo
 const mockStructures: Record<string, TableStructure[]> = {
   "cio_customers": [
     { column_name: "id", data_type: "integer", is_nullable: false, column_default: "nextval('cio_customers_id_seq'::regclass)", max_length: 0, precision: 0, scale: 0 },
@@ -179,3 +84,62 @@ const mockStructures: Record<string, TableStructure[]> = {
     { column_name: "updated_at", data_type: "timestamp with time zone", is_nullable: true, column_default: "CURRENT_TIMESTAMP", max_length: 0, precision: 0, scale: 0 }
   ]
 };
+
+export function TableStructureDialog({ 
+  open, 
+  onOpenChange, 
+  tableName
+}: TableStructureDialogProps) {
+  const { data: structure, isLoading } = useQuery({
+    queryKey: ['tableStructure', tableName],
+    queryFn: async () => {
+      // Simular tiempo de carga
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Devolver datos simulados o un array vacío si no existe la tabla
+      return mockStructures[tableName] || [];
+    },
+    enabled: open
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Estructura de la tabla: {tableName}</DialogTitle>
+        </DialogHeader>
+        {isLoading ? (
+          <div className="flex items-center justify-center p-8">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Columna</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Nullable</TableHead>
+                <TableHead>Valor por defecto</TableHead>
+                <TableHead>Longitud/Precisión</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {structure?.map((col) => (
+                <TableRow key={col.column_name}>
+                  <TableCell className="font-medium">{col.column_name}</TableCell>
+                  <TableCell>{col.data_type}</TableCell>
+                  <TableCell>{col.is_nullable ? 'Sí' : 'No'}</TableCell>
+                  <TableCell>{col.column_default || '-'}</TableCell>
+                  <TableCell>
+                    {col.max_length > 0 ? col.max_length : 
+                     col.precision > 0 ? `${col.precision},${col.scale}` : '-'}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}

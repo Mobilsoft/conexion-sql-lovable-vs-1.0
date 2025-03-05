@@ -26,8 +26,6 @@ class GlobalConnection {
   }
 
   public async getConnection(config: ConnectionConfig): Promise<mssql.ConnectionPool> {
-    console.log(`Requested connection to: ${config.server}:${config.port}/${config.database}`);
-    
     // Si ya hay una conexión activa y es con la misma configuración, la retornamos
     if (this.pool && this.isSameConfig(config)) {
       console.log('📊 Usando conexión global existente');
@@ -77,23 +75,20 @@ class GlobalConnection {
       server: config.server,
       port: parseInt(config.port),
       options: {
-        encrypt: true, 
+        encrypt: false,
         trustServerCertificate: true,
-        enableArithAbort: true,
-        connectTimeout: 60000, // Aumentar el timeout para conexiones lentas
-        requestTimeout: 60000,
-        validateConnection: true, // Validar conexión activamente
-        camelCaseColumns: true, // Convertir nombres de columnas a camelCase
+        enableArithAbort: true
       },
       pool: {
         max: 10,
         min: 0,
-        idleTimeoutMillis: 300000,
-        acquireTimeoutMillis: 60000 // Tiempo de espera para adquirir una conexión
-      }
+        idleTimeoutMillis: 300000
+      },
+      connectionTimeout: 15000,
+      requestTimeout: 15000
     };
 
-    console.log('🔌 Conectando a:', config.server, 'puerto:', config.port, 'Base de datos:', config.database);
+    console.log('🔌 Conectando a:', config.server, 'puerto:', config.port);
     return new mssql.ConnectionPool(poolConfig).connect();
   }
 

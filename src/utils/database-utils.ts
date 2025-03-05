@@ -1,5 +1,5 @@
 
-import { DynamicFormField, TableStructure } from "@/types/table-structure";
+import { TableStructure } from "@/types/table-structure";
 import { KnownTables } from "@/types/database-stats";
 
 // Función auxiliar para validar tablas conocidas
@@ -20,11 +20,11 @@ export const isKnownTable = (table: string): table is KnownTables => {
 };
 
 // Función para filtrar campos excluidos
-export const filterExcludedFields = (fields: DynamicFormField[]): DynamicFormField[] => {
+export const filterExcludedFields = (fields: TableStructure[]): TableStructure[] => {
   return fields.filter(field => 
-    field.name !== 'id' && 
-    field.name !== 'master_detail' && 
-    field.name !== 'fecha_creacion' && 
-    field.name !== 'fecha_actualizacion'
+    field.column_name !== 'id' && 
+    field.column_name !== 'master_detail' && 
+    field.column_name !== 'fecha_creacion' && 
+    field.column_name !== 'fecha_actualizacion'
   );
 };
