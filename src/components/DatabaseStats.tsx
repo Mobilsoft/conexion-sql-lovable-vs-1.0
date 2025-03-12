@@ -1,6 +1,5 @@
 
 import { Card } from "@/components/ui/card";
-import { Database } from "lucide-react";
 import { TableStructureDialog } from "./TableStructureDialog";
 import { DynamicForm } from "./DynamicForm";
 import { useState } from 'react';
@@ -38,14 +37,7 @@ const DatabaseStats = ({ stats, connectionData }: { stats: TableStats[], connect
   };
 
   return (
-    <Card className="w-full max-w-2xl p-6 mt-8 bg-white/90 dark:bg-slate-900/90 border-0 shadow-lg">
-      <div className="mb-6">
-        <h3 className="text-2xl font-semibold flex items-center gap-2">
-          <Database className="h-6 w-6" />
-          Estadísticas de la Base de Datos
-        </h3>
-      </div>
-      
+    <Card className="w-full max-w-2xl p-6 bg-white/90 dark:bg-slate-900/90 border-0 shadow-lg">
       <DatabaseStatsTable
         stats={stats}
         onViewStructure={(tableName) => setSelectedTable(tableName)}

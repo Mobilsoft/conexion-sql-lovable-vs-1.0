@@ -26,7 +26,7 @@ export const DatabaseStatsTable: React.FC<DatabaseStatsTableProps> = ({
   return (
     <Table>
       <TableHeader>
-        <TableRow>
+        <TableRow className="h-8">
           <TableHead>Tabla</TableHead>
           <TableHead className="text-right">Registros</TableHead>
           <TableHead className="text-right">Tamaño (KB)</TableHead>
@@ -35,15 +35,16 @@ export const DatabaseStatsTable: React.FC<DatabaseStatsTableProps> = ({
       </TableHeader>
       <TableBody>
         {(stats || []).map((stat) => (
-          <TableRow key={stat.table_name}>
-            <TableCell className="font-medium">{stat.table_name}</TableCell>
-            <TableCell className="text-right">{stat.row_count.toLocaleString()}</TableCell>
-            <TableCell className="text-right">{stat.size_in_kb.toFixed(2)}</TableCell>
-            <TableCell className="text-right space-x-2">
+          <TableRow key={stat.table_name} className="h-8">
+            <TableCell className="font-medium py-1">{stat.table_name}</TableCell>
+            <TableCell className="text-right py-1">{stat.row_count.toLocaleString()}</TableCell>
+            <TableCell className="text-right py-1">{stat.size_in_kb.toFixed(2)}</TableCell>
+            <TableCell className="text-right space-x-2 py-1">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => onViewStructure(stat.table_name)}
+                className="h-7 w-7"
               >
                 <FileText className="h-4 w-4" />
               </Button>
@@ -51,6 +52,7 @@ export const DatabaseStatsTable: React.FC<DatabaseStatsTableProps> = ({
                 variant="ghost"
                 size="icon"
                 onClick={() => onOpenForm(stat.table_name)}
+                className="h-7 w-7"
               >
                 <FormInput className="h-4 w-4" />
               </Button>
