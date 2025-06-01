@@ -9,1336 +9,1194 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      actividades_comerciales: {
+      anulaciones_factura: {
         Row: {
           created_at: string | null
-          descripcion: string | null
+          factura_id: number
+          fecha: string
+          id: number
+          motivo: string
+          updated_at: string | null
+          usuario: string
+        }
+        Insert: {
+          created_at?: string | null
+          factura_id: number
+          fecha?: string
+          id?: number
+          motivo: string
+          updated_at?: string | null
+          usuario: string
+        }
+        Update: {
+          created_at?: string | null
+          factura_id?: number
+          fecha?: string
+          id?: number
+          motivo?: string
+          updated_at?: string | null
+          usuario?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "anulaciones_factura_factura_id_fkey"
+            columns: ["factura_id"]
+            isOneToOne: false
+            referencedRelation: "facturas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      categorias: {
+        Row: {
+          activo: boolean | null
+          codigo: string
+          created_at: string | null
           id: number
           nombre: string
-          tabla_master: string | null
+          sublinea_id: number
           updated_at: string | null
         }
         Insert: {
+          activo?: boolean | null
+          codigo: string
           created_at?: string | null
-          descripcion?: string | null
           id?: number
           nombre: string
-          tabla_master?: string | null
+          sublinea_id: number
           updated_at?: string | null
         }
         Update: {
+          activo?: boolean | null
+          codigo?: string
           created_at?: string | null
-          descripcion?: string | null
           id?: number
           nombre?: string
-          tabla_master?: string | null
+          sublinea_id?: number
           updated_at?: string | null
         }
-        Relationships: []
-      }
-      cio_brands: {
-        Row: {
-          descripcion: string | null
-          estado: boolean | null
-          fecha_actualizacion: string | null
-          fecha_creacion: string | null
-          id: number
-          master_detail: string | null
-          nombre: string
-        }
-        Insert: {
-          descripcion?: string | null
-          estado?: boolean | null
-          fecha_actualizacion?: string | null
-          fecha_creacion?: string | null
-          id?: number
-          master_detail?: string | null
-          nombre: string
-        }
-        Update: {
-          descripcion?: string | null
-          estado?: boolean | null
-          fecha_actualizacion?: string | null
-          fecha_creacion?: string | null
-          id?: number
-          master_detail?: string | null
-          nombre?: string
-        }
-        Relationships: []
-      }
-      cio_customers: {
-        Row: {
-          apellido: string
-          direccion: string
-          email: string
-          estado: boolean | null
-          fecha_actualizacion: string | null
-          fecha_creacion: string | null
-          id: number
-          id_ciudad: number
-          id_tipo_documento: number
-          master_detail: string | null
-          nombre: string
-          numero_documento: string
-          razon_social: string
-          telefono: string
-        }
-        Insert: {
-          apellido: string
-          direccion: string
-          email: string
-          estado?: boolean | null
-          fecha_actualizacion?: string | null
-          fecha_creacion?: string | null
-          id?: number
-          id_ciudad: number
-          id_tipo_documento: number
-          master_detail?: string | null
-          nombre: string
-          numero_documento: string
-          razon_social: string
-          telefono: string
-        }
-        Update: {
-          apellido?: string
-          direccion?: string
-          email?: string
-          estado?: boolean | null
-          fecha_actualizacion?: string | null
-          fecha_creacion?: string | null
-          id?: number
-          id_ciudad?: number
-          id_tipo_documento?: number
-          master_detail?: string | null
-          nombre?: string
-          numero_documento?: string
-          razon_social?: string
-          telefono?: string
-        }
         Relationships: [
           {
-            foreignKeyName: "fk_customer_tipo_documento"
-            columns: ["id_tipo_documento"]
+            foreignKeyName: "categorias_sublinea_id_fkey"
+            columns: ["sublinea_id"]
             isOneToOne: false
-            referencedRelation: "cio_tipos_documento"
+            referencedRelation: "sublineas"
             referencedColumns: ["id"]
           },
         ]
       }
-      cio_inventory: {
+      certificados_digitales: {
         Row: {
-          cantidad: number
-          documento_referencia: string | null
-          fecha_actualizacion: string | null
-          fecha_creacion: string | null
-          fecha_movimiento: string | null
+          activo: boolean | null
+          archivo: string
+          contrasena: string
+          created_at: string | null
+          fecha_expiracion: string
           id: number
-          id_producto: number
-          master_detail: string | null
-          observaciones: string | null
-          tipo_movimiento: string
+          nombre: string
+          updated_at: string | null
         }
         Insert: {
-          cantidad: number
-          documento_referencia?: string | null
-          fecha_actualizacion?: string | null
-          fecha_creacion?: string | null
-          fecha_movimiento?: string | null
+          activo?: boolean | null
+          archivo: string
+          contrasena: string
+          created_at?: string | null
+          fecha_expiracion: string
           id?: number
-          id_producto: number
-          master_detail?: string | null
-          observaciones?: string | null
-          tipo_movimiento: string
+          nombre: string
+          updated_at?: string | null
         }
         Update: {
-          cantidad?: number
-          documento_referencia?: string | null
-          fecha_actualizacion?: string | null
-          fecha_creacion?: string | null
-          fecha_movimiento?: string | null
+          activo?: boolean | null
+          archivo?: string
+          contrasena?: string
+          created_at?: string | null
+          fecha_expiracion?: string
           id?: number
-          id_producto?: number
-          master_detail?: string | null
-          observaciones?: string | null
-          tipo_movimiento?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fk_inventory_product"
-            columns: ["id_producto"]
-            isOneToOne: false
-            referencedRelation: "cio_products"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      cio_product_categories: {
-        Row: {
-          descripcion: string | null
-          estado: boolean | null
-          fecha_actualizacion: string | null
-          fecha_creacion: string | null
-          id: number
-          master_detail: string | null
-          nombre: string
-        }
-        Insert: {
-          descripcion?: string | null
-          estado?: boolean | null
-          fecha_actualizacion?: string | null
-          fecha_creacion?: string | null
-          id?: number
-          master_detail?: string | null
-          nombre: string
-        }
-        Update: {
-          descripcion?: string | null
-          estado?: boolean | null
-          fecha_actualizacion?: string | null
-          fecha_creacion?: string | null
-          id?: number
-          master_detail?: string | null
           nombre?: string
-        }
-        Relationships: []
-      }
-      cio_products: {
-        Row: {
-          codigo: string
-          descripcion: string | null
-          estado: boolean | null
-          fecha_actualizacion: string | null
-          fecha_creacion: string | null
-          id: number
-          id_categoria: number
-          id_marca: number | null
-          master_detail: string | null
-          nombre: string
-          precio_compra: number
-          precio_venta: number
-          stock_actual: number | null
-          stock_maximo: number | null
-          stock_minimo: number | null
-        }
-        Insert: {
-          codigo: string
-          descripcion?: string | null
-          estado?: boolean | null
-          fecha_actualizacion?: string | null
-          fecha_creacion?: string | null
-          id?: number
-          id_categoria: number
-          id_marca?: number | null
-          master_detail?: string | null
-          nombre: string
-          precio_compra: number
-          precio_venta: number
-          stock_actual?: number | null
-          stock_maximo?: number | null
-          stock_minimo?: number | null
-        }
-        Update: {
-          codigo?: string
-          descripcion?: string | null
-          estado?: boolean | null
-          fecha_actualizacion?: string | null
-          fecha_creacion?: string | null
-          id?: number
-          id_categoria?: number
-          id_marca?: number | null
-          master_detail?: string | null
-          nombre?: string
-          precio_compra?: number
-          precio_venta?: number
-          stock_actual?: number | null
-          stock_maximo?: number | null
-          stock_minimo?: number | null
-        }
-        Relationships: []
-      }
-      cio_sale_details: {
-        Row: {
-          cantidad: number
-          descuento: number | null
-          fecha_actualizacion: string | null
-          fecha_creacion: string | null
-          id: number
-          id_producto: number
-          id_venta: number
-          master_detail: string | null
-          precio_unitario: number
-          subtotal: number
-        }
-        Insert: {
-          cantidad: number
-          descuento?: number | null
-          fecha_actualizacion?: string | null
-          fecha_creacion?: string | null
-          id?: number
-          id_producto: number
-          id_venta: number
-          master_detail?: string | null
-          precio_unitario: number
-          subtotal: number
-        }
-        Update: {
-          cantidad?: number
-          descuento?: number | null
-          fecha_actualizacion?: string | null
-          fecha_creacion?: string | null
-          id?: number
-          id_producto?: number
-          id_venta?: number
-          master_detail?: string | null
-          precio_unitario?: number
-          subtotal?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fk_sale_details_product"
-            columns: ["id_producto"]
-            isOneToOne: false
-            referencedRelation: "cio_products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_sale_details_sale"
-            columns: ["id_venta"]
-            isOneToOne: false
-            referencedRelation: "cio_sales"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      cio_sales: {
-        Row: {
-          descuento: number | null
-          estado: boolean | null
-          fecha_actualizacion: string | null
-          fecha_creacion: string | null
-          fecha_venta: string | null
-          id: number
-          id_cliente: number
-          iva: number | null
-          master_detail: string | null
-          numero_factura: string
-          subtotal: number
-          total: number
-        }
-        Insert: {
-          descuento?: number | null
-          estado?: boolean | null
-          fecha_actualizacion?: string | null
-          fecha_creacion?: string | null
-          fecha_venta?: string | null
-          id?: number
-          id_cliente: number
-          iva?: number | null
-          master_detail?: string | null
-          numero_factura: string
-          subtotal: number
-          total: number
-        }
-        Update: {
-          descuento?: number | null
-          estado?: boolean | null
-          fecha_actualizacion?: string | null
-          fecha_creacion?: string | null
-          fecha_venta?: string | null
-          id?: number
-          id_cliente?: number
-          iva?: number | null
-          master_detail?: string | null
-          numero_factura?: string
-          subtotal?: number
-          total?: number
-        }
-        Relationships: []
-      }
-      cio_tipos_documento: {
-        Row: {
-          codigo: string
-          descripcion: string | null
-          estado: boolean | null
-          fecha_actualizacion: string | null
-          fecha_creacion: string | null
-          id: number
-          master_detail: string | null
-          nombre: string
-        }
-        Insert: {
-          codigo: string
-          descripcion?: string | null
-          estado?: boolean | null
-          fecha_actualizacion?: string | null
-          fecha_creacion?: string | null
-          id?: number
-          master_detail?: string | null
-          nombre: string
-        }
-        Update: {
-          codigo?: string
-          descripcion?: string | null
-          estado?: boolean | null
-          fecha_actualizacion?: string | null
-          fecha_creacion?: string | null
-          id?: number
-          master_detail?: string | null
-          nombre?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
       ciudades: {
         Row: {
-          codigo: string | null
+          activo: boolean | null
+          codigo: string
           created_at: string | null
-          departamento_id: number | null
+          departamento: string
           id: number
           nombre: string
-          tabla_master: string | null
           updated_at: string | null
         }
         Insert: {
-          codigo?: string | null
+          activo?: boolean | null
+          codigo: string
           created_at?: string | null
-          departamento_id?: number | null
+          departamento: string
           id?: number
           nombre: string
-          tabla_master?: string | null
           updated_at?: string | null
         }
         Update: {
-          codigo?: string | null
+          activo?: boolean | null
+          codigo?: string
           created_at?: string | null
-          departamento_id?: number | null
+          departamento?: string
           id?: number
           nombre?: string
-          tabla_master?: string | null
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "ciudades_departamento_id_fkey"
-            columns: ["departamento_id"]
-            isOneToOne: false
-            referencedRelation: "departamentos"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       clientes: {
         Row: {
-          apellido: string
-          ciudad: string
+          activo: boolean | null
+          ciudad_id: number
           created_at: string | null
           direccion: string
-          documento: string
           email: string
-          estado: string
           id: number
-          nombre: string
-          tabla_master: string | null
+          nit: string
+          nombre_comercial: string | null
+          razon_social: string
+          regimen_tributario_id: number
           telefono: string
           updated_at: string | null
         }
         Insert: {
-          apellido: string
-          ciudad: string
+          activo?: boolean | null
+          ciudad_id: number
           created_at?: string | null
           direccion: string
-          documento: string
           email: string
-          estado: string
           id?: number
-          nombre: string
-          tabla_master?: string | null
+          nit: string
+          nombre_comercial?: string | null
+          razon_social: string
+          regimen_tributario_id: number
           telefono: string
           updated_at?: string | null
         }
         Update: {
-          apellido?: string
-          ciudad?: string
+          activo?: boolean | null
+          ciudad_id?: number
           created_at?: string | null
           direccion?: string
-          documento?: string
           email?: string
-          estado?: string
           id?: number
-          nombre?: string
-          tabla_master?: string | null
+          nit?: string
+          nombre_comercial?: string | null
+          razon_social?: string
+          regimen_tributario_id?: number
           telefono?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "clientes_ciudad_id_fkey"
+            columns: ["ciudad_id"]
+            isOneToOne: false
+            referencedRelation: "ciudades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clientes_regimen_tributario_id_fkey"
+            columns: ["regimen_tributario_id"]
+            isOneToOne: false
+            referencedRelation: "regimenes_tributarios"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      codigos_ciiu: {
+      cotizaciones: {
         Row: {
-          codigo: string
+          cliente_id: number
           created_at: string | null
-          descripcion: string
+          estado: string
+          fecha: string
           id: number
-          tabla_master: string | null
+          iva: number
+          lista_precio_id: number
+          numero: string
+          observaciones: string | null
+          subtotal: number
+          total: number
+          updated_at: string | null
+          vendedor_id: number
+        }
+        Insert: {
+          cliente_id: number
+          created_at?: string | null
+          estado?: string
+          fecha?: string
+          id?: number
+          iva?: number
+          lista_precio_id: number
+          numero: string
+          observaciones?: string | null
+          subtotal?: number
+          total?: number
+          updated_at?: string | null
+          vendedor_id: number
+        }
+        Update: {
+          cliente_id?: number
+          created_at?: string | null
+          estado?: string
+          fecha?: string
+          id?: number
+          iva?: number
+          lista_precio_id?: number
+          numero?: string
+          observaciones?: string | null
+          subtotal?: number
+          total?: number
+          updated_at?: string | null
+          vendedor_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cotizaciones_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cotizaciones_lista_precio_id_fkey"
+            columns: ["lista_precio_id"]
+            isOneToOne: false
+            referencedRelation: "listas_precios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cotizaciones_vendedor_id_fkey"
+            columns: ["vendedor_id"]
+            isOneToOne: false
+            referencedRelation: "vendedores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      detalles_cotizacion: {
+        Row: {
+          cantidad: number
+          cotizacion_id: number
+          created_at: string | null
+          id: number
+          iva: number
+          precio_unitario: number
+          producto_id: number
+          subtotal: number
+          total: number
           updated_at: string | null
         }
         Insert: {
-          codigo: string
+          cantidad: number
+          cotizacion_id: number
           created_at?: string | null
-          descripcion: string
           id?: number
-          tabla_master?: string | null
+          iva: number
+          precio_unitario: number
+          producto_id: number
+          subtotal: number
+          total: number
           updated_at?: string | null
         }
         Update: {
+          cantidad?: number
+          cotizacion_id?: number
+          created_at?: string | null
+          id?: number
+          iva?: number
+          precio_unitario?: number
+          producto_id?: number
+          subtotal?: number
+          total?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "detalles_cotizacion_cotizacion_id_fkey"
+            columns: ["cotizacion_id"]
+            isOneToOne: false
+            referencedRelation: "cotizaciones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "detalles_cotizacion_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "productos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      detalles_devolucion: {
+        Row: {
+          cantidad: number
+          created_at: string | null
+          detalle_factura_id: number
+          devolucion_id: number
+          id: number
+          iva: number
+          precio_unitario: number
+          producto_id: number
+          subtotal: number
+          total: number
+          updated_at: string | null
+        }
+        Insert: {
+          cantidad: number
+          created_at?: string | null
+          detalle_factura_id: number
+          devolucion_id: number
+          id?: number
+          iva: number
+          precio_unitario: number
+          producto_id: number
+          subtotal: number
+          total: number
+          updated_at?: string | null
+        }
+        Update: {
+          cantidad?: number
+          created_at?: string | null
+          detalle_factura_id?: number
+          devolucion_id?: number
+          id?: number
+          iva?: number
+          precio_unitario?: number
+          producto_id?: number
+          subtotal?: number
+          total?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "detalles_devolucion_detalle_factura_id_fkey"
+            columns: ["detalle_factura_id"]
+            isOneToOne: false
+            referencedRelation: "detalles_factura"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "detalles_devolucion_devolucion_id_fkey"
+            columns: ["devolucion_id"]
+            isOneToOne: false
+            referencedRelation: "devoluciones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "detalles_devolucion_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "productos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      detalles_factura: {
+        Row: {
+          cantidad: number
+          created_at: string | null
+          detalle_remision_id: number
+          factura_id: number
+          id: number
+          iva: number
+          precio_unitario: number
+          producto_id: number
+          subtotal: number
+          total: number
+          updated_at: string | null
+        }
+        Insert: {
+          cantidad: number
+          created_at?: string | null
+          detalle_remision_id: number
+          factura_id: number
+          id?: number
+          iva: number
+          precio_unitario: number
+          producto_id: number
+          subtotal: number
+          total: number
+          updated_at?: string | null
+        }
+        Update: {
+          cantidad?: number
+          created_at?: string | null
+          detalle_remision_id?: number
+          factura_id?: number
+          id?: number
+          iva?: number
+          precio_unitario?: number
+          producto_id?: number
+          subtotal?: number
+          total?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "detalles_factura_detalle_remision_id_fkey"
+            columns: ["detalle_remision_id"]
+            isOneToOne: false
+            referencedRelation: "detalles_remision"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "detalles_factura_factura_id_fkey"
+            columns: ["factura_id"]
+            isOneToOne: false
+            referencedRelation: "facturas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "detalles_factura_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "productos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      detalles_pedido: {
+        Row: {
+          cantidad: number
+          created_at: string | null
+          id: number
+          iva: number
+          pedido_id: number
+          precio_unitario: number
+          producto_id: number
+          subtotal: number
+          total: number
+          updated_at: string | null
+        }
+        Insert: {
+          cantidad: number
+          created_at?: string | null
+          id?: number
+          iva: number
+          pedido_id: number
+          precio_unitario: number
+          producto_id: number
+          subtotal: number
+          total: number
+          updated_at?: string | null
+        }
+        Update: {
+          cantidad?: number
+          created_at?: string | null
+          id?: number
+          iva?: number
+          pedido_id?: number
+          precio_unitario?: number
+          producto_id?: number
+          subtotal?: number
+          total?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "detalles_pedido_pedido_id_fkey"
+            columns: ["pedido_id"]
+            isOneToOne: false
+            referencedRelation: "pedidos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "detalles_pedido_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "productos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      detalles_remision: {
+        Row: {
+          cantidad: number
+          created_at: string | null
+          detalle_pedido_id: number
+          id: number
+          producto_id: number
+          remision_id: number
+          updated_at: string | null
+        }
+        Insert: {
+          cantidad: number
+          created_at?: string | null
+          detalle_pedido_id: number
+          id?: number
+          producto_id: number
+          remision_id: number
+          updated_at?: string | null
+        }
+        Update: {
+          cantidad?: number
+          created_at?: string | null
+          detalle_pedido_id?: number
+          id?: number
+          producto_id?: number
+          remision_id?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "detalles_remision_detalle_pedido_id_fkey"
+            columns: ["detalle_pedido_id"]
+            isOneToOne: false
+            referencedRelation: "detalles_pedido"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "detalles_remision_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "productos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "detalles_remision_remision_id_fkey"
+            columns: ["remision_id"]
+            isOneToOne: false
+            referencedRelation: "remisiones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      devoluciones: {
+        Row: {
+          created_at: string | null
+          estado: string
+          factura_id: number
+          fecha: string
+          id: number
+          iva: number
+          motivo: string
+          numero: string
+          observaciones: string | null
+          subtotal: number
+          total: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          estado?: string
+          factura_id: number
+          fecha?: string
+          id?: number
+          iva?: number
+          motivo: string
+          numero: string
+          observaciones?: string | null
+          subtotal?: number
+          total?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          estado?: string
+          factura_id?: number
+          fecha?: string
+          id?: number
+          iva?: number
+          motivo?: string
+          numero?: string
+          observaciones?: string | null
+          subtotal?: number
+          total?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "devoluciones_factura_id_fkey"
+            columns: ["factura_id"]
+            isOneToOne: false
+            referencedRelation: "facturas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      facturas: {
+        Row: {
+          certificado_id: number | null
+          cliente_id: number
+          created_at: string | null
+          cufe: string | null
+          estado: string
+          fecha: string
+          fecha_vencimiento: string
+          forma_pago_id: number
+          id: number
+          iva: number
+          numero: string
+          observaciones: string | null
+          remision_id: number
+          resolucion_id: number
+          subtotal: number
+          total: number
+          updated_at: string | null
+          vendedor_id: number
+        }
+        Insert: {
+          certificado_id?: number | null
+          cliente_id: number
+          created_at?: string | null
+          cufe?: string | null
+          estado?: string
+          fecha?: string
+          fecha_vencimiento: string
+          forma_pago_id: number
+          id?: number
+          iva?: number
+          numero: string
+          observaciones?: string | null
+          remision_id: number
+          resolucion_id: number
+          subtotal?: number
+          total?: number
+          updated_at?: string | null
+          vendedor_id: number
+        }
+        Update: {
+          certificado_id?: number | null
+          cliente_id?: number
+          created_at?: string | null
+          cufe?: string | null
+          estado?: string
+          fecha?: string
+          fecha_vencimiento?: string
+          forma_pago_id?: number
+          id?: number
+          iva?: number
+          numero?: string
+          observaciones?: string | null
+          remision_id?: number
+          resolucion_id?: number
+          subtotal?: number
+          total?: number
+          updated_at?: string | null
+          vendedor_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "facturas_certificado_id_fkey"
+            columns: ["certificado_id"]
+            isOneToOne: false
+            referencedRelation: "certificados_digitales"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "facturas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "facturas_forma_pago_id_fkey"
+            columns: ["forma_pago_id"]
+            isOneToOne: false
+            referencedRelation: "formas_pago"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "facturas_remision_id_fkey"
+            columns: ["remision_id"]
+            isOneToOne: false
+            referencedRelation: "remisiones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "facturas_resolucion_id_fkey"
+            columns: ["resolucion_id"]
+            isOneToOne: false
+            referencedRelation: "resoluciones_facturacion"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "facturas_vendedor_id_fkey"
+            columns: ["vendedor_id"]
+            isOneToOne: false
+            referencedRelation: "vendedores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      formas_pago: {
+        Row: {
+          activo: boolean | null
+          codigo: string
+          created_at: string | null
+          dias: number
+          id: number
+          nombre: string
+          updated_at: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          codigo: string
+          created_at?: string | null
+          dias?: number
+          id?: number
+          nombre: string
+          updated_at?: string | null
+        }
+        Update: {
+          activo?: boolean | null
           codigo?: string
           created_at?: string | null
-          descripcion?: string
+          dias?: number
           id?: number
-          tabla_master?: string | null
+          nombre?: string
           updated_at?: string | null
         }
         Relationships: []
       }
-      companies: {
+      items_lista_precios: {
         Row: {
-          actividad_comercial_id: number | null
-          barrio: string | null
-          camara_comercio_file_name: string | null
-          camara_comercio_file_url: string | null
-          categoria: string | null
-          ciudad: string | null
-          ciudad_id: number | null
-          codigo_ciiu: string | null
-          codigo_ciiu_id: number | null
-          codigo_ciuu: string | null
-          comentarios: string | null
-          correo_electronico: string | null
-          departamento: string
-          departamento_id: number | null
-          descripcion_actividad: string | null
-          direccion: string
-          direccion_principal: string | null
-          dv: string
-          email: string
-          estado_dian: string | null
-          estado_empresa: string | null
-          fecha_actualizacion: string | null
-          fecha_constitucion: string | null
-          fecha_creacion: string | null
-          municipio: string
-          naturaleza_empresa: string | null
-          nit: string
-          numero_documento: string | null
-          numero_matricula: string | null
-          numero_permiso: string | null
-          pagina_web: string | null
-          pais: string | null
-          pais_id: number | null
-          primer_apellido: string | null
-          primer_nombre: string | null
-          razon_social: string
-          regimen_tributario: string | null
-          responsabilidad_fiscal: string | null
-          rut_file_name: string | null
-          rut_file_url: string | null
-          segundo_apellido: string | null
-          segundo_nombre: string | null
-          sucursales: boolean | null
-          tabla_master: string | null
-          telefono: string
-          telefono_fijo: string | null
-          telefono_movil: string | null
-          tipo_contribuyente: string
-          tipo_documento: string | null
-          tipo_documento_id: number | null
-          tipo_empresa: string | null
-          tipo_permiso: string | null
-          tipo_regimen_id: number | null
+          created_at: string | null
+          id: number
+          lista_precio_id: number
+          precio: number
+          producto_id: number
+          updated_at: string | null
         }
         Insert: {
-          actividad_comercial_id?: number | null
-          barrio?: string | null
-          camara_comercio_file_name?: string | null
-          camara_comercio_file_url?: string | null
-          categoria?: string | null
-          ciudad?: string | null
-          ciudad_id?: number | null
-          codigo_ciiu?: string | null
-          codigo_ciiu_id?: number | null
-          codigo_ciuu?: string | null
-          comentarios?: string | null
-          correo_electronico?: string | null
-          departamento: string
-          departamento_id?: number | null
-          descripcion_actividad?: string | null
-          direccion: string
-          direccion_principal?: string | null
-          dv: string
-          email: string
-          estado_dian?: string | null
-          estado_empresa?: string | null
-          fecha_actualizacion?: string | null
-          fecha_constitucion?: string | null
-          fecha_creacion?: string | null
-          municipio: string
-          naturaleza_empresa?: string | null
-          nit: string
-          numero_documento?: string | null
-          numero_matricula?: string | null
-          numero_permiso?: string | null
-          pagina_web?: string | null
-          pais?: string | null
-          pais_id?: number | null
-          primer_apellido?: string | null
-          primer_nombre?: string | null
-          razon_social: string
-          regimen_tributario?: string | null
-          responsabilidad_fiscal?: string | null
-          rut_file_name?: string | null
-          rut_file_url?: string | null
-          segundo_apellido?: string | null
-          segundo_nombre?: string | null
-          sucursales?: boolean | null
-          tabla_master?: string | null
-          telefono: string
-          telefono_fijo?: string | null
-          telefono_movil?: string | null
-          tipo_contribuyente: string
-          tipo_documento?: string | null
-          tipo_documento_id?: number | null
-          tipo_empresa?: string | null
-          tipo_permiso?: string | null
-          tipo_regimen_id?: number | null
+          created_at?: string | null
+          id?: number
+          lista_precio_id: number
+          precio: number
+          producto_id: number
+          updated_at?: string | null
         }
         Update: {
-          actividad_comercial_id?: number | null
-          barrio?: string | null
-          camara_comercio_file_name?: string | null
-          camara_comercio_file_url?: string | null
-          categoria?: string | null
-          ciudad?: string | null
-          ciudad_id?: number | null
-          codigo_ciiu?: string | null
-          codigo_ciiu_id?: number | null
-          codigo_ciuu?: string | null
-          comentarios?: string | null
-          correo_electronico?: string | null
-          departamento?: string
-          departamento_id?: number | null
-          descripcion_actividad?: string | null
-          direccion?: string
-          direccion_principal?: string | null
-          dv?: string
-          email?: string
-          estado_dian?: string | null
-          estado_empresa?: string | null
-          fecha_actualizacion?: string | null
-          fecha_constitucion?: string | null
-          fecha_creacion?: string | null
-          municipio?: string
-          naturaleza_empresa?: string | null
-          nit?: string
-          numero_documento?: string | null
-          numero_matricula?: string | null
-          numero_permiso?: string | null
-          pagina_web?: string | null
-          pais?: string | null
-          pais_id?: number | null
-          primer_apellido?: string | null
-          primer_nombre?: string | null
-          razon_social?: string
-          regimen_tributario?: string | null
-          responsabilidad_fiscal?: string | null
-          rut_file_name?: string | null
-          rut_file_url?: string | null
-          segundo_apellido?: string | null
-          segundo_nombre?: string | null
-          sucursales?: boolean | null
-          tabla_master?: string | null
-          telefono?: string
-          telefono_fijo?: string | null
-          telefono_movil?: string | null
-          tipo_contribuyente?: string
-          tipo_documento?: string | null
-          tipo_documento_id?: number | null
-          tipo_empresa?: string | null
-          tipo_permiso?: string | null
-          tipo_regimen_id?: number | null
+          created_at?: string | null
+          id?: number
+          lista_precio_id?: number
+          precio?: number
+          producto_id?: number
+          updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "companies_actividad_comercial_id_fkey"
-            columns: ["actividad_comercial_id"]
+            foreignKeyName: "items_lista_precios_lista_precio_id_fkey"
+            columns: ["lista_precio_id"]
             isOneToOne: false
-            referencedRelation: "actividades_comerciales"
+            referencedRelation: "listas_precios"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "companies_ciudad_id_fkey"
-            columns: ["ciudad_id"]
+            foreignKeyName: "items_lista_precios_producto_id_fkey"
+            columns: ["producto_id"]
             isOneToOne: false
-            referencedRelation: "ciudades"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "companies_codigo_ciiu_id_fkey"
-            columns: ["codigo_ciiu_id"]
-            isOneToOne: false
-            referencedRelation: "codigos_ciiu"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "companies_departamento_id_fkey"
-            columns: ["departamento_id"]
-            isOneToOne: false
-            referencedRelation: "departamentos"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "companies_pais_id_fkey"
-            columns: ["pais_id"]
-            isOneToOne: false
-            referencedRelation: "paises"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "companies_tipo_documento_id_fkey"
-            columns: ["tipo_documento_id"]
-            isOneToOne: false
-            referencedRelation: "tipos_documento"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "companies_tipo_regimen_id_fkey"
-            columns: ["tipo_regimen_id"]
-            isOneToOne: false
-            referencedRelation: "tipos_regimen_tributario"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_companies_actividad_comercial"
-            columns: ["actividad_comercial_id"]
-            isOneToOne: false
-            referencedRelation: "actividades_comerciales"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_companies_ciudad"
-            columns: ["ciudad_id"]
-            isOneToOne: false
-            referencedRelation: "ciudades"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_companies_codigo_ciiu"
-            columns: ["codigo_ciiu_id"]
-            isOneToOne: false
-            referencedRelation: "codigos_ciiu"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_companies_departamento"
-            columns: ["departamento_id"]
-            isOneToOne: false
-            referencedRelation: "departamentos"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_companies_pais"
-            columns: ["pais_id"]
-            isOneToOne: false
-            referencedRelation: "paises"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_companies_tipo_documento"
-            columns: ["tipo_documento_id"]
-            isOneToOne: false
-            referencedRelation: "tipos_documento"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_companies_tipo_regimen"
-            columns: ["tipo_regimen_id"]
-            isOneToOne: false
-            referencedRelation: "tipos_regimen_tributario"
+            referencedRelation: "productos"
             referencedColumns: ["id"]
           },
         ]
       }
-      departamentos: {
+      lineas: {
         Row: {
-          codigo: string | null
+          activo: boolean | null
+          codigo: string
           created_at: string | null
           id: number
           nombre: string
-          pais_id: number | null
-          tabla_master: string | null
           updated_at: string | null
         }
         Insert: {
-          codigo?: string | null
+          activo?: boolean | null
+          codigo: string
           created_at?: string | null
           id?: number
           nombre: string
-          pais_id?: number | null
-          tabla_master?: string | null
           updated_at?: string | null
         }
         Update: {
-          codigo?: string | null
+          activo?: boolean | null
+          codigo?: string
           created_at?: string | null
           id?: number
           nombre?: string
-          pais_id?: number | null
-          tabla_master?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      listas_precios: {
+        Row: {
+          activo: boolean | null
+          created_at: string | null
+          descripcion: string | null
+          id: number
+          nombre: string
+          updated_at: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          created_at?: string | null
+          descripcion?: string | null
+          id?: number
+          nombre: string
+          updated_at?: string | null
+        }
+        Update: {
+          activo?: boolean | null
+          created_at?: string | null
+          descripcion?: string | null
+          id?: number
+          nombre?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      pedidos: {
+        Row: {
+          cliente_id: number
+          cotizacion_id: number | null
+          created_at: string | null
+          estado: string
+          fecha: string
+          forma_pago_id: number
+          id: number
+          iva: number
+          lista_precio_id: number
+          numero: string
+          observaciones: string | null
+          subtotal: number
+          total: number
+          updated_at: string | null
+          vendedor_id: number
+        }
+        Insert: {
+          cliente_id: number
+          cotizacion_id?: number | null
+          created_at?: string | null
+          estado?: string
+          fecha?: string
+          forma_pago_id: number
+          id?: number
+          iva?: number
+          lista_precio_id: number
+          numero: string
+          observaciones?: string | null
+          subtotal?: number
+          total?: number
+          updated_at?: string | null
+          vendedor_id: number
+        }
+        Update: {
+          cliente_id?: number
+          cotizacion_id?: number | null
+          created_at?: string | null
+          estado?: string
+          fecha?: string
+          forma_pago_id?: number
+          id?: number
+          iva?: number
+          lista_precio_id?: number
+          numero?: string
+          observaciones?: string | null
+          subtotal?: number
+          total?: number
+          updated_at?: string | null
+          vendedor_id?: number
         }
         Relationships: [
           {
-            foreignKeyName: "departamentos_pais_id_fkey"
-            columns: ["pais_id"]
+            foreignKeyName: "pedidos_cliente_id_fkey"
+            columns: ["cliente_id"]
             isOneToOne: false
-            referencedRelation: "paises"
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pedidos_cotizacion_id_fkey"
+            columns: ["cotizacion_id"]
+            isOneToOne: false
+            referencedRelation: "cotizaciones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pedidos_forma_pago_id_fkey"
+            columns: ["forma_pago_id"]
+            isOneToOne: false
+            referencedRelation: "formas_pago"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pedidos_lista_precio_id_fkey"
+            columns: ["lista_precio_id"]
+            isOneToOne: false
+            referencedRelation: "listas_precios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pedidos_vendedor_id_fkey"
+            columns: ["vendedor_id"]
+            isOneToOne: false
+            referencedRelation: "vendedores"
             referencedColumns: ["id"]
           },
         ]
       }
-      form_configurations: {
+      productos: {
         Row: {
-          configuration: Json
+          activo: boolean | null
+          categoria_id: number
+          codigo: string
           created_at: string | null
-          description: string | null
-          id: string
-          is_active: boolean | null
-          name: string
-          tabla_master: string | null
+          descripcion: string | null
+          id: number
+          iva: number
+          linea_id: number
+          nombre: string
+          precio: number
+          stock: number
+          sublinea_id: number
           updated_at: string | null
         }
         Insert: {
-          configuration: Json
+          activo?: boolean | null
+          categoria_id: number
+          codigo: string
           created_at?: string | null
-          description?: string | null
-          id?: string
-          is_active?: boolean | null
-          name: string
-          tabla_master?: string | null
+          descripcion?: string | null
+          id?: number
+          iva?: number
+          linea_id: number
+          nombre: string
+          precio?: number
+          stock?: number
+          sublinea_id: number
           updated_at?: string | null
         }
         Update: {
-          configuration?: Json
+          activo?: boolean | null
+          categoria_id?: number
+          codigo?: string
           created_at?: string | null
-          description?: string | null
-          id?: string
-          is_active?: boolean | null
-          name?: string
-          tabla_master?: string | null
+          descripcion?: string | null
+          id?: number
+          iva?: number
+          linea_id?: number
+          nombre?: string
+          precio?: number
+          stock?: number
+          sublinea_id?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "productos_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "categorias"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "productos_linea_id_fkey"
+            columns: ["linea_id"]
+            isOneToOne: false
+            referencedRelation: "lineas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "productos_sublinea_id_fkey"
+            columns: ["sublinea_id"]
+            isOneToOne: false
+            referencedRelation: "sublineas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      regimenes_tributarios: {
+        Row: {
+          activo: boolean | null
+          codigo: string
+          created_at: string | null
+          descripcion: string | null
+          id: number
+          nombre: string
+          updated_at: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          codigo: string
+          created_at?: string | null
+          descripcion?: string | null
+          id?: number
+          nombre: string
+          updated_at?: string | null
+        }
+        Update: {
+          activo?: boolean | null
+          codigo?: string
+          created_at?: string | null
+          descripcion?: string | null
+          id?: number
+          nombre?: string
           updated_at?: string | null
         }
         Relationships: []
       }
-      gen_empresas: {
+      remisiones: {
         Row: {
-          actividad_comercial_id: number | null
-          ciudad_id: number | null
-          codigo_ciiu: number | null
           created_at: string | null
-          departamento_id: number | null
-          direccion: string
-          dv: string
-          email: string
-          estado_empresa: string | null
+          estado: string
+          fecha: string
           id: number
-          municipio: string
-          nit: string
-          pais_id: number | null
-          razon_social: string
-          tabla_master: string | null
-          telefono: string
-          tipo_contribuyente: string
-          tipo_documento_id: number | null
-          tipo_regimen_id: number | null
+          numero: string
+          observaciones: string | null
+          pedido_id: number
           updated_at: string | null
         }
         Insert: {
-          actividad_comercial_id?: number | null
-          ciudad_id?: number | null
-          codigo_ciiu?: number | null
           created_at?: string | null
-          departamento_id?: number | null
-          direccion: string
-          dv: string
-          email: string
-          estado_empresa?: string | null
+          estado?: string
+          fecha?: string
           id?: number
-          municipio: string
-          nit: string
-          pais_id?: number | null
-          razon_social: string
-          tabla_master?: string | null
-          telefono: string
-          tipo_contribuyente: string
-          tipo_documento_id?: number | null
-          tipo_regimen_id?: number | null
+          numero: string
+          observaciones?: string | null
+          pedido_id: number
           updated_at?: string | null
         }
         Update: {
-          actividad_comercial_id?: number | null
-          ciudad_id?: number | null
-          codigo_ciiu?: number | null
           created_at?: string | null
-          departamento_id?: number | null
-          direccion?: string
-          dv?: string
-          email?: string
-          estado_empresa?: string | null
+          estado?: string
+          fecha?: string
           id?: number
-          municipio?: string
-          nit?: string
-          pais_id?: number | null
-          razon_social?: string
-          tabla_master?: string | null
-          telefono?: string
-          tipo_contribuyente?: string
-          tipo_documento_id?: number | null
-          tipo_regimen_id?: number | null
+          numero?: string
+          observaciones?: string | null
+          pedido_id?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "remisiones_pedido_id_fkey"
+            columns: ["pedido_id"]
+            isOneToOne: false
+            referencedRelation: "pedidos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resoluciones_facturacion: {
+        Row: {
+          activo: boolean | null
+          created_at: string | null
+          fecha_fin: string
+          fecha_inicio: string
+          id: number
+          numero: string
+          prefijo: string
+          rango_final: number
+          rango_inicial: number
+          resolucion_actual: number
+          updated_at: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          created_at?: string | null
+          fecha_fin: string
+          fecha_inicio: string
+          id?: number
+          numero: string
+          prefijo: string
+          rango_final: number
+          rango_inicial: number
+          resolucion_actual: number
+          updated_at?: string | null
+        }
+        Update: {
+          activo?: boolean | null
+          created_at?: string | null
+          fecha_fin?: string
+          fecha_inicio?: string
+          id?: number
+          numero?: string
+          prefijo?: string
+          rango_final?: number
+          rango_inicial?: number
+          resolucion_actual?: number
           updated_at?: string | null
         }
         Relationships: []
       }
-      gen_usuarios: {
+      sublineas: {
         Row: {
-          apellidos: string
-          ciudad: string
+          activo: boolean | null
+          codigo: string
           created_at: string | null
-          direccion: string
-          documento: string
-          email: string
-          estado: string | null
           id: number
+          linea_id: number
           nombre: string
-          telefono: string
-          tipo: string | null
           updated_at: string | null
         }
         Insert: {
-          apellidos: string
-          ciudad: string
+          activo?: boolean | null
+          codigo: string
           created_at?: string | null
-          direccion: string
-          documento: string
-          email: string
-          estado?: string | null
           id?: number
+          linea_id: number
           nombre: string
-          telefono: string
-          tipo?: string | null
           updated_at?: string | null
         }
         Update: {
-          apellidos?: string
-          ciudad?: string
+          activo?: boolean | null
+          codigo?: string
           created_at?: string | null
-          direccion?: string
+          id?: number
+          linea_id?: number
+          nombre?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sublineas_linea_id_fkey"
+            columns: ["linea_id"]
+            isOneToOne: false
+            referencedRelation: "lineas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendedores: {
+        Row: {
+          activo: boolean | null
+          codigo: string
+          comision: number
+          created_at: string | null
+          documento: string
+          email: string
+          id: number
+          nombre: string
+          telefono: string
+          updated_at: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          codigo: string
+          comision?: number
+          created_at?: string | null
+          documento: string
+          email: string
+          id?: number
+          nombre: string
+          telefono: string
+          updated_at?: string | null
+        }
+        Update: {
+          activo?: boolean | null
+          codigo?: string
+          comision?: number
+          created_at?: string | null
           documento?: string
           email?: string
-          estado?: string | null
           id?: number
           nombre?: string
           telefono?: string
-          tipo?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      paises: {
-        Row: {
-          codigo: string | null
-          created_at: string | null
-          id: number
-          nombre: string
-          tabla_master: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          codigo?: string | null
-          created_at?: string | null
-          id?: number
-          nombre: string
-          tabla_master?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          codigo?: string | null
-          created_at?: string | null
-          id?: number
-          nombre?: string
-          tabla_master?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      sql_connections: {
-        Row: {
-          created_at: string | null
-          database: string
-          id: number
-          last_connected: string | null
-          password: string
-          port: string
-          server: string
-          tabla_master: string | null
-          updated_at: string | null
-          use_windows_auth: boolean | null
-          username: string
-        }
-        Insert: {
-          created_at?: string | null
-          database: string
-          id: number
-          last_connected?: string | null
-          password: string
-          port: string
-          server: string
-          tabla_master?: string | null
-          updated_at?: string | null
-          use_windows_auth?: boolean | null
-          username: string
-        }
-        Update: {
-          created_at?: string | null
-          database?: string
-          id?: number
-          last_connected?: string | null
-          password?: string
-          port?: string
-          server?: string
-          tabla_master?: string | null
-          updated_at?: string | null
-          use_windows_auth?: boolean | null
-          username?: string
-        }
-        Relationships: []
-      }
-      table_structures: {
-        Row: {
-          column_default: string | null
-          column_name: string
-          created_at: string | null
-          data_type: string
-          id: number
-          is_nullable: boolean
-          sql_connection_id: number | null
-          tabla_master: string | null
-          table_name: string
-          updated_at: string | null
-        }
-        Insert: {
-          column_default?: string | null
-          column_name: string
-          created_at?: string | null
-          data_type: string
-          id?: number
-          is_nullable: boolean
-          sql_connection_id?: number | null
-          tabla_master?: string | null
-          table_name: string
-          updated_at?: string | null
-        }
-        Update: {
-          column_default?: string | null
-          column_name?: string
-          created_at?: string | null
-          data_type?: string
-          id?: number
-          is_nullable?: boolean
-          sql_connection_id?: number | null
-          tabla_master?: string | null
-          table_name?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "table_structures_sql_connection_id_fkey"
-            columns: ["sql_connection_id"]
-            isOneToOne: false
-            referencedRelation: "sql_connections"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      task_attachments: {
-        Row: {
-          created_at: string | null
-          file_name: string
-          file_size: number
-          file_type: string
-          file_url: string
-          id: string
-          tabla_master: string | null
-          task_id: string
-          uploaded_by: string
-        }
-        Insert: {
-          created_at?: string | null
-          file_name: string
-          file_size: number
-          file_type: string
-          file_url: string
-          id?: string
-          tabla_master?: string | null
-          task_id: string
-          uploaded_by: string
-        }
-        Update: {
-          created_at?: string | null
-          file_name?: string
-          file_size?: number
-          file_type?: string
-          file_url?: string
-          id?: string
-          tabla_master?: string | null
-          task_id?: string
-          uploaded_by?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "task_attachments_task_id_fkey"
-            columns: ["task_id"]
-            isOneToOne: false
-            referencedRelation: "tasks"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "task_attachments_uploaded_by_fkey"
-            columns: ["uploaded_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      task_comments: {
-        Row: {
-          comment: string
-          created_at: string | null
-          id: string
-          tabla_master: string | null
-          task_id: string
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          comment: string
-          created_at?: string | null
-          id?: string
-          tabla_master?: string | null
-          task_id: string
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          comment?: string
-          created_at?: string | null
-          id?: string
-          tabla_master?: string | null
-          task_id?: string
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "task_comments_task_id_fkey"
-            columns: ["task_id"]
-            isOneToOne: false
-            referencedRelation: "tasks"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "task_comments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      tasks: {
-        Row: {
-          assigned_to: string | null
-          company_id: string | null
-          created_at: string | null
-          created_by: string
-          description: string | null
-          due_date: string | null
-          id: string
-          priority: string
-          status: string
-          tabla_master: string | null
-          title: string
-          updated_at: string | null
-        }
-        Insert: {
-          assigned_to?: string | null
-          company_id?: string | null
-          created_at?: string | null
-          created_by: string
-          description?: string | null
-          due_date?: string | null
-          id?: string
-          priority?: string
-          status?: string
-          tabla_master?: string | null
-          title: string
-          updated_at?: string | null
-        }
-        Update: {
-          assigned_to?: string | null
-          company_id?: string | null
-          created_at?: string | null
-          created_by?: string
-          description?: string | null
-          due_date?: string | null
-          id?: string
-          priority?: string
-          status?: string
-          tabla_master?: string | null
-          title?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "tasks_assigned_to_fkey"
-            columns: ["assigned_to"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tasks_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["nit"]
-          },
-          {
-            foreignKeyName: "tasks_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      tipos_contribuyente: {
-        Row: {
-          codigo: string | null
-          created_at: string | null
-          descripcion: string | null
-          id: number
-          nombre: string
-          tabla_master: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          codigo?: string | null
-          created_at?: string | null
-          descripcion?: string | null
-          id?: never
-          nombre: string
-          tabla_master?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          codigo?: string | null
-          created_at?: string | null
-          descripcion?: string | null
-          id?: never
-          nombre?: string
-          tabla_master?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      tipos_documento: {
-        Row: {
-          codigo: string | null
-          created_at: string | null
-          id: number
-          nombre: string
-          tabla_master: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          codigo?: string | null
-          created_at?: string | null
-          id?: number
-          nombre: string
-          tabla_master?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          codigo?: string | null
-          created_at?: string | null
-          id?: number
-          nombre?: string
-          tabla_master?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      tipos_regimen_tributario: {
-        Row: {
-          created_at: string | null
-          descripcion: string | null
-          id: number
-          nombre: string
-          tabla_master: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          descripcion?: string | null
-          id?: number
-          nombre: string
-          tabla_master?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          descripcion?: string | null
-          id?: number
-          nombre?: string
-          tabla_master?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      users: {
-        Row: {
-          created_at: string | null
-          email: string
-          id: string
-          password_hash: string
-          role: string
-          tabla_master: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          email: string
-          id?: string
-          password_hash: string
-          role?: string
-          tabla_master?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          email?: string
-          id?: string
-          password_hash?: string
-          role?: string
-          tabla_master?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -1348,14 +1206,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_table_stats: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          table_name: string
-          row_count: number
-          size_in_kb: number
-        }[]
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
@@ -1366,27 +1217,29 @@ export type Database = {
   }
 }
 
-type PublicSchema = Database[Extract<keyof Database, "public">]
+type DefaultSchema = Database[Extract<keyof Database, "public">]
 
 export type Tables<
-  PublicTableNameOrOptions extends
-    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-        Database[PublicTableNameOrOptions["schema"]]["Views"])
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
-        PublicSchema["Views"])
-    ? (PublicSchema["Tables"] &
-        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -1394,20 +1247,22 @@ export type Tables<
     : never
 
 export type TablesInsert<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -1415,20 +1270,22 @@ export type TablesInsert<
     : never
 
 export type TablesUpdate<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -1436,21 +1293,23 @@ export type TablesUpdate<
     : never
 
 export type Enums<
-  PublicEnumNameOrOptions extends
-    | keyof PublicSchema["Enums"]
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
     | { schema: keyof Database },
-  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
-    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof PublicSchema["CompositeTypes"]
+    | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof Database },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof Database
@@ -1459,6 +1318,12 @@ export type CompositeTypes<
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
   ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
-    ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
+
+export const Constants = {
+  public: {
+    Enums: {},
+  },
+} as const
